@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المدى نت — الشبكات الفرعية</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e1a;--bg2:#0f1525;--bg3:#141c30;
+  --surface:#1a2440;--surface2:#1e2b4a;
+  --border:#243058;--border2:#2e3d6e;
+  --accent:#00d4ff;--accent2:#0099cc;
+  --green:#00e5a0;--yellow:#ffd166;--red:#ff4d6a;--purple:#a78bfa;
+  --text:#e2e8f4;--text2:#8899b8;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'IBM Plex Sans Arabic',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+
+.sidebar{position:fixed;right:0;top:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.logo-text h1{font-size:14px;font-weight:700;line-height:1.2}
+.logo-text span{font-size:10px;color:var(--accent);font-family:var(--mono)}
+.sidebar-nav{padding:12px 10px;flex:1;overflow-y:auto}
+.nav-section-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;padding:8px 8px 4px;margin-top:6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:all .2s;margin-bottom:2px;color:var(--text2);font-size:13px;text-decoration:none}
+.nav-item:hover{background:var(--surface);color:var(--text)}
+.nav-item.active{background:rgba(0,212,255,.12);color:var(--accent)}
+.nav-icon{font-size:15px;width:18px;text-align:center}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.net-status{background:var(--surface);border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px}
+.sdot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pg 2s infinite}
+@keyframes pg{0%,100%{opacity:1}50%{opacity:.5}}
+
+.main{margin-right:240px;min-height:100vh;position:relative;z-index:1}
+.topbar{position:sticky;top:0;background:rgba(10,14,26,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:50}
+.topbar-title{font-size:17px;font-weight:600;flex:1}
+.topbar-title span{color:var(--accent)}
+.tbtn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 14px;font-family:var(--sans);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s}
+.tbtn:hover{background:var(--surface2);border-color:var(--border2)}
+.tbtn.primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700}
+.tbtn.primary:hover{background:var(--accent2)}
+
+.content{padding:24px}
+
+/* SUBNET CARDS */
+.subnet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px}
+.subnet-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s,transform .2s;animation:fiu .4s ease both;cursor:pointer}
+.subnet-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.subnet-card.selected{border-color:var(--accent)}
+@keyframes fiu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.sc-header{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sc-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sc-info{flex:1}
+.sc-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.sc-range{font-family:var(--mono);font-size:11px;color:var(--accent)}
+.sc-body{padding:14px}
+.sc-stats{display:flex;justify-content:space-between;margin-bottom:12px}
+.sc-stat{text-align:center}
+.sc-stat-val{font-size:18px;font-weight:700;font-family:var(--mono)}
+.sc-stat-lbl{font-size:10px;color:var(--text2);margin-top:1px}
+.sc-bar-wrap{margin-bottom:4px}
+.sc-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px}
+.sc-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.sc-bar-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.sc-actions{display:flex;gap:6px;margin-top:12px}
+.sc-btn{flex:1;background:none;border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:5px;font-family:var(--sans);font-size:12px;cursor:pointer;transition:all .2s}
+.sc-btn:hover{border-color:var(--accent);color:var(--accent)}
+.sc-btn.danger:hover{border-color:var(--red);color:var(--red)}
+
+/* IP MAP PANEL */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;animation:fiu .4s ease .2s both}
+.ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ph-title{font-size:14px;font-weight:600;flex:1}
+
+.ip-grid-wrap{padding:18px;overflow-x:auto}
+.ip-legend{display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.ip-leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.ip-leg-dot{width:10px;height:10px;border-radius:2px}
+
+.ip-grid{display:grid;grid-template-columns:repeat(16,1fr);gap:3px;min-width:500px}
+.ip-cell{aspect-ratio:1;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:7px;font-family:var(--mono);cursor:pointer;transition:all .2s;position:relative;border:1px solid transparent}
+.ip-cell.used{background:rgba(0,212,255,.2);border-color:rgba(0,212,255,.3);color:var(--accent)}
+.ip-cell.used:hover{background:rgba(0,212,255,.35);transform:scale(1.2);z-index:5}
+.ip-cell.offline{background:rgba(255,77,106,.2);border-color:rgba(255,77,106,.3);color:var(--red)}
+.ip-cell.warning{background:rgba(255,209,102,.2);border-color:rgba(255,209,102,.3);color:var(--yellow)}
+.ip-cell.free{background:var(--bg3);border-color:var(--border)}
+.ip-cell.free:hover{background:rgba(0,229,160,.1);border-color:rgba(0,229,160,.3)}
+.ip-cell.reserved{background:rgba(167,139,250,.15);border-color:rgba(167,139,250,.3);color:var(--purple)}
+
+.ip-tooltip{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;z-index:100;pointer-events:none;opacity:0;transition:opacity .15s;min-width:160px}
+.ip-tooltip.show{opacity:1}
+.ipt-ip{font-family:var(--mono);font-weight:700;color:var(--accent);margin-bottom:3px}
+.ipt-name{font-weight:600;margin-bottom:2px}
+.ipt-status{font-size:11px;color:var(--text2)}
+
+/* DEVICE LIST */
+.dev-list{padding:0}
+table{width:100%;border-collapse:collapse}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.ip-code{font-family:var(--mono);font-size:11px;color:var(--accent);background:rgba(0,212,255,.08);padding:2px 7px;border-radius:4px}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
+.online{background:rgba(0,229,160,.12);color:var(--green)}
+.offline{background:rgba(255,77,106,.12);color:var(--red)}
+.warning{background:rgba(255,209,102,.12);color:var(--yellow)}
+.sdot2{width:5px;height:5px;border-radius:50%}
+.online .sdot2{background:var(--green)}.offline .sdot2{background:var(--red)}.warning .sdot2{background:var(--yellow)}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:scale(.95) translateY(20px);transition:transform .3s}
+.overlay.open .modal{transform:scale(1) translateY(0)}
+.mhdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.mhdr h2{font-size:15px;font-weight:600;flex:1}
+.mclose{background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:3px;line-height:1}
+.mbody{padding:22px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fgrow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.fg input,.fg select,.fg textarea{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .2s;width:100%}
+.fg input:focus,.fg select:focus{border-color:var(--accent)}
+.fg .mono-input{font-family:var(--mono)}
+.mftr{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.btn-cancel{background:none;border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:8px 18px;font-family:var(--sans);font-size:13px;cursor:pointer}
+.btn-save{background:var(--accent);border:none;color:var(--bg);border-radius:7px;padding:8px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer}
+.btn-save:hover{background:var(--accent2)}
+.btn-save:disabled{opacity:.5;cursor:not-allowed}
+
+.toast-wrap{position:fixed;bottom:24px;left:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:8px;min-width:200px;animation:slideIn .3s ease;transition:opacity .3s}
+.toast.out{opacity:0}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.toast.success{border-color:rgba(0,229,160,.3);color:var(--green)}
+.toast.error{border-color:rgba(255,77,106,.3);color:var(--red)}
+.toast.info{border-color:rgba(0,212,255,.3);color:var(--accent)}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🌐</div>
+    <div class="logo-text"><h1>المدى نت</h1><span>ALMADA NET v1.0</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">الرئيسية</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> لوحة التحكم</a>
+    <a href="topology.html" class="nav-item"><span class="nav-icon">🗺️</span> توبولوجيا الشبكة</a>
+    <div class="nav-section-title">الأجهزة والشبكة</div>
+    <a href="devices.html" class="nav-item"><span class="nav-icon">🖥️</span> إدارة الأجهزة</a>
+    <a href="subnets.html" class="nav-item active"><span class="nav-icon">🔌</span> الشبكات الفرعية</a>
+    <div class="nav-section-title">الإدارة المالية</div>
+    <a href="finances.html" class="nav-item"><span class="nav-icon">💰</span> الإدارة المالية</a>
+    <div class="nav-section-title">الإعدادات</div>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> الإعدادات</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="net-status">
+      <div class="sdot"></div>
+      <div>
+        <div style="font-size:12px;font-weight:600" id="fbStatus">جاري الاتصال...</div>
+        <div style="font-size:11px;color:var(--text2)">Firebase Firestore</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-title">الشبكات الفرعية <span>/ إدارة الـ IPs</span></div>
+    <button class="tbtn primary" onclick="openAddSubnet()">＋ إضافة شبكة فرعية</button>
+  </header>
+  <div class="content">
+
+    <!-- SUBNET CARDS -->
+    <div class="subnet-grid" id="subnetGrid">
+      <div style="grid-column:1/-1;padding:48px;text-align:center;color:var(--text2)">
+        <div style="width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px"></div>
+        <p>جاري التحميل...</p>
+      </div>
+    </div>
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    <!-- IP MAP + DEVICES -->
+    <div class="grid-2">
+      <div class="panel" id="ipMapPanel">
+        <div class="ph">
+          <span>🗺️</span>
+          <div class="ph-title" id="ipMapTitle">خريطة الـ IPs</div>
+          <span id="ipMapSubnet" style="font-size:11px;color:var(--accent);font-family:var(--mono)">اختر شبكة فرعية</span>
+        </div>
+        <div class="ip-grid-wrap">
+          <div class="ip-legend">
+            <div class="ip-leg-item"><div class="ip-leg-dot" style="background:rgba(0,212,255,.4)"></div>مستخدم (Online)</div>
+            <div class="ip-leg-item"><div class="ip-leg-dot" style="background:rgba(255,77,106,.4)"></div>غير متصل</div>
+            <div class="ip-leg-item"><div class="ip-leg-dot" style="background:rgba(255,209,102,.4)"></div>تحذير</div>
+            <div class="ip-leg-item"><div class="ip-leg-dot" style="background:var(--bg3)"></div>حر</div>
+          </div>
+          <div class="ip-grid" id="ipGrid">
+            <div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text2);font-size:13px">اختر شبكة فرعية لعرض خريطة الـ IPs</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="ph">
+          <span>🖥️</span>
+          <div class="ph-title" id="devListTitle">أجهزة الشبكة</div>
+        </div>
+        <div class="dev-list">
+          <table>
+            <thead><tr>
+              <th>الجهاز</th><th>IP</th><th>الحالة</th>
+            </tr></thead>
+            <tbody id="subDevBody">
+              <tr><td colspan="3" style="text-align:center;padding:28px;color:var(--text2)">اختر شبكة فرعية</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- IP TOOLTIP -->
+<div class="ip-tooltip" id="ipTooltip">
+  <div class="ipt-ip" id="ttIp"></div>
+  <div class="ipt-name" id="ttName"></div>
+  <div class="ipt-status" id="ttStatus"></div>
+</div>
+
+<!-- ADD SUBNET MODAL -->
+<div class="overlay" id="subnetOverlay">
+  <div class="modal">
+    <div class="mhdr">
+      <span style="font-size:20px">🔌</span>
+      <h2 id="subnetModalTitle">إضافة شبكة فرعية</h2>
+      <button class="mclose" onclick="closeModal('subnetOverlay')">✕</button>
+    </div>
+    <div class="mbody">
+      <div class="fgrow">
+        <div class="fg">
+          <label>اسم الشبكة *</label>
+          <input type="text" id="sn-name" placeholder="مثال: Subnet-North">
+        </div>
+        <div class="fg">
+          <label>نطاق الـ IP (CIDR) *</label>
+          <input type="text" id="sn-cidr" placeholder="مثال: 10.0.1.0/24" class="mono-input">
+        </div>
+        <div class="fg">
+          <label>Gateway</label>
+          <input type="text" id="sn-gw" placeholder="مثال: 10.0.1.1" class="mono-input">
+        </div>
+        <div class="fg">
+          <label>DNS</label>
+          <input type="text" id="sn-dns" placeholder="مثال: 8.8.8.8" class="mono-input">
+        </div>
+      </div>
+      <div class="fg">
+        <label>الوصف</label>
+        <input type="text" id="sn-desc" placeholder="وصف الشبكة الفرعية">
+      </div>
+      <div class="fg">
+        <label>اللون</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="colorPicker">
+          <div class="cp-dot" data-color="#00d4ff" style="width:24px;height:24px;border-radius:50%;background:#00d4ff;cursor:pointer;border:2px solid #00d4ff;transition:transform .2s" onclick="selectColor(this)"></div>
+          <div class="cp-dot" data-color="#a78bfa" style="width:24px;height:24px;border-radius:50%;background:#a78bfa;cursor:pointer;border:2px solid transparent;transition:transform .2s" onclick="selectColor(this)"></div>
+          <div class="cp-dot" data-color="#00e5a0" style="width:24px;height:24px;border-radius:50%;background:#00e5a0;cursor:pointer;border:2px solid transparent;transition:transform .2s" onclick="selectColor(this)"></div>
+          <div class="cp-dot" data-color="#ffd166" style="width:24px;height:24px;border-radius:50%;background:#ffd166;cursor:pointer;border:2px solid transparent;transition:transform .2s" onclick="selectColor(this)"></div>
+          <div class="cp-dot" data-color="#ff9a3c" style="width:24px;height:24px;border-radius:50%;background:#ff9a3c;cursor:pointer;border:2px solid transparent;transition:transform .2s" onclick="selectColor(this)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mftr">
+      <button class="btn-cancel" onclick="closeModal('subnetOverlay')">إلغاء</button>
+      <button class="btn-save" id="snSaveBtn" onclick="saveSubnet()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
+  onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig={apiKey:"AIzaSyDdYIiZcithhvDRLwHwahV6-W_puXHN4rs",authDomain:"almadadashboard.firebaseapp.com",projectId:"almadadashboard",storageBucket:"almadadashboard.firebasestorage.app",messagingSenderId:"172655018085",appId:"1:172655018085:web:6b956408061985c3ccc68c"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+let subnets=[], devices=[], selectedSubnet=null, editingSubnetId=null, selColor="#00d4ff";
+
+document.getElementById("fbStatus").textContent="متصل بـ Firebase";
+
+// ── Listeners ──────────────────────────────────────────
+onSnapshot(collection(db,"subnets"),snap=>{
+  subnets=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderSubnetCards();
+  if(selectedSubnet){
+    const updated=subnets.find(s=>s.id===selectedSubnet);
+    if(updated) selectSubnet(updated);
+  }
+});
+onSnapshot(collection(db,"devices"),snap=>{
+  devices=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderSubnetCards();
+  if(selectedSubnet){
+    const sn=subnets.find(s=>s.id===selectedSubnet);
+    if(sn) selectSubnet(sn);
+  }
+});
+
+// ── Subnet Cards ───────────────────────────────────────
+function renderSubnetCards(){
+  const wrap=document.getElementById("subnetGrid");
+  if(!subnets.length){
+    wrap.innerHTML=`<div style="grid-column:1/-1;padding:48px;text-align:center;color:var(--text2)"><div style="font-size:40px;margin-bottom:12px">🔌</div><p>لا توجد شبكات فرعية — أضف أول شبكة!</p></div>`;
+    return;
+  }
+  const colors={
+    "#00d4ff":"rgba(0,212,255,.15)","#a78bfa":"rgba(167,139,250,.15)",
+    "#00e5a0":"rgba(0,229,160,.15)","#ffd166":"rgba(255,209,102,.15)","#ff9a3c":"rgba(255,154,60,.15)"
+  };
+  wrap.innerHTML=subnets.map((sn,i)=>{
+    const snDevs=devices.filter(d=>d.subnet===sn.name);
+    const online=snDevs.filter(d=>d.status==="online").length;
+    const offline=snDevs.filter(d=>d.status==="offline").length;
+    const totalIPs=cidrToCount(sn.cidr||"");
+    const usedPct=totalIPs?Math.round(snDevs.length/totalIPs*100):0;
+    const col=sn.color||"#00d4ff";
+    const isWarn=usedPct>85;
+    return `<div class="subnet-card ${selectedSubnet===sn.id?'selected':''}" style="animation-delay:${i*0.05}s" onclick="selectSubnet(${JSON.stringify(sn).replace(/"/g,'&quot;')})">
+      <div class="sc-header">
+        <div class="sc-icon" style="background:${colors[col]||'rgba(0,212,255,.15)'}">${snDevs.length?'🔌':'➕'}</div>
+        <div class="sc-info">
+          <div class="sc-name">${esc(sn.name)}</div>
+          <div class="sc-range">${esc(sn.cidr||"—")}</div>
+        </div>
+        <div style="font-size:10px;color:var(--text2);text-align:left">
+          <div style="font-family:var(--mono);font-weight:700;color:${col};font-size:18px">${snDevs.length}</div>
+          <div>جهاز</div>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-stats">
+          <div class="sc-stat"><div class="sc-stat-val" style="color:var(--green)">${online}</div><div class="sc-stat-lbl">متصل</div></div>
+          <div class="sc-stat"><div class="sc-stat-val" style="color:var(--red)">${offline}</div><div class="sc-stat-lbl">غير متصل</div></div>
+          <div class="sc-stat"><div class="sc-stat-val" style="color:var(--text2)">${totalIPs||"—"}</div><div class="sc-stat-lbl">إجمالي IP</div></div>
+        </div>
+        <div class="sc-bar-wrap">
+          <div class="sc-bar-label"><span>استخدام الـ IPs</span><span style="color:${isWarn?'var(--red)':col}">${usedPct}%</span></div>
+          <div class="sc-bar"><div class="sc-bar-fill" style="width:${usedPct}%;background:${isWarn?'var(--red)':col}"></div></div>
+        </div>
+        ${sn.desc?`<div style="font-size:11px;color:var(--text2);margin-top:6px">${esc(sn.desc)}</div>`:""}
+        <div class="sc-actions">
+          <button class="sc-btn" onclick="event.stopPropagation();editSubnet('${sn.id}')">✏️ تعديل</button>
+          <button class="sc-btn danger" onclick="event.stopPropagation();delSubnet('${sn.id}','${esc(sn.name)}')">🗑️ حذف</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ── Select Subnet ──────────────────────────────────────
+window.selectSubnet=sn=>{
+  selectedSubnet=sn.id;
+  renderSubnetCards();
+  const snDevs=devices.filter(d=>d.subnet===sn.name);
+  document.getElementById("ipMapTitle").textContent="خريطة الـ IPs — "+sn.name;
+  document.getElementById("ipMapSubnet").textContent=sn.cidr||"";
+  document.getElementById("devListTitle").textContent="أجهزة "+sn.name+" ("+snDevs.length+")";
+  renderIPGrid(sn, snDevs);
+  renderDevList(snDevs);
+};
+
+// ── IP Grid ────────────────────────────────────────────
+function renderIPGrid(sn, snDevs){
+  const base=cidrToBase(sn.cidr||"");
+  const count=cidrToCount(sn.cidr||"");
+  if(!base||!count){ document.getElementById("ipGrid").innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text2)">نطاق IP غير صالح</div>`; return; }
+  const ipMap={};
+  snDevs.forEach(d=>{ if(d.ip) ipMap[d.ip]={name:d.name,status:d.status||"warning",type:d.type}; });
+  const displayCount=Math.min(count,256);
+  const [b1,b2,b3,b4]=base.split(".").map(Number);
+  const wrap=document.getElementById("ipGrid");
+  wrap.innerHTML=Array.from({length:displayCount},(_,i)=>{
+    const last=b4+i;
+    const ip=`${b1}.${b2}.${b3}.${last}`;
+    const dev=ipMap[ip];
+    const cls=dev?(dev.status==="online"?"used":dev.status==="offline"?"offline":"warning"):"free";
+    return `<div class="ip-cell ${cls}" data-ip="${ip}" data-name="${esc(dev?.name||"")}" data-status="${dev?.status||""}" onmouseenter="showTT(this,event)" onmouseleave="hideTT()">${last}</div>`;
+  }).join("");
+}
+
+function renderDevList(devs){
+  const tbody=document.getElementById("subDevBody");
+  if(!devs.length){tbody.innerHTML=`<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--text2)">لا توجد أجهزة في هذه الشبكة</td></tr>`;return;}
+  const typeEmoji={router:"🌐",switch:"🔀",ap:"📡",server:"🖧",other:"⚙️"};
+  tbody.innerHTML=devs.map(d=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:8px">
+      <span>${typeEmoji[d.type]||"⚙️"}</span>
+      <div><div style="font-weight:600;font-size:13px">${esc(d.name)}</div><div style="font-size:11px;color:var(--text2)">${esc(d.model||"")}</div></div>
+    </div></td>
+    <td><span class="ip-code">${esc(d.ip||"—")}</span></td>
+    <td><span class="status-badge ${d.status||'warning'}"><span class="sdot2"></span>${{online:"متصل",offline:"غير متصل",warning:"تحذير"}[d.status]||d.status}</span></td>
+  </tr>`).join("");
+}
+
+// ── Tooltip ────────────────────────────────────────────
+window.showTT=(el,e)=>{
+  const tt=document.getElementById("ipTooltip");
+  document.getElementById("ttIp").textContent=el.dataset.ip;
+  document.getElementById("ttName").textContent=el.dataset.name||"حر";
+  document.getElementById("ttStatus").textContent=el.dataset.status?({online:"متصل",offline:"غير متصل",warning:"تحذير"}[el.dataset.status]||el.dataset.status):"متاح";
+  tt.style.left=(e.clientX+12)+"px"; tt.style.top=(e.clientY-40)+"px";
+  tt.classList.add("show");
+};
+window.hideTT=()=>document.getElementById("ipTooltip").classList.remove("show");
+
+// ── Add/Edit Subnet ────────────────────────────────────
+window.openAddSubnet=()=>{
+  editingSubnetId=null; selColor="#00d4ff";
+  document.getElementById("subnetModalTitle").textContent="إضافة شبكة فرعية";
+  ["sn-name","sn-cidr","sn-gw","sn-dns","sn-desc"].forEach(id=>document.getElementById(id).value="");
+  resetColorPicker("#00d4ff");
+  openModal("subnetOverlay");
+};
+
+window.editSubnet=id=>{
+  const sn=subnets.find(s=>s.id===id); if(!sn) return;
+  editingSubnetId=id; selColor=sn.color||"#00d4ff";
+  document.getElementById("subnetModalTitle").textContent="تعديل: "+sn.name;
+  document.getElementById("sn-name").value=sn.name||"";
+  document.getElementById("sn-cidr").value=sn.cidr||"";
+  document.getElementById("sn-gw").value=sn.gateway||"";
+  document.getElementById("sn-dns").value=sn.dns||"";
+  document.getElementById("sn-desc").value=sn.desc||"";
+  resetColorPicker(selColor);
+  openModal("subnetOverlay");
+};
+
+window.saveSubnet=async()=>{
+  const name=document.getElementById("sn-name").value.trim();
+  const cidr=document.getElementById("sn-cidr").value.trim();
+  if(!name||!cidr){showToast("اسم الشبكة ونطاق الـ IP مطلوبان","error");return;}
+  const payload={name,cidr,gateway:document.getElementById("sn-gw").value.trim(),dns:document.getElementById("sn-dns").value.trim(),desc:document.getElementById("sn-desc").value.trim(),color:selColor};
+  const btn=document.getElementById("snSaveBtn"); btn.disabled=true;
+  try{
+    if(editingSubnetId) await updateDoc(doc(db,"subnets",editingSubnetId),{...payload,updatedAt:serverTimestamp()});
+    else await addDoc(collection(db,"subnets"),{...payload,createdAt:serverTimestamp()});
+    showToast(editingSubnetId?"تم التحديث ✅":"تمت الإضافة ✅","success");
+    closeModal("subnetOverlay");
+  }catch(e){showToast("خطأ: "+e.message,"error");}
+  finally{btn.disabled=false;}
+};
+
+window.delSubnet=async(id,name)=>{
+  if(!confirm(`حذف الشبكة "${name}" نهائياً؟`)) return;
+  await deleteDoc(doc(db,"subnets",id));
+  if(selectedSubnet===id){selectedSubnet=null;document.getElementById("ipGrid").innerHTML="";document.getElementById("subDevBody").innerHTML="";}
+  showToast("تم الحذف ✅","success");
+};
+
+// ── Color Picker ───────────────────────────────────────
+window.selectColor=el=>{
+  selColor=el.dataset.color;
+  document.querySelectorAll(".cp-dot").forEach(d=>d.style.border="2px solid transparent");
+  el.style.border="2px solid white";
+};
+function resetColorPicker(c){
+  selColor=c;
+  document.querySelectorAll(".cp-dot").forEach(d=>{ d.style.border=d.dataset.color===c?"2px solid white":"2px solid transparent"; });
+}
+
+// ── Helpers ────────────────────────────────────────────
+function cidrToBase(cidr){return cidr.split("/")[0]}
+function cidrToCount(cidr){
+  if(!cidr||!cidr.includes("/")) return 0;
+  const prefix=parseInt(cidr.split("/")[1]);
+  return Math.min(Math.pow(2,32-prefix),256);
+}
+function openModal(id){document.getElementById(id).classList.add("open")}
+window.closeModal=id=>document.getElementById(id).classList.remove("open");
+document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("open")}));
+function showToast(msg,type="info"){const w=document.getElementById("toastWrap"),t=document.createElement("div");t.className="toast "+type;t.innerHTML=`<span>${{success:"✅",error:"❌",info:"ℹ️"}[type]}</span><span>${msg}</span>`;w.appendChild(t);setTimeout(()=>{t.classList.add("out");setTimeout(()=>t.remove(),350)},3500);}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+</script>
+</body>
+</html>

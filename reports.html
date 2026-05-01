@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المدى نت — التقارير المالية</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--bg2:#0f1525;--bg3:#141c30;--surface:#1a2440;--surface2:#1e2b4a;--border:#243058;--border2:#2e3d6e;--accent:#00d4ff;--accent2:#0099cc;--green:#00e5a0;--yellow:#ffd166;--red:#ff4d6a;--purple:#a78bfa;--text:#e2e8f4;--text2:#8899b8;--mono:'JetBrains Mono',monospace;--sans:'IBM Plex Sans Arabic',sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.sidebar{position:fixed;right:0;top:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.logo-text h1{font-size:14px;font-weight:700;line-height:1.2}
+.logo-text span{font-size:10px;color:var(--accent);font-family:var(--mono)}
+.sidebar-nav{padding:12px 10px;flex:1;overflow-y:auto}
+.nav-section-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;padding:8px 8px 4px;margin-top:6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:all .2s;margin-bottom:2px;color:var(--text2);font-size:13px;text-decoration:none}
+.nav-item:hover{background:var(--surface);color:var(--text)}
+.nav-item.active{background:rgba(0,212,255,.12);color:var(--accent)}
+.nav-icon{font-size:15px;width:18px;text-align:center}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.net-status{background:var(--surface);border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px}
+.sdot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pg 2s infinite}
+@keyframes pg{0%,100%{opacity:1}50%{opacity:.5}}
+.main{margin-right:240px;min-height:100vh;position:relative;z-index:1}
+.topbar{position:sticky;top:0;background:rgba(10,14,26,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:50}
+.topbar-title{font-size:17px;font-weight:600;flex:1}
+.topbar-title span{color:var(--accent)}
+.tbtn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 14px;font-family:var(--sans);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s}
+.tbtn:hover{background:var(--surface2);border-color:var(--border2)}
+.content{padding:24px}
+@keyframes fiu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* PROFIT CARD - BIG */
+.profit-card{border-radius:16px;padding:28px;margin-bottom:22px;position:relative;overflow:hidden;animation:fiu .4s ease both;border:2px solid}
+.profit-card.profit{background:rgba(0,229,160,.07);border-color:rgba(0,229,160,.3)}
+.profit-card.loss{background:rgba(255,77,106,.07);border-color:rgba(255,77,106,.3)}
+.profit-card.break{background:rgba(255,209,102,.07);border-color:rgba(255,209,102,.3)}
+.pc-label{font-size:13px;font-weight:600;margin-bottom:8px;opacity:.8}
+.pc-amount{font-size:42px;font-weight:700;font-family:var(--mono);line-height:1;margin-bottom:6px}
+.profit-card.profit .pc-amount{color:var(--green)}
+.profit-card.loss .pc-amount{color:var(--red)}
+.profit-card.break .pc-amount{color:var(--yellow)}
+.pc-sub{font-size:13px;opacity:.7}
+.pc-icon{position:absolute;left:24px;top:50%;transform:translateY(-50%);font-size:64px;opacity:.15}
+
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:18px;animation:fiu .4s ease both}
+.kpi:nth-child(1){animation-delay:.1s}.kpi:nth-child(2){animation-delay:.15s}.kpi:nth-child(3){animation-delay:.2s}
+.kpi-lbl{font-size:11px;color:var(--text2);margin-bottom:6px}
+.kpi-val{font-size:22px;font-weight:700;font-family:var(--mono)}
+.kpi.ck-green .kpi-val{color:var(--green)}.kpi.ck-red .kpi-val{color:var(--red)}.kpi.ck-yellow .kpi-val{color:var(--yellow)}
+.kpi-sub{font-size:11px;color:var(--text2);margin-top:4px}
+
+/* PANEL */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:18px;animation:fiu .4s ease .25s both}
+.ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.ph-title{font-size:14px;font-weight:600;flex:1}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+
+/* MONTHLY TABLE */
+table{width:100%;border-collapse:collapse}
+th{padding:9px 14px;text-align:right;font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;background:var(--bg3);border-bottom:1px solid var(--border)}
+td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.pos{color:var(--green);font-weight:700;font-family:var(--mono)}
+.neg{color:var(--red);font-weight:700;font-family:var(--mono)}
+.neutral{color:var(--yellow);font-weight:700;font-family:var(--mono)}
+
+/* BAR CHART */
+.chart-area{padding:18px 20px;height:220px;display:flex;align-items:flex-end;gap:8px}
+.cb{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.cb-bars{flex:1;display:flex;align-items:flex-end;gap:2px;width:100%}
+.cb-bar{flex:1;border-radius:3px 3px 0 0;min-height:2px;transition:height .8s cubic-bezier(.4,0,.2,1)}
+.cb-label{font-size:9px;color:var(--text2);font-family:var(--mono)}
+
+/* YEAR SELECTOR */
+.year-select{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 10px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none}
+
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🌐</div>
+    <div class="logo-text"><h1>المدى نت</h1><span>ALMADA NET v1.0</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">الرئيسية</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> لوحة التحكم</a>
+    <a href="topology.html" class="nav-item"><span class="nav-icon">🗺️</span> توبولوجيا الشبكة</a>
+    <div class="nav-section-title">الأجهزة والشبكة</div>
+    <a href="devices.html" class="nav-item"><span class="nav-icon">🖥️</span> إدارة الأجهزة</a>
+    <a href="subnets.html" class="nav-item"><span class="nav-icon">🔌</span> الشبكات الفرعية</a>
+    <div class="nav-section-title">الإدارة المالية</div>
+    <a href="finances.html" class="nav-item"><span class="nav-icon">💰</span> الإدارة المالية</a>
+    <a href="purchases.html" class="nav-item"><span class="nav-icon">🛒</span> المشتريات</a>
+    <a href="reports.html" class="nav-item active"><span class="nav-icon">📈</span> التقارير المالية</a>
+    <div class="nav-section-title">الإعدادات</div>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> الإعدادات</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="net-status"><div class="sdot"></div>
+      <div><div style="font-size:12px;font-weight:600">متصل بـ Firebase</div><div style="font-size:11px;color:var(--text2)">Firebase Firestore</div></div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-title">التقارير المالية <span>/ الربح والخسارة</span></div>
+    <select class="year-select" id="yearSel" onchange="changeYear(this.value)"></select>
+    <button class="tbtn" onclick="exportReport()">📤 تصدير التقرير</button>
+  </header>
+  <div class="content">
+
+    <!-- PROFIT/LOSS CARD -->
+    <div class="profit-card" id="profitCard">
+      <div class="pc-label" id="pcLabel">جاري الحساب...</div>
+      <div class="pc-amount" id="pcAmount">—</div>
+      <div class="pc-sub" id="pcSub">—</div>
+      <div class="pc-icon" id="pcIcon">💰</div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi ck-green">
+        <div class="kpi-lbl">📥 إجمالي الإيرادات</div>
+        <div class="kpi-val" id="k-income">—</div>
+        <div class="kpi-sub" id="k-income-sub">—</div>
+      </div>
+      <div class="kpi ck-red">
+        <div class="kpi-lbl">📤 إجمالي المصاريف</div>
+        <div class="kpi-val" id="k-expense">—</div>
+        <div class="kpi-sub" id="k-expense-sub">—</div>
+      </div>
+      <div class="kpi ck-yellow">
+        <div class="kpi-lbl">🖥️ تكلفة الأجهزة</div>
+        <div class="kpi-val" id="k-devices">—</div>
+        <div class="kpi-sub">من سجل الأجهزة</div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="grid-2">
+      <div class="panel">
+        <div class="ph"><span>📊</span><div class="ph-title">الإيرادات vs المصاريف شهرياً</div></div>
+        <div class="chart-area" id="monthChart">
+          <div style="width:100%;text-align:center;color:var(--text2)">جاري التحميل...</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="ph"><span>🍕</span><div class="ph-title">توزيع المصاريف</div></div>
+        <div style="padding:16px">
+          <div id="catChart" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MONTHLY TABLE -->
+    <div class="panel">
+      <div class="ph"><span>📋</span><div class="ph-title">التفصيل الشهري</div></div>
+      <table>
+        <thead><tr>
+          <th>الشهر</th>
+          <th>الإيرادات</th>
+          <th>المصاريف</th>
+          <th>صافي الربح/الخسارة</th>
+          <th>الحالة</th>
+        </tr></thead>
+        <tbody id="monthTable">
+          <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text2)">جاري التحميل...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig={apiKey:"AIzaSyDdYIiZcithhvDRLwHwahV6-W_puXHN4rs",authDomain:"almadadashboard.firebaseapp.com",projectId:"almadadashboard",storageBucket:"almadadashboard.firebasestorage.app",messagingSenderId:"172655018085",appId:"1:172655018085:web:6b956408061985c3ccc68c"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const CUR = "ر.ي";
+let allTx=[], allDevices=[], selYear=new Date().getFullYear();
+
+// Year selector
+const yearSel=document.getElementById("yearSel");
+for(let y=2023;y<=2027;y++){
+  const o=document.createElement("option");
+  o.value=y; o.textContent=y; if(y===selYear) o.selected=true;
+  yearSel.appendChild(o);
+}
+window.changeYear=y=>{selYear=parseInt(y);renderAll();};
+
+// Listeners
+onSnapshot(collection(db,"transactions"),snap=>{
+  allTx=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderAll();
+});
+onSnapshot(collection(db,"devices"),snap=>{
+  allDevices=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderAll();
+});
+
+function fmt(n){return CUR+" "+Math.abs(n).toLocaleString("ar-YE",{minimumFractionDigits:0,maximumFractionDigits:0});}
+
+function renderAll(){
+  const yearTx=allTx.filter(t=>(t.date||"").startsWith(selYear));
+  const income  =yearTx.filter(t=>t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const expense =yearTx.filter(t=>t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const devCost =allDevices.reduce((s,d)=>s+(parseFloat(d.cost)||0),0);
+  const net=income-expense;
+
+  // Profit card
+  const card=document.getElementById("profitCard");
+  card.className="profit-card "+(net>0?"profit":net<0?"loss":"break");
+  document.getElementById("pcLabel").textContent=net>0?"✅ أنت في ربح هذا العام":net<0?"❌ أنت في خسارة هذا العام":"➡️ نقطة التعادل";
+  document.getElementById("pcAmount").textContent=(net>0?"+":"")+CUR+" "+Math.abs(net).toLocaleString("ar-YE",{minimumFractionDigits:0});
+  document.getElementById("pcSub").textContent=`إيرادات: ${fmt(income)} — مصاريف: ${fmt(expense)}`;
+  document.getElementById("pcIcon").textContent=net>0?"📈":net<0?"📉":"⚖️";
+
+  // KPIs
+  document.getElementById("k-income").textContent=fmt(income);
+  document.getElementById("k-income-sub").textContent=yearTx.filter(t=>t.txType==="income").length+" معاملة إيراد";
+  document.getElementById("k-expense").textContent=fmt(expense);
+  document.getElementById("k-expense-sub").textContent=yearTx.filter(t=>t.txType==="expense").length+" معاملة مصروف";
+  document.getElementById("k-devices").textContent=fmt(devCost);
+
+  // Monthly chart
+  const months=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  const mInc={},mExp={};
+  months.forEach((_,i)=>{const m=String(i+1).padStart(2,"0");mInc[m]=0;mExp[m]=0;});
+  yearTx.forEach(t=>{
+    const m=(t.date||"").slice(5,7);
+    if(mInc[m]!==undefined){
+      if(t.txType==="income") mInc[m]+=(parseFloat(t.amount)||0);
+      else mExp[m]+=(parseFloat(t.amount)||0);
+    }
+  });
+  const maxVal=Math.max(...Object.values(mInc),...Object.values(mExp),1);
+  const chartWrap=document.getElementById("monthChart");
+  chartWrap.innerHTML=Object.keys(mInc).map((m,i)=>{
+    const iH=Math.round((mInc[m]/maxVal)*160);
+    const eH=Math.round((mExp[m]/maxVal)*160);
+    const net=mInc[m]-mExp[m];
+    return `<div class="cb" title="${months[i]}: إيراد ${fmt(mInc[m])} / مصروف ${fmt(mExp[m])}">
+      <div class="cb-bars">
+        <div class="cb-bar" style="height:${iH}px;background:var(--green);opacity:.8"></div>
+        <div class="cb-bar" style="height:${eH}px;background:var(--red);opacity:.8"></div>
+      </div>
+      <div class="cb-label">${months[i].slice(0,3)}</div>
+    </div>`;
+  }).join("");
+
+  // Cat breakdown
+  const cats={};
+  yearTx.filter(t=>t.txType==="expense").forEach(t=>{cats[t.category||"misc"]=(cats[t.category||"misc"]||0)+(parseFloat(t.amount)||0);});
+  const catTotal=Object.values(cats).reduce((s,v)=>s+v,0);
+  const catColors={device:"#00d4ff",maintenance:"#a78bfa",electricity:"#ffd166",rent:"#ff9a3c",misc:"#8899b8"};
+  const catNames={device:"أجهزة",maintenance:"صيانة",electricity:"كهرباء",rent:"إيجار",misc:"متفرقات"};
+  document.getElementById("catChart").innerHTML=Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>{
+    const pct=catTotal?Math.round(amt/catTotal*100):0;
+    const col=catColors[cat]||"#8899b8";
+    return `<div style="margin-bottom:4px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+        <span>${catNames[cat]||cat}</span>
+        <span style="font-family:var(--mono);color:${col}">${fmt(amt)} (${pct}%)</span>
+      </div>
+      <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${col};border-radius:3px;transition:width 1s"></div>
+      </div>
+    </div>`;
+  }).join("") || `<div style="text-align:center;color:var(--text2);padding:20px">لا توجد مصاريف هذا العام</div>`;
+
+  // Monthly table
+  const tbody=document.getElementById("monthTable");
+  tbody.innerHTML=Object.keys(mInc).map((m,i)=>{
+    const inc=mInc[m], exp=mExp[m], n=inc-exp;
+    const hasData=inc>0||exp>0;
+    if(!hasData && i>=new Date().getMonth()+1) return "";
+    return `<tr>
+      <td style="font-weight:600">${months[i]}</td>
+      <td class="pos">${inc>0?fmt(inc):"—"}</td>
+      <td class="neg">${exp>0?fmt(exp):"—"}</td>
+      <td class="${n>0?'pos':n<0?'neg':'neutral'}">${hasData?(n>0?"+":"")+CUR+" "+n.toLocaleString("ar-YE",{minimumFractionDigits:0}):"—"}</td>
+      <td>${!hasData?"—":n>0?`<span style="color:var(--green);font-size:11px;font-weight:700">✅ ربح</span>`:n<0?`<span style="color:var(--red);font-size:11px;font-weight:700">❌ خسارة</span>`:`<span style="color:var(--yellow);font-size:11px;font-weight:700">➡️ تعادل</span>`}</td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--text2)">لا توجد بيانات — سجّل إيراداتك ومصاريفك من <a href="finances.html" style="color:var(--accent)">الإدارة المالية</a></td></tr>`;
+}
+
+window.exportReport=()=>{
+  const yearTx=allTx.filter(t=>(t.date||"").startsWith(selYear));
+  const inc=yearTx.filter(t=>t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const exp=yearTx.filter(t=>t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const rows=[["الوصف","النوع","الفئة","المبلغ","التاريخ"],...yearTx.map(t=>[t.description,t.txType==="income"?"إيراد":"مصروف",t.category,t.amount,t.date])];
+  rows.push([]); rows.push(["إجمالي الإيرادات","","",inc,""]); rows.push(["إجمالي المصاريف","","",exp,""]); rows.push(["صافي الربح/الخسارة","","",(inc-exp),"",inc-exp>0?"ربح":"خسارة"]);
+  const csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v||"").replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a=document.createElement("a"); a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
+  a.download=`تقرير-المدى-نت-${selYear}.csv`; a.click();
+};
+</script>
+</body>
+</html>

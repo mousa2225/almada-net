@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المدى نت — الإدارة المالية</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e1a;--bg2:#0f1525;--bg3:#141c30;
+  --surface:#1a2440;--surface2:#1e2b4a;
+  --border:#243058;--border2:#2e3d6e;
+  --accent:#00d4ff;--accent2:#0099cc;
+  --green:#00e5a0;--yellow:#ffd166;--red:#ff4d6a;--purple:#a78bfa;--orange:#ff9a3c;
+  --text:#e2e8f4;--text2:#8899b8;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'IBM Plex Sans Arabic',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+
+/* SIDEBAR */
+.sidebar{position:fixed;right:0;top:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.logo-text h1{font-size:14px;font-weight:700;line-height:1.2}
+.logo-text span{font-size:10px;color:var(--accent);font-family:var(--mono)}
+.sidebar-nav{padding:12px 10px;flex:1;overflow-y:auto}
+.nav-section-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;padding:8px 8px 4px;margin-top:6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:all .2s;margin-bottom:2px;color:var(--text2);font-size:13px;text-decoration:none}
+.nav-item:hover{background:var(--surface);color:var(--text)}
+.nav-item.active{background:rgba(0,212,255,.12);color:var(--accent)}
+.nav-icon{font-size:15px;width:18px;text-align:center}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.net-status{background:var(--surface);border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px}
+.sdot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pg 2s infinite}
+@keyframes pg{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* MAIN */
+.main{margin-right:240px;min-height:100vh;position:relative;z-index:1}
+.topbar{position:sticky;top:0;background:rgba(10,14,26,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:50}
+.topbar-title{font-size:17px;font-weight:600;flex:1}
+.topbar-title span{color:var(--accent)}
+.tbtn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 14px;font-family:var(--sans);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s}
+.tbtn:hover{background:var(--surface2);border-color:var(--border2)}
+.tbtn.primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700}
+.tbtn.primary:hover{background:var(--accent2)}
+
+/* CONTENT */
+.content{padding:24px}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:18px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;animation:fiu .4s ease both}
+.kpi:hover{border-color:var(--border2);transform:translateY(-2px)}
+@keyframes fiu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.kpi:nth-child(1){animation-delay:.05s}.kpi:nth-child(2){animation-delay:.1s}.kpi:nth-child(3){animation-delay:.15s}.kpi:nth-child(4){animation-delay:.2s}
+.kpi::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%;border-radius:0 2px 2px 0}
+.kpi.ck-yellow::after{background:var(--yellow)}
+.kpi.ck-red::after{background:var(--red)}
+.kpi.ck-green::after{background:var(--green)}
+.kpi.ck-blue::after{background:var(--accent)}
+.kpi-lbl{font-size:11px;color:var(--text2);font-weight:500;margin-bottom:6px}
+.kpi-val{font-size:24px;font-weight:700;font-family:var(--mono);line-height:1;margin-bottom:5px}
+.kpi.ck-yellow .kpi-val{color:var(--yellow)}
+.kpi.ck-red .kpi-val{color:var(--red)}
+.kpi.ck-green .kpi-val{color:var(--green)}
+.kpi.ck-blue .kpi-val{color:var(--accent)}
+.kpi-sub{font-size:11px;color:var(--text2)}
+
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.grid-3-2{display:grid;grid-template-columns:3fr 2fr;gap:18px;margin-bottom:18px}
+
+/* PANEL */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;animation:fiu .4s ease .25s both}
+.ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ph-title{font-size:14px;font-weight:600;flex:1}
+.ph-action{font-size:12px;color:var(--accent);cursor:pointer;text-decoration:none}
+
+/* CHART BARS */
+.chart-wrap{padding:18px 20px}
+.bar-chart{display:flex;flex-direction:column;gap:12px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-label{font-size:12px;color:var(--text2);width:80px;flex-shrink:0;text-align:left}
+.bar-outer{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.bar-val{font-family:var(--mono);font-size:12px;width:80px;text-align:left;flex-shrink:0}
+
+/* MONTHLY CHART */
+.monthly-chart{padding:18px 20px;height:200px;display:flex;align-items:flex-end;gap:6px}
+.m-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.m-bar-wrap{flex:1;display:flex;align-items:flex-end;width:100%;justify-content:center;gap:3px}
+.m-bar{width:14px;border-radius:3px 3px 0 0;transition:height .8s cubic-bezier(.4,0,.2,1),opacity .2s;min-height:2px}
+.m-col:hover .m-bar{opacity:.8}
+.m-label{font-size:10px;color:var(--text2);font-family:var(--mono)}
+.m-val{font-size:9px;color:var(--text2)}
+
+/* TRANSACTION TABLE */
+.filter-bar{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--bg3)}
+.chip{padding:4px 11px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:transparent;font-family:var(--sans);transition:all .2s}
+.chip:hover{border-color:var(--border2);color:var(--text)}
+.chip.active{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th{padding:8px 14px;text-align:right;font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer}
+th:hover{color:var(--accent)}
+td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+.cat-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.tx-row{display:flex;align-items:center;gap:9px}
+.tx-name{font-weight:500;font-size:13px}
+.tx-note{font-size:11px;color:var(--text2)}
+.amount-cell{font-family:var(--mono);font-size:13px;font-weight:700}
+.amount-cell.neg{color:var(--red)}
+.amount-cell.pos{color:var(--green)}
+.cat-badge{font-size:11px;padding:2px 9px;border-radius:4px;font-weight:600}
+.cat-device{background:rgba(0,212,255,.1);color:var(--accent)}
+.cat-maint{background:rgba(167,139,250,.1);color:var(--purple)}
+.cat-elec{background:rgba(255,209,102,.1);color:var(--yellow)}
+.cat-rent{background:rgba(255,154,60,.1);color:var(--orange)}
+.cat-misc{background:rgba(136,153,184,.1);color:var(--text2)}
+.cat-income{background:rgba(0,229,160,.1);color:var(--green)}
+
+/* CATEGORY BREAKDOWN */
+.cat-list{padding:16px}
+.cat-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;background:var(--bg3);border:1px solid var(--border);margin-bottom:8px;transition:border-color .2s}
+.cat-item:hover{border-color:var(--border2)}
+.cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cat-info{flex:1}
+.cat-name{font-size:13px;font-weight:500;margin-bottom:2px}
+.cat-bar-mini{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px}
+.cat-bar-mini-fill{height:100%;border-radius:2px}
+.cat-pct{font-size:11px;color:var(--text2);white-space:nowrap}
+.cat-amt{font-family:var(--mono);font-size:12px;font-weight:700;text-align:left;white-space:nowrap}
+
+/* BUDGET METER */
+.budget-meter{padding:18px 20px}
+.meter-row{margin-bottom:16px}
+.meter-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.meter-name{font-size:13px;font-weight:500}
+.meter-nums{font-size:11px;color:var(--text2);font-family:var(--mono)}
+.meter-bar{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.meter-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+
+/* TABLE PAGINATION */
+.pagination{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.page-info{font-size:12px;color:var(--text2)}
+.page-btns{display:flex;gap:4px}
+.pbn{background:none;border:1px solid var(--border);color:var(--text2);border-radius:5px;padding:3px 9px;font-size:12px;cursor:pointer;font-family:var(--sans);transition:all .2s}
+.pbn:hover{border-color:var(--accent);color:var(--accent)}
+.pbn.active{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent)}
+.pbn:disabled{opacity:.3;cursor:not-allowed}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:520px;max-width:95vw;max-height:92vh;overflow-y:auto;transform:scale(.95) translateY(20px);transition:transform .3s}
+.overlay.open .modal{transform:scale(1) translateY(0)}
+.mhdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.mhdr h2{font-size:15px;font-weight:600;flex:1}
+.mclose{background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;border-radius:5px;padding:3px;line-height:1}
+.mclose:hover{color:var(--text)}
+.mbody{padding:22px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fgrow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.fg input,.fg select,.fg textarea{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .2s;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent)}
+.fg select option{background:var(--bg2)}
+.fg textarea{resize:vertical;min-height:65px}
+.mftr{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.btn-cancel{background:none;border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:8px 18px;font-family:var(--sans);font-size:13px;cursor:pointer}
+.btn-save{background:var(--green);border:none;color:var(--bg);border-radius:7px;padding:8px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn-save:hover{background:#00cc8e}
+.btn-save:disabled{opacity:.5;cursor:not-allowed}
+.spspin{width:13px;height:13px;border:2px solid rgba(0,0,0,.2);border-top-color:var(--bg);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* DEL */
+.del-modal{width:380px}
+.del-body{padding:24px;text-align:center}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:24px;left:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:8px;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:slideIn .3s ease;transition:opacity .3s}
+.toast.out{opacity:0}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.toast.success{border-color:rgba(0,229,160,.3);color:var(--green)}
+.toast.error{border-color:rgba(255,77,106,.3);color:var(--red)}
+.toast.info{border-color:rgba(0,212,255,.3);color:var(--accent)}
+
+/* TYPE TOGGLE */
+.type-toggle{display:flex;background:var(--bg3);border-radius:8px;padding:3px;gap:3px}
+.type-btn{flex:1;padding:7px;border-radius:6px;border:none;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;background:none;color:var(--text2)}
+.type-btn.active-exp{background:rgba(255,77,106,.2);color:var(--red)}
+.type-btn.active-inc{background:rgba(0,229,160,.2);color:var(--green)}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🌐</div>
+    <div class="logo-text"><h1>المدى نت</h1><span>ALMADA NET v1.0</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">الرئيسية</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> لوحة التحكم</a>
+    <a href="topology.html" class="nav-item"><span class="nav-icon">🗺️</span> توبولوجيا الشبكة</a>
+    <div class="nav-section-title">الأجهزة والشبكة</div>
+    <a href="devices.html" class="nav-item"><span class="nav-icon">🖥️</span> إدارة الأجهزة</a>
+    <a href="subnets.html" class="nav-item"><span class="nav-icon">🔌</span> الشبكات الفرعية</a>
+    <div class="nav-section-title">الإدارة المالية</div>
+    <a href="finances.html" class="nav-item active"><span class="nav-icon">💰</span> الإدارة المالية</a>
+    <a href="purchases.html" class="nav-item"><span class="nav-icon">🛒</span> المشتريات</a>
+    <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> التقارير</a>
+    <div class="nav-section-title">الإعدادات</div>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> الإعدادات</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="net-status">
+      <div class="sdot"></div>
+      <div>
+        <div style="font-size:12px;font-weight:600" id="fbStatus">جاري الاتصال...</div>
+        <div style="font-size:11px;color:var(--text2)">Firebase Firestore</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-title">الإدارة المالية <span>/ السجل الكامل</span></div>
+    <button class="tbtn" id="exportBtn">📤 تصدير CSV</button>
+    <button class="tbtn primary" onclick="openAdd()">＋ تسجيل معاملة</button>
+  </header>
+
+  <div class="content">
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi ck-yellow">
+        <div class="kpi-lbl">💵 إجمالي المصاريف</div>
+        <div class="kpi-val" id="kpi-total">$0</div>
+        <div class="kpi-sub">كامل الفترة</div>
+      </div>
+      <div class="kpi ck-red">
+        <div class="kpi-lbl">📅 مصاريف هذا الشهر</div>
+        <div class="kpi-val" id="kpi-month">$0</div>
+        <div class="kpi-sub" id="kpi-month-sub">—</div>
+      </div>
+      <div class="kpi ck-green">
+        <div class="kpi-lbl">✅ أكبر فئة مصاريف</div>
+        <div class="kpi-val" id="kpi-top-cat" style="font-size:16px">—</div>
+        <div class="kpi-sub" id="kpi-top-amt">—</div>
+      </div>
+      <div class="kpi ck-blue">
+        <div class="kpi-lbl">📋 عدد المعاملات</div>
+        <div class="kpi-val" id="kpi-count">0</div>
+        <div class="kpi-sub" id="kpi-count-sub">—</div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="grid-2">
+
+      <!-- MONTHLY CHART -->
+      <div class="panel">
+        <div class="ph">
+          <span>📊</span>
+          <div class="ph-title">المصاريف الشهرية</div>
+          <span id="chartYear" style="font-size:12px;color:var(--text2);font-family:var(--mono)">2025</span>
+        </div>
+        <div class="monthly-chart" id="monthlyChart">
+          <div style="width:100%;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:13px">جاري التحميل...</div>
+        </div>
+      </div>
+
+      <!-- CATEGORY BREAKDOWN -->
+      <div class="panel">
+        <div class="ph">
+          <span>🍕</span>
+          <div class="ph-title">توزيع المصاريف بالفئات</div>
+        </div>
+        <div class="cat-list" id="catList">
+          <div style="padding:20px;text-align:center;color:var(--text2)">جاري التحميل...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS TABLE -->
+    <div class="panel" id="purchases">
+      <div class="ph">
+        <span>📋</span>
+        <div class="ph-title">سجل المعاملات</div>
+        <span id="txCount" style="font-size:12px;color:var(--text2);background:var(--bg3);padding:3px 10px;border-radius:10px">0</span>
+      </div>
+      <div class="filter-bar">
+        <button class="chip active" data-filter="all">الكل</button>
+        <button class="chip" data-filter="expense">🔴 مصاريف</button>
+        <button class="chip" data-filter="income">🟢 إيرادات</button>
+        <div style="width:1px;height:20px;background:var(--border);margin:0 4px"></div>
+        <button class="chip" data-filter="device">🖥️ أجهزة</button>
+        <button class="chip" data-filter="maintenance">🔧 صيانة</button>
+        <button class="chip" data-filter="electricity">⚡ كهرباء</button>
+        <button class="chip" data-filter="rent">🏢 إيجار</button>
+        <button class="chip" data-filter="misc">📦 متفرقات</button>
+        <div style="margin-right:auto">
+          <input type="month" id="monthFilter" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none">
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>الوصف</th>
+              <th>الفئة</th>
+              <th>النوع</th>
+              <th data-col="amount">المبلغ ↕</th>
+              <th data-col="date">التاريخ ↕</th>
+              <th>الجهاز المرتبط</th>
+              <th style="width:100px">الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="txBody">
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text2)">
+              <div style="margin-bottom:8px;font-size:28px">💰</div>جاري تحميل البيانات...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <div class="page-info" id="txPageInfo">0 معاملة</div>
+        <div class="page-btns" id="txPageBtns"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="overlay" id="txOverlay">
+  <div class="modal">
+    <div class="mhdr">
+      <span id="mIcon" style="font-size:20px">💰</span>
+      <h2 id="mTitle">تسجيل معاملة جديدة</h2>
+      <button class="mclose" onclick="closeModal('txOverlay')">✕</button>
+    </div>
+    <div class="mbody">
+      <div class="fg">
+        <label>نوع المعاملة</label>
+        <div class="type-toggle">
+          <button class="type-btn active-exp" id="typeExp" onclick="setType('expense')">🔴 مصروف</button>
+          <button class="type-btn" id="typeInc" onclick="setType('income')">🟢 إيراد</button>
+        </div>
+      </div>
+      <div class="fgrow">
+        <div class="fg">
+          <label>الوصف *</label>
+          <input type="text" id="f-desc" placeholder="مثال: شراء AP جديد">
+        </div>
+        <div class="fg">
+          <label>الفئة *</label>
+          <select id="f-cat">
+            <option value="device">🖥️ شراء جهاز</option>
+            <option value="maintenance">🔧 صيانة</option>
+            <option value="electricity">⚡ كهرباء</option>
+            <option value="rent">🏢 إيجار</option>
+            <option value="misc">📦 متفرقات</option>
+            <option value="income">💵 إيراد</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>المبلغ (ر.ي) *</label>
+          <input type="number" id="f-amount" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="fg">
+          <label>التاريخ *</label>
+          <input type="date" id="f-date">
+        </div>
+        <div class="fg">
+          <label>الجهاز المرتبط</label>
+          <select id="f-device">
+            <option value="">— لا يوجد —</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>طريقة الدفع</label>
+          <select id="f-payment">
+            <option value="cash">نقدي</option>
+            <option value="transfer">تحويل بنكي</option>
+            <option value="card">بطاقة</option>
+            <option value="other">أخرى</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg">
+        <label>ملاحظات</label>
+        <textarea id="f-notes" placeholder="تفاصيل إضافية..."></textarea>
+      </div>
+    </div>
+    <div class="mftr">
+      <button class="btn-cancel" onclick="closeModal('txOverlay')">إلغاء</button>
+      <button class="btn-save" id="saveBtn" onclick="saveTx()">
+        <span id="saveTxt">💾 حفظ</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="overlay" id="delOverlay">
+  <div class="modal del-modal">
+    <div class="mhdr"><h2 style="color:var(--red)">⚠️ تأكيد الحذف</h2><button class="mclose" onclick="closeModal('delOverlay')">✕</button></div>
+    <div class="del-body">
+      <div style="font-size:36px;margin-bottom:10px">🗑️</div>
+      <div style="font-size:15px;font-weight:700;color:var(--red);margin-bottom:8px">حذف المعاملة؟</div>
+      <div style="font-size:13px;color:var(--text2)">سيتم حذف "<span id="delDesc" style="color:var(--text);font-weight:600"></span>" نهائياً.</div>
+    </div>
+    <div class="mftr" style="justify-content:center;gap:12px">
+      <button class="btn-cancel" onclick="closeModal('delOverlay')">إلغاء</button>
+      <button style="background:var(--red);border:none;color:#fff;border-radius:7px;padding:8px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer" id="confirmDel">نعم، احذف</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
+  onSnapshot, serverTimestamp, query, orderBy
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyDdYIiZcithhvDRLwHwahV6-W_puXHN4rs",
+  authDomain:"almadadashboard.firebaseapp.com",
+  projectId:"almadadashboard",
+  storageBucket:"almadadashboard.firebasestorage.app",
+  messagingSenderId:"172655018085",
+  appId:"1:172655018085:web:6b956408061985c3ccc68c"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+// ── State ────────────────────────────────────────────
+let allTx       = [];
+let allDevices  = [];
+let filtered    = [];
+let curFilter   = "all";
+let curMonth    = "";
+let sortCol     = "date";
+let sortDir     = -1;
+let curPage     = 1;
+let editingId   = null;
+let pendingDel  = null;
+let curType     = "expense";
+const PAGE      = 12;
+
+document.getElementById("fbStatus").textContent = "متصل بـ Firebase";
+
+// ── Listen: Transactions ─────────────────────────────
+const qTx = query(collection(db,"transactions"), orderBy("date","desc"));
+onSnapshot(qTx, snap => {
+  allTx = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  applyFilters();
+  updateKPIs();
+  renderMonthlyChart();
+  renderCatBreakdown();
+}, e => showToast("خطأ Firebase: "+e.message,"error"));
+
+// ── Listen: Devices (for dropdown) ──────────────────
+onSnapshot(collection(db,"devices"), snap => {
+  allDevices = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  populateDeviceSelect();
+});
+
+// ── KPIs ─────────────────────────────────────────────
+function updateKPIs() {
+  const expenses = allTx.filter(t => t.txType === "expense");
+  const total    = expenses.reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
+
+  const now = new Date();
+  const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+  const monthTx   = expenses.filter(t => (t.date||"").startsWith(thisMonth));
+  const monthTotal= monthTx.reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
+
+  // top category
+  const catTotals = {};
+  expenses.forEach(t => { catTotals[t.category] = (catTotals[t.category]||0) + (parseFloat(t.amount)||0); });
+  const topCat = Object.entries(catTotals).sort((a,b)=>b[1]-a[1])[0];
+
+  document.getElementById("kpi-total").textContent   = "ر.ي"+total.toLocaleString("ar-YE",{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById("kpi-month").textContent   = "ر.ي"+monthTotal.toLocaleString("ar-YE",{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById("kpi-month-sub").textContent = monthTx.length + " معاملة هذا الشهر";
+  document.getElementById("kpi-top-cat").textContent = topCat ? catName(topCat[0]) : "—";
+  document.getElementById("kpi-top-amt").textContent = topCat ? "ر.ي"+topCat[1].toLocaleString("ar-YE",{minimumFractionDigits:0}) : "—";
+  document.getElementById("kpi-count").textContent   = allTx.length;
+  document.getElementById("kpi-count-sub").textContent = expenses.length+" مصروف / "+(allTx.length-expenses.length)+" إيراد";
+}
+
+// ── Monthly Chart ─────────────────────────────────────
+function renderMonthlyChart() {
+  const year = new Date().getFullYear();
+  document.getElementById("chartYear").textContent = year;
+  const months = Array.from({length:12},(_,i)=>String(i+1).padStart(2,"0"));
+  const expByM = {}, incByM = {};
+  months.forEach(m => { expByM[m]=0; incByM[m]=0; });
+  allTx.forEach(t => {
+    const d = t.date||""; const m = d.slice(5,7);
+    if (d.startsWith(year) && expByM[m]!==undefined) {
+      if (t.txType==="expense") expByM[m]+=(parseFloat(t.amount)||0);
+      else incByM[m]+=(parseFloat(t.amount)||0);
+    }
+  });
+  const maxVal = Math.max(...Object.values(expByM),...Object.values(incByM),1);
+  const mNames = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  const wrap = document.getElementById("monthlyChart");
+  wrap.innerHTML = months.map((m,i) => {
+    const expH = Math.round((expByM[m]/maxVal)*140);
+    const incH = Math.round((incByM[m]/maxVal)*140);
+    return `<div class="m-col" title="${mNames[i]}: مصاريف ر.ي ${expByM[m].toLocaleString('en')} / إيرادات ر.ي ${incByM[m].toLocaleString('en')}">
+      <div class="m-bar-wrap">
+        <div class="m-bar" style="height:${expH}px;background:var(--red);opacity:.7"></div>
+        <div class="m-bar" style="height:${incH}px;background:var(--green);opacity:.7"></div>
+      </div>
+      <div class="m-label">${mNames[i].slice(0,3)}</div>
+    </div>`;
+  }).join("");
+}
+
+// ── Category Breakdown ────────────────────────────────
+function renderCatBreakdown() {
+  const expenses = allTx.filter(t => t.txType==="expense");
+  const total    = expenses.reduce((s,t) => s+(parseFloat(t.amount)||0),0);
+  const cats     = {};
+  expenses.forEach(t => { cats[t.category||"misc"] = (cats[t.category||"misc"]||0)+(parseFloat(t.amount)||0); });
+  const sorted   = Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  const colors   = {device:"#00d4ff",maintenance:"#a78bfa",electricity:"#ffd166",rent:"#ff9a3c",misc:"#8899b8",income:"#00e5a0"};
+  const wrap     = document.getElementById("catList");
+  if (!sorted.length) { wrap.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text2)">لا توجد بيانات</div>`; return; }
+  wrap.innerHTML = sorted.map(([cat,amt]) => {
+    const pct = total ? Math.round(amt/total*100) : 0;
+    const col = colors[cat]||"#8899b8";
+    return `<div class="cat-item">
+      <div class="cat-dot" style="background:${col}"></div>
+      <div class="cat-info">
+        <div class="cat-name">${catName(cat)}</div>
+        <div class="cat-bar-mini"><div class="cat-bar-mini-fill" style="width:${pct}%;background:${col}"></div></div>
+      </div>
+      <div class="cat-pct" style="color:${col}">${pct}%</div>
+      <div class="cat-amt" style="color:${col};margin-right:8px">ر.ي ${amt.toLocaleString("ar-YE",{minimumFractionDigits:0})}</div>
+    </div>`;
+  }).join("");
+}
+
+// ── Filters ───────────────────────────────────────────
+function applyFilters() {
+  let data = [...allTx];
+  if (curFilter === "expense" || curFilter === "income") {
+    data = data.filter(t => t.txType === curFilter);
+  } else if (curFilter !== "all") {
+    data = data.filter(t => t.category === curFilter);
+  }
+  if (curMonth) data = data.filter(t => (t.date||"").startsWith(curMonth));
+  data.sort((a,b) => {
+    let av=a[sortCol]??"", bv=b[sortCol]??"";
+    if (sortCol==="amount") { av=parseFloat(av)||0; bv=parseFloat(bv)||0; }
+    return av<bv ? -sortDir : av>bv ? sortDir : 0;
+  });
+  filtered = data;
+  curPage  = 1;
+  renderTable();
+}
+
+// ── Table ─────────────────────────────────────────────
+function renderTable() {
+  const total = filtered.length;
+  const start = (curPage-1)*PAGE;
+  const slice = filtered.slice(start,start+PAGE);
+  document.getElementById("txCount").textContent = total + " معاملة";
+  document.getElementById("txPageInfo").textContent = `عرض ${start+1}–${Math.min(start+PAGE,total)} من ${total}`;
+  const tbody = document.getElementById("txBody");
+  if (!total) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:36px;color:var(--text2)"><div style="font-size:28px;margin-bottom:8px">📋</div>لا توجد معاملات</td></tr>`;
+    renderPager(0); return;
+  }
+  tbody.innerHTML = slice.map(t => {
+    const isExp = t.txType === "expense";
+    const amtStr = (isExp?"-":"+")+`ر.ي ${parseFloat(t.amount||0).toLocaleString("ar-YE",{minimumFractionDigits:2})}`;
+    return `<tr>
+      <td><div class="tx-row">
+        <div class="cat-icon" style="background:${catColor(t.category)}22">${catEmoji(t.category)}</div>
+        <div><div class="tx-name">${esc(t.description||"—")}</div><div class="tx-note">${esc(t.notes||"")}</div></div>
+      </div></td>
+      <td><span class="cat-badge cat-${t.category||'misc'}">${catName(t.category)}</span></td>
+      <td><span style="font-size:12px;font-weight:700;color:${isExp?'var(--red)':'var(--green)'}">${isExp?"مصروف":"إيراد"}</span></td>
+      <td><span class="amount-cell ${isExp?'neg':'pos'}">${amtStr}</span></td>
+      <td><span style="font-size:12px;color:var(--text2)">${t.date||"—"}</span></td>
+      <td><span style="font-size:12px;color:var(--text2)">${esc(t.linkedDevice||"—")}</span></td>
+      <td>
+        <div style="display:flex;gap:5px">
+          <button onclick="editTx('${t.id}')" style="background:none;border:1px solid var(--border);color:var(--text2);border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .2s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">✏️</button>
+          <button onclick="delTx('${t.id}','${esc(t.description||'')}')" style="background:none;border:1px solid var(--border);color:var(--text2);border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .2s" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+  renderPager(total);
+}
+
+function renderPager(total) {
+  const pages = Math.ceil(total/PAGE);
+  const wrap  = document.getElementById("txPageBtns");
+  if (pages<=1) { wrap.innerHTML=""; return; }
+  wrap.innerHTML = `<button class="pbn" onclick="goPage(${curPage-1})" ${curPage===1?"disabled":""}>→</button>`
+    + Array.from({length:pages},(_,i)=>`<button class="pbn ${i+1===curPage?'active':''}" onclick="goPage(${i+1})">${i+1}</button>`).join("")
+    + `<button class="pbn" onclick="goPage(${curPage+1})" ${curPage===pages?"disabled":""}>←</button>`;
+}
+window.goPage = p => { curPage=p; renderTable(); };
+
+// ── Filter chips ──────────────────────────────────────
+document.querySelectorAll(".chip[data-filter]").forEach(c => {
+  c.addEventListener("click", () => {
+    document.querySelectorAll(".chip[data-filter]").forEach(x=>x.classList.remove("active"));
+    c.classList.add("active"); curFilter=c.dataset.filter; applyFilters();
+  });
+});
+document.getElementById("monthFilter").addEventListener("change", e => { curMonth=e.target.value; applyFilters(); });
+
+// ── Type Toggle ───────────────────────────────────────
+window.setType = type => {
+  curType = type;
+  document.getElementById("typeExp").className = "type-btn" + (type==="expense"?" active-exp":"");
+  document.getElementById("typeInc").className = "type-btn" + (type==="income"?" active-inc":"");
+  document.getElementById("f-cat").querySelector('option[value="income"]').selected = (type==="income");
+};
+
+// ── Add Modal ─────────────────────────────────────────
+window.openAdd = () => {
+  editingId = null; curType = "expense";
+  document.getElementById("mTitle").textContent = "تسجيل معاملة جديدة";
+  document.getElementById("mIcon").textContent  = "💰";
+  document.getElementById("saveTxt").textContent = "💾 حفظ";
+  clearForm(); document.getElementById("f-date").value = new Date().toISOString().split("T")[0];
+  setType("expense");
+  openModal("txOverlay");
+};
+
+window.editTx = id => {
+  const t = allTx.find(x=>x.id===id); if (!t) return;
+  editingId = id; curType = t.txType||"expense";
+  document.getElementById("mTitle").textContent = "تعديل المعاملة";
+  document.getElementById("mIcon").textContent  = "✏️";
+  document.getElementById("saveTxt").textContent = "💾 حفظ التعديلات";
+  document.getElementById("f-desc").value   = t.description||"";
+  document.getElementById("f-cat").value    = t.category||"misc";
+  document.getElementById("f-amount").value = t.amount||"";
+  document.getElementById("f-date").value   = t.date||"";
+  document.getElementById("f-device").value = t.linkedDevice||"";
+  document.getElementById("f-payment").value= t.paymentMethod||"cash";
+  document.getElementById("f-notes").value  = t.notes||"";
+  setType(t.txType||"expense");
+  openModal("txOverlay");
+};
+
+window.delTx = (id, desc) => {
+  pendingDel = id;
+  document.getElementById("delDesc").textContent = desc;
+  document.getElementById("confirmDel").onclick = async () => {
+    await deleteDoc(doc(db,"transactions",pendingDel));
+    showToast("تم الحذف ✅","success");
+    closeModal("delOverlay");
+  };
+  openModal("delOverlay");
+};
+
+// ── Save ──────────────────────────────────────────────
+window.saveTx = async () => {
+  const desc   = document.getElementById("f-desc").value.trim();
+  const amount = parseFloat(document.getElementById("f-amount").value);
+  const date   = document.getElementById("f-date").value;
+  const cat    = document.getElementById("f-cat").value;
+  if (!desc || !amount || !date) { showToast("يرجى ملء الحقول المطلوبة *","error"); return; }
+  const payload = {
+    description:  desc,
+    txType:       curType,
+    category:     cat,
+    amount:       amount,
+    date,
+    linkedDevice: document.getElementById("f-device").value,
+    paymentMethod:document.getElementById("f-payment").value,
+    notes:        document.getElementById("f-notes").value.trim(),
+  };
+  const btn = document.getElementById("saveBtn");
+  btn.disabled = true;
+  document.getElementById("saveTxt").innerHTML = '<span class="spspin"></span> جاري الحفظ...';
+  try {
+    if (editingId) {
+      await updateDoc(doc(db,"transactions",editingId), {...payload, updatedAt:serverTimestamp()});
+      showToast("تم التحديث ✅","success");
+    } else {
+      await addDoc(collection(db,"transactions"), {...payload, createdAt:serverTimestamp()});
+      showToast("تمت إضافة المعاملة ✅","success");
+    }
+    closeModal("txOverlay");
+  } catch(e) { showToast("خطأ: "+e.message,"error"); }
+  finally { btn.disabled=false; document.getElementById("saveTxt").textContent=editingId?"💾 حفظ التعديلات":"💾 حفظ"; }
+};
+
+// ── Export CSV ────────────────────────────────────────
+document.getElementById("exportBtn").onclick = () => {
+  const headers = ["الوصف","النوع","الفئة","المبلغ","التاريخ","الجهاز","طريقة الدفع","ملاحظات"];
+  const rows = filtered.map(t=>[t.description,t.txType,t.category,t.amount,t.date,t.linkedDevice||"",t.paymentMethod||"",t.notes||""]
+    .map(v=>`"${String(v||"").replace(/"/g,'""')}"`).join(","));
+  const csv = "\uFEFF"+headers.join(",")+"\n"+rows.join("\n");
+  const a = document.createElement("a"); a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
+  a.download="almada-finances-"+new Date().toISOString().split("T")[0]+".csv"; a.click();
+  showToast("تم تصدير "+filtered.length+" معاملة 📤","info");
+};
+
+// ── Helpers ───────────────────────────────────────────
+function populateDeviceSelect() {
+  const sel = document.getElementById("f-device");
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— لا يوجد —</option>';
+  allDevices.forEach(d => {
+    const o=document.createElement("option"); o.value=d.name; o.textContent=d.name+(d.ip?" ("+d.ip+")":""); sel.appendChild(o);
+  });
+  sel.value = cur;
+}
+
+function clearForm() {
+  ["f-desc","f-amount","f-date","f-notes"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("f-cat").value="device";
+  document.getElementById("f-device").value="";
+  document.getElementById("f-payment").value="cash";
+}
+
+function catName(c){return{device:"أجهزة",maintenance:"صيانة",electricity:"كهرباء",rent:"إيجار",misc:"متفرقات",income:"إيراد"}[c]||c||"—"}
+function catEmoji(c){return{device:"🖥️",maintenance:"🔧",electricity:"⚡",rent:"🏢",misc:"📦",income:"💵"}[c]||"📋"}
+function catColor(c){return{device:"#00d4ff",maintenance:"#a78bfa",electricity:"#ffd166",rent:"#ff9a3c",misc:"#8899b8",income:"#00e5a0"}[c]||"#8899b8"}
+
+function openModal(id){document.getElementById(id).classList.add("open")}
+window.closeModal=id=>document.getElementById(id).classList.remove("open");
+document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("open")}));
+
+function showToast(msg,type="info"){
+  const w=document.getElementById("toastWrap"),t=document.createElement("div");
+  t.className="toast "+type;
+  t.innerHTML=`<span>${{success:"✅",error:"❌",info:"ℹ️"}[type]||"ℹ️"}</span><span>${msg}</span>`;
+  w.appendChild(t); setTimeout(()=>{t.classList.add("out");setTimeout(()=>t.remove(),350)},3500);
+}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+</script>
+</body>
+</html>

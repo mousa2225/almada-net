@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المدى نت — توبولوجيا الشبكة</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e1a;--bg2:#0f1525;--bg3:#141c30;
+  --surface:#1a2440;--surface2:#1e2b4a;
+  --border:#243058;--border2:#2e3d6e;
+  --accent:#00d4ff;--accent2:#0099cc;
+  --green:#00e5a0;--yellow:#ffd166;--red:#ff4d6a;--purple:#a78bfa;
+  --text:#e2e8f4;--text2:#8899b8;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'IBM Plex Sans Arabic',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{position:fixed;right:0;top:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.logo-text h1{font-size:14px;font-weight:700;line-height:1.2}
+.logo-text span{font-size:10px;color:var(--accent);font-family:var(--mono)}
+.sidebar-nav{padding:12px 10px;flex:1;overflow-y:auto}
+.nav-section-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;padding:8px 8px 4px;margin-top:6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:all .2s;margin-bottom:2px;color:var(--text2);font-size:13px;text-decoration:none}
+.nav-item:hover{background:var(--surface);color:var(--text)}
+.nav-item.active{background:rgba(0,212,255,.12);color:var(--accent)}
+.nav-icon{font-size:15px;width:18px;text-align:center}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.net-status{background:var(--surface);border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px}
+.sdot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pg 2s infinite}
+@keyframes pg{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* MAIN */
+.main{margin-right:240px;height:100vh;display:flex;flex-direction:column;position:relative}
+
+/* TOPBAR */
+.topbar{background:rgba(10,14,26,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:50;flex-shrink:0}
+.topbar-title{font-size:17px;font-weight:600;flex:1}
+.topbar-title span{color:var(--accent)}
+.tbtn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:6px 14px;font-family:var(--sans);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s}
+.tbtn:hover{background:var(--surface2);border-color:var(--border2)}
+.tbtn.active{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent)}
+
+/* CANVAS AREA */
+.topo-wrap{flex:1;position:relative;overflow:hidden}
+#topoCanvas{width:100%;height:100%;cursor:grab;display:block}
+#topoCanvas:active{cursor:grabbing}
+#topoCanvas.moving{cursor:grabbing}
+
+/* LEGEND */
+.legend{position:absolute;bottom:20px;right:20px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;gap:7px;z-index:10}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-line{width:20px;height:2px;flex-shrink:0}
+
+/* MINIMAP */
+.minimap-wrap{position:absolute;bottom:20px;left:20px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;z-index:10}
+#minimap{display:block}
+
+/* CONTROLS */
+.zoom-controls{position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:4px;z-index:10}
+.zoom-btn{width:32px;height:32px;background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:var(--mono)}
+.zoom-btn:hover{background:var(--surface2);border-color:var(--border2)}
+
+/* DETAIL PANEL */
+.detail-panel{position:absolute;top:16px;right:260px;width:280px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:0;z-index:20;transform:translateX(20px);opacity:0;pointer-events:none;transition:all .3s;max-height:calc(100vh - 100px);overflow-y:auto}
+.detail-panel.open{transform:translateX(0);opacity:1;pointer-events:all}
+.dp-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.dp-icon{font-size:20px}
+.dp-title{font-size:14px;font-weight:700;flex:1}
+.dp-close{background:none;border:none;color:var(--text2);font-size:16px;cursor:pointer;padding:2px}
+.dp-body{padding:14px 16px}
+.dp-row{margin-bottom:10px}
+.dp-lbl{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:2px}
+.dp-val{font-size:13px;font-weight:500}
+.ip-code{font-family:var(--mono);font-size:11px;color:var(--accent);background:rgba(0,212,255,.1);padding:2px 7px;border-radius:4px}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
+.online{background:rgba(0,229,160,.12);color:var(--green)}
+.offline{background:rgba(255,77,106,.12);color:var(--red)}
+.warning{background:rgba(255,209,102,.12);color:var(--yellow)}
+.sdot2{width:5px;height:5px;border-radius:50%}
+.online .sdot2{background:var(--green)}
+.offline .sdot2{background:var(--red)}
+.warning .sdot2{background:var(--yellow)}
+.dp-children{margin-top:8px}
+.dp-child{font-size:12px;color:var(--text2);padding:4px 8px;background:var(--bg3);border-radius:5px;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.dp-child-dot{width:5px;height:5px;border-radius:50%;background:var(--border2)}
+
+/* STATS BAR */
+.stats-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 16px;display:flex;align-items:center;gap:20px;z-index:10;white-space:nowrap}
+.sb-item{display:flex;align-items:center;gap:6px;font-size:12px}
+.sb-val{font-family:var(--mono);font-weight:700}
+.sb-val.blue{color:var(--accent)}
+.sb-val.green{color:var(--green)}
+.sb-val.red{color:var(--red)}
+.sb-val.yellow{color:var(--yellow)}
+
+/* LOADING */
+.topo-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:5}
+.big-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.topo-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:5;display:none}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🌐</div>
+    <div class="logo-text"><h1>المدى نت</h1><span>ALMADA NET v1.0</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">الرئيسية</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> لوحة التحكم</a>
+    <a href="topology.html" class="nav-item active"><span class="nav-icon">🗺️</span> توبولوجيا الشبكة</a>
+    <div class="nav-section-title">الأجهزة والشبكة</div>
+    <a href="devices.html" class="nav-item"><span class="nav-icon">🖥️</span> إدارة الأجهزة</a>
+    <a href="subnets.html" class="nav-item"><span class="nav-icon">🔌</span> الشبكات الفرعية</a>
+    <div class="nav-section-title">الإدارة المالية</div>
+    <a href="finances.html" class="nav-item"><span class="nav-icon">💰</span> الإدارة المالية</a>
+    <div class="nav-section-title">الإعدادات</div>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> الإعدادات</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="net-status">
+      <div class="sdot"></div>
+      <div>
+        <div style="font-size:12px;font-weight:600" id="fbStatus">جاري الاتصال...</div>
+        <div style="font-size:11px;color:var(--text2)">Firebase Firestore</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-title">توبولوجيا الشبكة <span>/ الخريطة التفاعلية</span></div>
+    <button class="tbtn" id="btnHierarchy" onclick="setLayout('hierarchy')">🌳 هرمي</button>
+    <button class="tbtn active" id="btnTree" onclick="setLayout('tree')">🔀 شجري</button>
+    <button class="tbtn" onclick="resetView()">⟳ إعادة ضبط</button>
+    <button class="tbtn" onclick="fitAll()">⊡ عرض الكل</button>
+  </header>
+
+  <div class="topo-wrap">
+
+    <!-- LOADING -->
+    <div class="topo-loading" id="topoLoading">
+      <div class="big-spinner"></div>
+      <div style="font-size:14px;color:var(--text2)">جاري تحميل بيانات الشبكة...</div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="topo-empty" id="topoEmpty">
+      <div style="font-size:48px">🔌</div>
+      <div style="font-size:16px;font-weight:600">لا توجد أجهزة</div>
+      <div style="font-size:13px;color:var(--text2)">أضف أجهزة من صفحة إدارة الأجهزة أولاً</div>
+      <a href="devices.html" style="margin-top:8px;background:var(--accent);color:var(--bg);border-radius:7px;padding:8px 18px;text-decoration:none;font-size:13px;font-weight:700">إضافة جهاز</a>
+    </div>
+
+    <!-- CANVAS -->
+    <canvas id="topoCanvas"></canvas>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar" id="statsBar" style="display:none">
+      <div class="sb-item"><span>🖥️</span><span class="sb-val blue" id="sbTotal">0</span><span style="color:var(--text2)">جهاز</span></div>
+      <div style="width:1px;height:16px;background:var(--border)"></div>
+      <div class="sb-item"><span class="sb-val green" id="sbOnline">0</span><span style="color:var(--text2)">متصل</span></div>
+      <div class="sb-item"><span class="sb-val red" id="sbOffline">0</span><span style="color:var(--text2)">غير متصل</span></div>
+      <div class="sb-item"><span class="sb-val yellow" id="sbWarn">0</span><span style="color:var(--text2)">تحذير</span></div>
+    </div>
+
+    <!-- ZOOM CONTROLS -->
+    <div class="zoom-controls">
+      <button class="zoom-btn" onclick="zoom(1.2)" title="تكبير">+</button>
+      <button class="zoom-btn" id="zoomLevel" style="font-size:10px;cursor:default">100%</button>
+      <button class="zoom-btn" onclick="zoom(0.8)" title="تصغير">−</button>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.8px">المفتاح</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> راوتر (Master)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> سويتش (L2)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> AP نشط</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div> AP تحذير</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> غير متصل</div>
+      <div class="legend-item"><div class="legend-line" style="background:var(--accent);opacity:.7"></div> اتصال نشط</div>
+      <div class="legend-item"><div class="legend-line" style="background:var(--border2);border-top:2px dashed var(--border2)"></div> اتصال عادي</div>
+    </div>
+
+    <!-- DETAIL PANEL -->
+    <div class="detail-panel" id="detailPanel">
+      <div class="dp-header">
+        <div class="dp-icon" id="dpIcon">🖥️</div>
+        <div class="dp-title" id="dpTitle">—</div>
+        <button class="dp-close" onclick="closeDetail()">✕</button>
+      </div>
+      <div class="dp-body" id="dpBody"></div>
+    </div>
+
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyDdYIiZcithhvDRLwHwahV6-W_puXHN4rs",
+  authDomain:"almadadashboard.firebaseapp.com",
+  projectId:"almadadashboard",
+  storageBucket:"almadadashboard.firebasestorage.app",
+  messagingSenderId:"172655018085",
+  appId:"1:172655018085:web:6b956408061985c3ccc68c"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+// ── State ──────────────────────────────────────────────
+let devices    = [];
+let nodes      = [];
+let edges      = [];
+let layout     = "tree";
+let scale      = 1;
+let offsetX    = 0;
+let offsetY    = 0;
+let dragging   = false;
+let dragStart  = {x:0,y:0};
+let hoveredNode= null;
+let selectedNode=null;
+let animFrame  = null;
+let needsRedraw= false;
+
+const canvas = document.getElementById("topoCanvas");
+const ctx    = canvas.getContext("2d");
+
+// ── Firebase ───────────────────────────────────────────
+document.getElementById("fbStatus").textContent = "متصل بـ Firebase";
+onSnapshot(collection(db,"devices"), snap => {
+  devices = snap.docs.map(d=>({id:d.id,...d.data()}));
+  buildGraph();
+  document.getElementById("topoLoading").style.display = "none";
+  if (devices.length===0) {
+    document.getElementById("topoEmpty").style.display = "flex";
+    return;
+  }
+  document.getElementById("topoEmpty").style.display = "none";
+  document.getElementById("statsBar").style.display = "";
+  updateStatsBar();
+  computeLayout();
+  fitAll();
+  scheduleRedraw();
+});
+
+// ── Build Graph ────────────────────────────────────────
+function buildGraph() {
+  nodes = devices.map(d => ({
+    id:     d.id,
+    name:   d.name||"—",
+    type:   d.type||"other",
+    ip:     d.ip||"",
+    subnet: d.subnet||"",
+    parent: d.parent||"",
+    status: d.status||"warning",
+    model:  d.model||"",
+    location: d.location||"",
+    cost:   d.cost||0,
+    x: 0, y: 0, vx:0, vy:0,
+    radius: nodeRadius({type:d.type}),
+  }));
+  edges = [];
+  nodes.forEach(n => {
+    if (n.parent) {
+      const p = nodes.find(x=>x.name===n.parent);
+      if (p) edges.push({from:p.id, to:n.id, active:p.status==="online"&&n.status==="online"});
+    }
+  });
+}
+
+function nodeRadius(n) {
+  return {router:28,switch:22,server:22,ap:16,other:14}[n.type]||14;
+}
+
+// ── Layout ─────────────────────────────────────────────
+function computeLayout() {
+  const W = canvas.width/scale, H = canvas.height/scale;
+  // Build tree levels
+  const levels = {};
+  const roots  = nodes.filter(n=>!n.parent);
+  roots.forEach(n=>{ n._level=0; levels[0]=(levels[0]||[]).concat(n); });
+  let changed=true, iter=0;
+  while(changed && iter<10){
+    changed=false; iter++;
+    nodes.forEach(n=>{
+      if(n.parent){
+        const p=nodes.find(x=>x.name===n.parent);
+        if(p && (n._level===undefined||n._level<=p._level)){
+          n._level=(p._level||0)+1;
+          levels[n._level]=(levels[n._level]||[]).concat(n);
+          changed=true;
+        }
+      }
+    });
+  }
+  // nodes without parent or level
+  nodes.forEach(n=>{ if(n._level===undefined){ n._level=0; levels[0]=(levels[0]||[]).concat(n); }});
+
+  const maxLevel = Math.max(...nodes.map(n=>n._level||0));
+  const levelH   = Math.min(160, (H*0.8)/(maxLevel+1));
+  const startY   = levelH*0.8;
+
+  Object.entries(levels).forEach(([lvl,lvlNodes])=>{
+    // remove duplicates
+    const uniq=[...new Map(lvlNodes.map(n=>[n.id,n])).values()];
+    const spacing=Math.min(180,(W*0.85)/Math.max(uniq.length,1));
+    const totalW=(uniq.length-1)*spacing;
+    uniq.forEach((n,i)=>{
+      n.x = W/2 - totalW/2 + i*spacing;
+      n.y = startY + parseInt(lvl)*levelH;
+    });
+  });
+}
+
+// ── Canvas Setup ────────────────────────────────────────
+function resizeCanvas(){
+  const wrap=canvas.parentElement;
+  canvas.width=wrap.clientWidth;
+  canvas.height=wrap.clientHeight;
+  if(devices.length>0) computeLayout();
+  scheduleRedraw();
+}
+window.addEventListener("resize",resizeCanvas);
+resizeCanvas();
+
+// ── Draw ───────────────────────────────────────────────
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();
+  ctx.translate(offsetX,offsetY);
+  ctx.scale(scale,scale);
+
+  // GRID
+  drawGrid();
+
+  // EDGES
+  edges.forEach(e=>{
+    const from=nodes.find(n=>n.id===e.from);
+    const to  =nodes.find(n=>n.id===e.to);
+    if(!from||!to) return;
+    drawEdge(from,to,e.active);
+  });
+
+  // NODES
+  nodes.forEach(n=>drawNode(n));
+
+  ctx.restore();
+}
+
+function drawGrid(){
+  const gridSize=60, W=canvas.width/scale, H=canvas.height/scale;
+  const startX=Math.floor(-offsetX/scale/gridSize)*gridSize;
+  const startY=Math.floor(-offsetY/scale/gridSize)*gridSize;
+  ctx.strokeStyle="rgba(0,212,255,0.04)"; ctx.lineWidth=1;
+  for(let x=startX;x<W+offsetX/scale;x+=gridSize){
+    ctx.beginPath(); ctx.moveTo(x,startY); ctx.lineTo(x,H+200); ctx.stroke();
+  }
+  for(let y=startY;y<H+offsetY/scale;y+=gridSize){
+    ctx.beginPath(); ctx.moveTo(startX,y); ctx.lineTo(W+200,y); ctx.stroke();
+  }
+}
+
+function drawEdge(from,to,active){
+  const dx=to.x-from.x, dy=to.y-from.y;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const ux=dx/dist, uy=dy/dist;
+  const sx=from.x+ux*from.radius, sy=from.y+uy*from.radius;
+  const ex=to.x-ux*to.radius,     ey=to.y-uy*to.radius;
+
+  if(active){
+    ctx.strokeStyle="rgba(0,212,255,0.5)"; ctx.lineWidth=2;
+    ctx.setLineDash([]);
+  } else {
+    ctx.strokeStyle="rgba(46,61,110,0.8)"; ctx.lineWidth=1.5;
+    ctx.setLineDash([5,4]);
+  }
+  ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(ex,ey); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Arrow
+  const angle=Math.atan2(ey-sy,ex-sx);
+  const al=8, aw=5;
+  ctx.fillStyle=active?"rgba(0,212,255,0.6)":"rgba(46,61,110,0.8)";
+  ctx.beginPath();
+  ctx.moveTo(ex,ey);
+  ctx.lineTo(ex-al*Math.cos(angle-aw/10),ey-al*Math.sin(angle-aw/10));
+  ctx.lineTo(ex-al*Math.cos(angle+aw/10),ey-al*Math.sin(angle+aw/10));
+  ctx.closePath(); ctx.fill();
+}
+
+function nodeColor(n){
+  if(n.status==="offline") return {main:"#ff4d6a",glow:"rgba(255,77,106,0.3)",border:"#ff4d6a"};
+  if(n.status==="warning") return {main:"#ffd166",glow:"rgba(255,209,102,0.3)",border:"#ffd166"};
+  switch(n.type){
+    case"router": return{main:"#00d4ff",glow:"rgba(0,212,255,0.4)",border:"#00d4ff"};
+    case"switch": return{main:"#a78bfa",glow:"rgba(167,139,250,0.3)",border:"#a78bfa"};
+    case"server": return{main:"#ffd166",glow:"rgba(255,209,102,0.3)",border:"#ffd166"};
+    default:      return{main:"#00e5a0",glow:"rgba(0,229,160,0.3)",border:"#00e5a0"};
+  }
+}
+
+function nodeEmoji(type){
+  return{router:"🌐",switch:"🔀",ap:"📡",server:"🖧",other:"⚙️"}[type]||"⚙️";
+}
+
+function drawNode(n){
+  const col=nodeColor(n);
+  const r=n.radius;
+  const isHover=hoveredNode===n.id;
+  const isSel  =selectedNode===n.id;
+  const rScale = isHover||isSel ? 1.12 : 1;
+  const nr=r*rScale;
+
+  // GLOW
+  if(isHover||isSel||n.type==="router"){
+    const grd=ctx.createRadialGradient(n.x,n.y,nr*0.5,n.x,n.y,nr*2.5);
+    grd.addColorStop(0,col.glow); grd.addColorStop(1,"transparent");
+    ctx.beginPath(); ctx.arc(n.x,n.y,nr*2.5,0,Math.PI*2);
+    ctx.fillStyle=grd; ctx.fill();
+  }
+
+  // BG CIRCLE
+  ctx.beginPath(); ctx.arc(n.x,n.y,nr,0,Math.PI*2);
+  const bgGrd=ctx.createRadialGradient(n.x-nr*0.3,n.y-nr*0.3,0,n.x,n.y,nr);
+  bgGrd.addColorStop(0,col.main+"33"); bgGrd.addColorStop(1,col.main+"11");
+  ctx.fillStyle=bgGrd; ctx.fill();
+
+  // BORDER
+  ctx.strokeStyle=isSel?col.main:col.main+"99";
+  ctx.lineWidth=isSel?2.5:1.5;
+  ctx.stroke();
+
+  // EMOJI
+  ctx.font=`${nr*0.85}px serif`;
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillStyle="#fff"; ctx.fillText(nodeEmoji(n.type),n.x,n.y);
+
+  // NAME
+  ctx.font=`600 ${Math.max(9,11/scale*0.9)}px IBM Plex Sans Arabic,sans-serif`;
+  ctx.textAlign="center"; ctx.textBaseline="top";
+  ctx.fillStyle=col.main;
+  ctx.fillText(n.name,n.x,n.y+nr+4);
+
+  // IP
+  if(scale>0.5){
+    ctx.font=`${Math.max(8,10/scale*0.8)}px JetBrains Mono,monospace`;
+    ctx.fillStyle="rgba(136,153,184,0.9)";
+    ctx.fillText(n.ip,n.x,n.y+nr+17);
+  }
+}
+
+function scheduleRedraw(){
+  if(animFrame) cancelAnimationFrame(animFrame);
+  animFrame=requestAnimationFrame(()=>{draw();animFrame=null;});
+}
+
+// ── Interaction ────────────────────────────────────────
+canvas.addEventListener("mousedown",e=>{
+  dragging=true; dragStart={x:e.clientX-offsetX, y:e.clientY-offsetY};
+  canvas.classList.add("moving");
+});
+canvas.addEventListener("mousemove",e=>{
+  if(dragging){
+    offsetX=e.clientX-dragStart.x; offsetY=e.clientY-dragStart.y;
+    scheduleRedraw(); return;
+  }
+  const wp=worldPt(e.clientX,e.clientY);
+  const hit=hitTest(wp.x,wp.y);
+  if(hit!==hoveredNode){ hoveredNode=hit; canvas.style.cursor=hit?"pointer":"grab"; scheduleRedraw(); }
+});
+canvas.addEventListener("mouseup",e=>{
+  if(!dragging) return;
+  const dx=e.clientX-dragStart.x-offsetX, dy=e.clientY-dragStart.y-offsetY;
+  if(Math.abs(dx)<4&&Math.abs(dy)<4){
+    const wp=worldPt(e.clientX,e.clientY);
+    const hit=hitTest(wp.x,wp.y);
+    if(hit){ selectedNode=hit; showDetail(hit); }
+    else { selectedNode=null; closeDetail(); }
+    scheduleRedraw();
+  }
+  dragging=false; canvas.classList.remove("moving");
+});
+canvas.addEventListener("wheel",e=>{
+  e.preventDefault();
+  const factor=e.deltaY<0?1.1:0.9;
+  const rect=canvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  offsetX=(offsetX-mx)*factor+mx; offsetY=(offsetY-my)*factor+my;
+  scale*=factor; scale=Math.min(Math.max(scale,0.2),4);
+  document.getElementById("zoomLevel").textContent=Math.round(scale*100)+"%";
+  scheduleRedraw();
+},{passive:false});
+
+// Touch support
+let lastTouchDist=0;
+canvas.addEventListener("touchstart",e=>{
+  if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX-offsetX,y:e.touches[0].clientY-offsetY};}
+  if(e.touches.length===2){const t=e.touches;lastTouchDist=Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);}
+},{passive:true});
+canvas.addEventListener("touchmove",e=>{
+  if(e.touches.length===1&&dragging){offsetX=e.touches[0].clientX-dragStart.x;offsetY=e.touches[0].clientY-dragStart.y;scheduleRedraw();}
+  if(e.touches.length===2){const t=e.touches;const d=Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);scale*=d/lastTouchDist;scale=Math.min(Math.max(scale,0.2),4);lastTouchDist=d;scheduleRedraw();}
+},{passive:true});
+canvas.addEventListener("touchend",()=>{dragging=false;});
+
+function worldPt(cx,cy){
+  const rect=canvas.getBoundingClientRect();
+  return{x:(cx-rect.left-offsetX)/scale, y:(cy-rect.top-offsetY)/scale};
+}
+function hitTest(wx,wy){
+  for(const n of nodes){const dx=wx-n.x,dy=wy-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.radius*1.5)return n.id;}
+  return null;
+}
+
+// ── Detail Panel ───────────────────────────────────────
+function showDetail(id){
+  const n=nodes.find(x=>x.id===id); if(!n) return;
+  const col=nodeColor(n);
+  document.getElementById("dpIcon").textContent=nodeEmoji(n.type);
+  document.getElementById("dpTitle").textContent=n.name;
+  const children=nodes.filter(x=>x.parent===n.name);
+  const statusLabel={online:"متصل",offline:"غير متصل",warning:"تحذير"}[n.status]||n.status;
+  document.getElementById("dpBody").innerHTML=`
+    <div class="dp-row"><div class="dp-lbl">عنوان IP</div><div class="dp-val"><span class="ip-code">${n.ip||"—"}</span></div></div>
+    <div class="dp-row"><div class="dp-lbl">الشبكة الفرعية</div><div class="dp-val" style="font-size:13px">${n.subnet||"—"}</div></div>
+    <div class="dp-row"><div class="dp-lbl">الجهاز الرئيسي</div><div class="dp-val">${n.parent||"Core (بلا رئيسي)"}</div></div>
+    <div class="dp-row"><div class="dp-lbl">الحالة</div><div class="dp-val"><span class="status-badge ${n.status}"><span class="sdot2"></span>${statusLabel}</span></div></div>
+    <div class="dp-row"><div class="dp-lbl">الموديل</div><div class="dp-val" style="color:var(--text2)">${n.model||"—"}</div></div>
+    <div class="dp-row"><div class="dp-lbl">الموقع</div><div class="dp-val" style="color:var(--text2)">${n.location||"—"}</div></div>
+    <div class="dp-row"><div class="dp-lbl">التكلفة</div><div class="dp-val" style="color:var(--yellow);font-family:var(--mono)">${n.cost?"$"+parseFloat(n.cost).toLocaleString("en"):"—"}</div></div>
+    ${children.length?`<div class="dp-row"><div class="dp-lbl">الأجهزة التابعة (${children.length})</div><div class="dp-children">${children.map(c=>`<div class="dp-child"><div class="dp-child-dot" style="background:${nodeColor(c).main}"></div>${c.name} <span style="font-family:var(--mono);font-size:10px;color:var(--text2)">${c.ip}</span></div>`).join("")}</div></div>`:""}
+    <div style="margin-top:12px"><a href="devices.html" style="display:block;text-align:center;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--accent);border-radius:7px;padding:7px;font-size:12px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">✏️ تعديل الجهاز</a></div>
+  `;
+  document.getElementById("detailPanel").classList.add("open");
+}
+
+window.closeDetail=()=>{
+  document.getElementById("detailPanel").classList.remove("open");
+  selectedNode=null; scheduleRedraw();
+};
+
+// ── Controls ───────────────────────────────────────────
+window.zoom=factor=>{
+  scale*=factor; scale=Math.min(Math.max(scale,0.2),4);
+  document.getElementById("zoomLevel").textContent=Math.round(scale*100)+"%";
+  scheduleRedraw();
+};
+window.resetView=()=>{ scale=1; offsetX=0; offsetY=0; document.getElementById("zoomLevel").textContent="100%"; scheduleRedraw(); };
+window.fitAll=()=>{
+  if(!nodes.length) return;
+  const xs=nodes.map(n=>n.x), ys=nodes.map(n=>n.y);
+  const minX=Math.min(...xs)-50, maxX=Math.max(...xs)+50;
+  const minY=Math.min(...ys)-50, maxY=Math.max(...ys)+50;
+  const W=canvas.width, H=canvas.height;
+  const scaleX=W/(maxX-minX), scaleY=H/(maxY-minY);
+  scale=Math.min(scaleX,scaleY,1.5);
+  offsetX=W/2-(minX+maxX)/2*scale;
+  offsetY=H/2-(minY+maxY)/2*scale;
+  document.getElementById("zoomLevel").textContent=Math.round(scale*100)+"%";
+  scheduleRedraw();
+};
+window.setLayout=l=>{
+  layout=l;
+  document.getElementById("btnHierarchy").className="tbtn"+(l==="hierarchy"?" active":"");
+  document.getElementById("btnTree").className="tbtn"+(l==="tree"?" active":"");
+  computeLayout(); fitAll(); scheduleRedraw();
+};
+
+function updateStatsBar(){
+  document.getElementById("sbTotal").textContent=devices.length;
+  document.getElementById("sbOnline").textContent=devices.filter(d=>d.status==="online").length;
+  document.getElementById("sbOffline").textContent=devices.filter(d=>d.status==="offline").length;
+  document.getElementById("sbWarn").textContent=devices.filter(d=>d.status==="warning").length;
+}
+</script>
+</body>
+</html>
