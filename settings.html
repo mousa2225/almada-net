@@ -3,187 +3,153 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>المدى نت — الإعدادات</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>الإعدادات — المدى نت</title>
+<link rel="stylesheet" href="theme.css">
 <style>
-:root{--bg:#0a0e1a;--bg2:#0f1525;--bg3:#141c30;--surface:#1a2440;--surface2:#1e2b4a;--border:#243058;--border2:#2e3d6e;--accent:#00d4ff;--accent2:#0099cc;--green:#00e5a0;--yellow:#ffd166;--red:#ff4d6a;--purple:#a78bfa;--text:#e2e8f4;--text2:#8899b8;--mono:'JetBrains Mono',monospace;--sans:'IBM Plex Sans Arabic',sans-serif;}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
-.sidebar{position:fixed;right:0;top:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
-.sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.logo-text h1{font-size:14px;font-weight:700;line-height:1.2}
-.logo-text span{font-size:10px;color:var(--accent);font-family:var(--mono)}
-.sidebar-nav{padding:12px 10px;flex:1;overflow-y:auto}
-.nav-section-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;padding:8px 8px 4px;margin-top:6px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:all .2s;margin-bottom:2px;color:var(--text2);font-size:13px;text-decoration:none}
-.nav-item:hover{background:var(--surface);color:var(--text)}
-.nav-item.active{background:rgba(0,212,255,.12);color:var(--accent)}
-.nav-icon{font-size:15px;width:18px;text-align:center}
-.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
-.net-status{background:var(--surface);border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px}
-.sdot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pg 2s infinite}
-@keyframes pg{0%,100%{opacity:1}50%{opacity:.5}}
-.main{margin-right:240px;min-height:100vh;position:relative;z-index:1}
-.topbar{position:sticky;top:0;background:rgba(10,14,26,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:50}
-.topbar-title{font-size:17px;font-weight:600;flex:1}
-.topbar-title span{color:var(--accent)}
-.content{padding:24px;max-width:800px}
-.section{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:18px;animation:fiu .4s ease both}
-@keyframes fiu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.section:nth-child(1){animation-delay:.05s}.section:nth-child(2){animation-delay:.1s}.section:nth-child(3){animation-delay:.15s}.section:nth-child(4){animation-delay:.2s}
-.sh{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.sh-icon{font-size:18px}
-.sh-title{font-size:14px;font-weight:700;flex:1}
-.sh-desc{font-size:12px;color:var(--text2)}
-.sb{padding:20px}
-.setting-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.section-card{background:linear-gradient(180deg,var(--surface) 0%,rgba(13,20,36,.5) 100%);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:18px;animation:fadeUp .4s ease both}
+.sc-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.sc-icon{width:38px;height:38px;background:var(--accent-soft);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--accent)}
+.sc-title{font-size:15px;font-weight:700;flex:1}
+.sc-desc{font-size:12px;color:var(--text-3);margin-top:2px}
+.sc-body{padding:22px}
+.setting-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
 .setting-row:last-child{border-bottom:none;padding-bottom:0}
+.setting-row:first-child{padding-top:0}
 .sr-info{flex:1}
 .sr-label{font-size:13px;font-weight:600;margin-bottom:2px}
-.sr-desc{font-size:11px;color:var(--text2)}
-.sr-control input,.sr-control select{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .2s;min-width:180px}
+.sr-desc{font-size:11px;color:var(--text-3)}
+.sr-control{flex-shrink:0}
+.sr-control input,.sr-control select{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .2s;min-width:200px}
 .sr-control input:focus,.sr-control select:focus{border-color:var(--accent)}
-.sr-control select option{background:var(--bg2)}
-/* Toggle */
-.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:12px;cursor:pointer;transition:.3s}
-.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;right:3px;top:3px;background:#fff;border-radius:50%;transition:.3s}
-.toggle input:checked+.toggle-slider{background:var(--accent)}
-.toggle input:checked+.toggle-slider::before{transform:translateX(-20px)}
-.save-btn{background:var(--accent);border:none;color:var(--bg);border-radius:8px;padding:9px 24px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;margin-top:16px;transition:background .2s}
-.save-btn:hover{background:var(--accent2)}
-.danger-btn{background:rgba(255,77,106,.12);border:1px solid rgba(255,77,106,.3);color:var(--red);border-radius:8px;padding:8px 18px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
-.danger-btn:hover{background:rgba(255,77,106,.2)}
-.info-box{background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.2);border-radius:9px;padding:12px 16px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px}
-.info-box span{color:var(--accent);font-weight:600}
-.toast-wrap{position:fixed;bottom:24px;left:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-.toast{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:8px;min-width:200px;animation:slideIn .3s ease;transition:opacity .3s}
-.toast.out{opacity:0}
-@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-.toast.success{border-color:rgba(0,229,160,.3);color:var(--green)}
-.toast.error{border-color:rgba(255,77,106,.3);color:var(--red)}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.info-banner{background:linear-gradient(135deg,rgba(6,182,212,.08),rgba(139,92,246,.04));border:1px solid var(--accent-soft);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:14px}
+.info-banner b{color:var(--accent)}
+.warn-banner{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:14px}
+.warn-banner b{color:var(--warn)}
+.curr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px}
+.curr-card{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:11px}
+.curr-card:hover{border-color:var(--border-2)}
+.curr-card.selected{background:var(--accent-soft);border-color:var(--accent)}
+.curr-flag{font-size:24px}
+.curr-info{flex:1;min-width:0}
+.curr-code{font-family:var(--mono);font-size:11px;color:var(--text-3);font-weight:600;letter-spacing:.5px}
+.curr-name{font-size:13px;font-weight:600;margin-bottom:1px}
+.curr-card.selected .curr-name{color:var(--accent)}
+.rates-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:8px}
+.rate-card{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:10px 12px}
+.rate-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;color:var(--text-2)}
+.rate-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:var(--mono);font-size:13px;color:var(--text);outline:none}
+.rate-input:focus{border-color:var(--accent)}
+
+/* Currency change dialog */
+.curr-change-modal .modal-body{padding:24px}
+.curr-old-new{display:flex;align-items:center;gap:12px;justify-content:center;background:var(--surface-2);border-radius:10px;padding:14px;margin-bottom:14px}
+.curr-pill{padding:8px 14px;background:var(--surface);border-radius:8px;font-weight:700;display:flex;align-items:center;gap:6px}
 </style>
 </head>
 <body>
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">🌐</div>
-    <div class="logo-text"><h1>المدى نت</h1><span>ALMADA NET v1.0</span></div>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section-title">الرئيسية</div>
-    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> لوحة التحكم</a>
-    <a href="topology.html" class="nav-item"><span class="nav-icon">🗺️</span> توبولوجيا الشبكة</a>
-    <div class="nav-section-title">الأجهزة والشبكة</div>
-    <a href="devices.html" class="nav-item"><span class="nav-icon">🖥️</span> إدارة الأجهزة</a>
-    <a href="subnets.html" class="nav-item"><span class="nav-icon">🔌</span> الشبكات الفرعية</a>
-    <div class="nav-section-title">الإدارة المالية</div>
-    <a href="finances.html" class="nav-item"><span class="nav-icon">💰</span> الإدارة المالية</a>
-    <a href="purchases.html" class="nav-item"><span class="nav-icon">🛒</span> المشتريات</a>
-    <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> التقارير المالية</a>
-    <div class="nav-section-title">الإعدادات</div>
-    <a href="settings.html" class="nav-item active"><span class="nav-icon">⚙️</span> الإعدادات</a>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="net-status"><div class="sdot"></div>
-      <div><div style="font-size:12px;font-weight:600">متصل بـ Firebase</div><div style="font-size:11px;color:var(--text2)">Firebase Firestore</div></div>
-    </div>
-  </div>
-</aside>
-
+<aside class="sidebar" id="sidebar"></aside>
 <main class="main">
   <header class="topbar">
-    <div class="topbar-title">الإعدادات <span>/ ضبط النظام</span></div>
+    <h1 class="tb-title">الإعدادات <span class="breadcrumb">/ ضبط النظام</span></h1>
   </header>
-  <div class="content">
+  <div class="content" style="max-width:900px">
 
-    <!-- شبكة المدى نت -->
-    <div class="section">
-      <div class="sh"><span class="sh-icon">🌐</span><div><div class="sh-title">معلومات الشبكة</div><div class="sh-desc">البيانات الأساسية لشبكة المدى نت</div></div></div>
-      <div class="sb">
+    <!-- معلومات الشبكة -->
+    <div class="section-card" style="animation-delay:.05s">
+      <div class="sc-head">
+        <div class="sc-icon">◉</div>
+        <div>
+          <div class="sc-title">معلومات الشبكة</div>
+          <div class="sc-desc">البيانات الأساسية لشبكتك</div>
+        </div>
+      </div>
+      <div class="sc-body">
         <div class="setting-row">
-          <div class="sr-info"><div class="sr-label">اسم الشبكة</div><div class="sr-desc">يظهر في لوحة التحكم</div></div>
-          <div class="sr-control"><input type="text" id="netName" value="شبكة المدى نت"></div>
+          <div class="sr-info"><div class="sr-label">اسم الشبكة</div><div class="sr-desc">يظهر في كل صفحات النظام</div></div>
+          <div class="sr-control"><input type="text" id="netName" placeholder="مثال: شبكة المدى نت"></div>
         </div>
         <div class="setting-row">
           <div class="sr-info"><div class="sr-label">اسم المالك</div><div class="sr-desc">صاحب الشبكة</div></div>
           <div class="sr-control"><input type="text" id="ownerName" placeholder="اسمك"></div>
         </div>
-        <div class="setting-row">
-          <div class="sr-info"><div class="sr-label">رقم التواصل</div><div class="sr-desc">للطوارئ والدعم</div></div>
-          <div class="sr-control"><input type="text" id="phone" placeholder="+967xxxxxxxxx"></div>
+        <div style="margin-top:14px">
+          <button class="btn btn-primary" onclick="saveBasic()">💾 حفظ معلومات الشبكة</button>
         </div>
-        <button class="save-btn" onclick="saveGeneral()">💾 حفظ</button>
       </div>
     </div>
 
     <!-- العملة -->
-    <div class="section">
-      <div class="sh"><span class="sh-icon">💵</span><div><div class="sh-title">العملة والمالية</div><div class="sh-desc">إعدادات العملة المستخدمة في النظام</div></div></div>
-      <div class="sb">
-        <div class="info-box">العملة الحالية: <span>ريال يمني (ر.ي)</span> — كل الأرقام المالية تُعرض بالريال اليمني</div>
-        <div class="setting-row">
-          <div class="sr-info"><div class="sr-label">العملة</div><div class="sr-desc">رمز العملة في النظام</div></div>
-          <div class="sr-control">
-            <select id="currency">
-              <option value="ر.ي" selected>ريال يمني (ر.ي)</option>
-              <option value="$">دولار ($)</option>
-              <option value="ر.س">ريال سعودي (ر.س)</option>
-              <option value="د.إ">درهم إماراتي (د.إ)</option>
-            </select>
+    <div class="section-card" style="animation-delay:.1s">
+      <div class="sc-head">
+        <div class="sc-icon">◆</div>
+        <div>
+          <div class="sc-title">العملة وأسعار الصرف</div>
+          <div class="sc-desc">العملة الأساسية وكيف يتم تحويل العملات الأخرى</div>
+        </div>
+      </div>
+      <div class="sc-body">
+
+        <div class="info-banner">
+          💡 <b>كيف يعمل النظام؟</b><br>
+          النظام يحفظ كل المبالغ بالعملة الأساسية (<b id="baseCurDisplay">SAR</b>). عند تغيير عملة العرض،
+          تتحول كل الأرقام تلقائياً حسب أسعار الصرف. <b>تأكد من تحديث الأسعار قبل التغيير!</b>
+        </div>
+
+        <div class="setting-row" style="border-bottom:none;padding-bottom:0">
+          <div class="sr-info">
+            <div class="sr-label">العملة الأساسية</div>
+            <div class="sr-desc">يتم حفظ كل المبالغ بهذه العملة في قاعدة البيانات</div>
           </div>
         </div>
-        <div class="setting-row">
-          <div class="sr-info"><div class="sr-label">الميزانية السنوية المستهدفة</div><div class="sr-desc">للمقارنة في التقارير</div></div>
-          <div class="sr-control"><input type="number" id="budget" placeholder="0"></div>
-        </div>
-        <button class="save-btn" onclick="saveCurrency()">💾 حفظ</button>
-      </div>
-    </div>
+        <div class="curr-grid" id="baseCurrGrid"></div>
 
-    <!-- الإشعارات -->
-    <div class="section">
-      <div class="sh"><span class="sh-icon">🔔</span><div><div class="sh-title">التنبيهات</div><div class="sh-desc">متى تظهر التنبيهات</div></div></div>
-      <div class="sb">
-        <div class="setting-row">
-          <div class="sr-info"><div class="sr-label">تنبيه عند انقطاع جهاز</div><div class="sr-desc">يظهر تنبيه فوري</div></div>
-          <label class="toggle"><input type="checkbox" id="alertOffline" checked><span class="toggle-slider"></span></label>
+        <div class="setting-row" style="margin-top:18px;border-bottom:none">
+          <div class="sr-info">
+            <div class="sr-label">عملة العرض</div>
+            <div class="sr-desc">العملة التي تظهر للمستخدم — تتحول تلقائياً</div>
+          </div>
         </div>
-        <div class="setting-row">
-          <div class="sr-info"><div class="sr-label">تنبيه امتلاء الـ IPs</div><div class="sr-desc">عند تجاوز 85%</div></div>
-          <label class="toggle"><input type="checkbox" id="alertIp" checked><span class="toggle-slider"></span></label>
+        <div class="curr-grid" id="dispCurrGrid"></div>
+
+        <div style="margin-top:22px">
+          <div class="text-sm fw-700 mb-3" style="color:var(--text-2)">أسعار الصرف (1 وحدة من العملة الأساسية = ؟)</div>
+          <div class="rates-grid" id="ratesGrid"></div>
         </div>
-        <div class="setting-row">
-          <div class="sr-info"><div class="sr-label">تنبيه المصاريف العالية</div><div class="sr-desc">عند تجاوز الميزانية</div></div>
-          <label class="toggle"><input type="checkbox" id="alertBudget"><span class="toggle-slider"></span></label>
+
+        <div style="margin-top:18px">
+          <button class="btn btn-primary" onclick="saveCurrency()">💾 حفظ إعدادات العملة</button>
         </div>
-        <button class="save-btn" onclick="saveNotif()">💾 حفظ</button>
       </div>
     </div>
 
     <!-- معلومات النظام -->
-    <div class="section">
-      <div class="sh"><span class="sh-icon">ℹ️</span><div><div class="sh-title">معلومات النظام</div></div></div>
-      <div class="sb">
+    <div class="section-card" style="animation-delay:.15s">
+      <div class="sc-head">
+        <div class="sc-icon">ℹ</div>
+        <div>
+          <div class="sc-title">معلومات النظام</div>
+        </div>
+      </div>
+      <div class="sc-body">
         <div class="setting-row">
           <div class="sr-info"><div class="sr-label">الإصدار</div></div>
-          <div style="font-family:var(--mono);font-size:12px;color:var(--accent)">v1.0.0</div>
+          <div class="text-mono text-accent text-sm">v2.0.0</div>
         </div>
         <div class="setting-row">
           <div class="sr-info"><div class="sr-label">قاعدة البيانات</div></div>
-          <div style="font-size:12px;color:var(--green)">Firebase Firestore ✅</div>
+          <div class="text-success text-sm fw-600">✓ Firebase Firestore</div>
         </div>
         <div class="setting-row">
           <div class="sr-info"><div class="sr-label">الاستضافة</div></div>
-          <div style="font-size:12px;color:var(--green)">Firebase Hosting ✅</div>
+          <div class="text-success text-sm fw-600">✓ Firebase Hosting</div>
         </div>
         <div class="setting-row">
           <div class="sr-info"><div class="sr-label">Project ID</div></div>
-          <div style="font-family:var(--mono);font-size:11px;color:var(--text2)">almadadashboard</div>
+          <div class="text-mono text-3 text-xs">almadadashboard</div>
+        </div>
+        <div class="setting-row">
+          <div class="sr-info"><div class="sr-label">URL</div></div>
+          <a href="https://almadadashboard.web.app" target="_blank" class="text-accent text-mono text-xs" style="text-decoration:none">almadadashboard.web.app ↗</a>
         </div>
       </div>
     </div>
@@ -191,62 +157,178 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   </div>
 </main>
 
-<div class="toast-wrap" id="toastWrap"></div>
+<!-- Currency change confirmation -->
+<div class="modal-overlay" id="currChangeModal">
+  <div class="modal modal-sm curr-change-modal">
+    <div class="modal-header">
+      <div class="modal-icon">↔</div>
+      <div class="modal-title">تأكيد تغيير العملة</div>
+      <button class="modal-close" onclick="closeM('currChangeModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="curr-old-new">
+        <div class="curr-pill" id="oldCur">—</div>
+        <span style="font-size:18px;color:var(--accent)">←</span>
+        <div class="curr-pill" id="newCur">—</div>
+      </div>
+      <div class="warn-banner">
+        ⚠ <b>هذا تغيير مهم!</b><br>
+        سيتم استخدام سعر الصرف لتحويل كل المبالغ المعروضة. تأكد أن السعر صحيح.
+      </div>
+      <div class="fg">
+        <label>سعر صرف 1 <b id="rateBase">SAR</b> = كم <b id="rateNew">USD</b>؟</label>
+        <input type="number" id="rateInput" class="input-mono" step="0.000001" min="0" placeholder="0.27">
+        <div class="hint" id="rateHint">مثال: إذا 1 ريال سعودي = 0.27 دولار، اكتب 0.27</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeM('currChangeModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="confirmCurrencyChange()">✓ تأكيد التغيير</button>
+    </div>
+  </div>
+</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  db, doc, setDoc, getDoc, serverTimestamp,
+  watchSettings, getSettings, getAllCurrencies, getCurrencyInfo,
+  esc, renderSidebar, toast, openModal, closeModal
+} from "./app.js";
 
-const firebaseConfig={apiKey:"AIzaSyDdYIiZcithhvDRLwHwahV6-W_puXHN4rs",authDomain:"almadadashboard.firebaseapp.com",projectId:"almadadashboard",storageBucket:"almadadashboard.firebasestorage.app",messagingSenderId:"172655018085",appId:"1:172655018085:web:6b956408061985c3ccc68c"};
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
+document.getElementById("sidebar").innerHTML = renderSidebar("settings");
 
-// Load settings
-async function loadSettings(){
-  try{
-    const d=await getDoc(doc(db,"settings","general"));
-    if(d.exists()){
-      const s=d.data();
-      if(s.netName) document.getElementById("netName").value=s.netName;
-      if(s.ownerName) document.getElementById("ownerName").value=s.ownerName;
-      if(s.phone) document.getElementById("phone").value=s.phone;
-      if(s.currency) document.getElementById("currency").value=s.currency;
-      if(s.budget) document.getElementById("budget").value=s.budget;
-      if(s.alertOffline!==undefined) document.getElementById("alertOffline").checked=s.alertOffline;
-      if(s.alertIp!==undefined) document.getElementById("alertIp").checked=s.alertIp;
-      if(s.alertBudget!==undefined) document.getElementById("alertBudget").checked=s.alertBudget;
-    }
-  }catch(e){}
+let currentSettings = null;
+let pendingDispCurrency = null;
+
+watchSettings(s => {
+  currentSettings = s;
+  document.getElementById("netName").value = s.netName || "";
+  document.getElementById("ownerName").value = s.ownerName || "";
+  document.getElementById("baseCurDisplay").textContent = s.baseCurrency || "SAR";
+  renderCurrencies();
+  renderRates();
+  // Update sidebar
+  const sn=document.getElementById("sbNetName");
+  if(sn)sn.textContent=s.netName;
+});
+
+function renderCurrencies(){
+  const all=getAllCurrencies();
+  const baseGrid=document.getElementById("baseCurrGrid");
+  const dispGrid=document.getElementById("dispCurrGrid");
+  baseGrid.innerHTML=Object.entries(all).map(([code,info])=>`
+    <div class="curr-card ${currentSettings.baseCurrency===code?'selected':''}" onclick="selectBase('${code}')">
+      <div class="curr-flag">${info.flag}</div>
+      <div class="curr-info">
+        <div class="curr-name">${info.name}</div>
+        <div class="curr-code">${code} (${info.symbol})</div>
+      </div>
+    </div>
+  `).join("");
+  dispGrid.innerHTML=Object.entries(all).map(([code,info])=>`
+    <div class="curr-card ${currentSettings.displayCurrency===code?'selected':''}" onclick="selectDisplay('${code}')">
+      <div class="curr-flag">${info.flag}</div>
+      <div class="curr-info">
+        <div class="curr-name">${info.name}</div>
+        <div class="curr-code">${code} (${info.symbol})</div>
+      </div>
+    </div>
+  `).join("");
 }
-loadSettings();
 
-window.saveGeneral=async()=>{
-  await setDoc(doc(db,"settings","general"),{
-    netName:document.getElementById("netName").value,
-    ownerName:document.getElementById("ownerName").value,
-    phone:document.getElementById("phone").value,
-  },{merge:true});
-  showToast("تم حفظ معلومات الشبكة ✅","success");
+function renderRates(){
+  const all=getAllCurrencies();
+  const base=currentSettings.baseCurrency||"SAR";
+  const rates=currentSettings.exchangeRates||{};
+  const grid=document.getElementById("ratesGrid");
+  grid.innerHTML=Object.entries(all).filter(([code])=>code!==base).map(([code,info])=>`
+    <div class="rate-card">
+      <div class="rate-head">
+        <span style="font-size:18px">${info.flag}</span>
+        <span>1 ${base} = </span>
+        <input type="number" class="rate-input" data-code="${code}" value="${rates[code]||1}" step="0.000001" min="0">
+        <span class="text-mono text-3">${code}</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+window.selectBase = code => {
+  if(currentSettings.baseCurrency === code) return;
+  // Confirm changing base
+  if(!confirm(`تغيير العملة الأساسية إلى ${code}؟\nهذا يؤثر على كيفية حفظ الأرقام في قاعدة البيانات.`)) return;
+  currentSettings.baseCurrency = code;
+  // If display matches old base, update too
+  renderCurrencies();
+  renderRates();
 };
 
-window.saveCurrency=async()=>{
-  await setDoc(doc(db,"settings","general"),{
-    currency:document.getElementById("currency").value,
-    budget:parseFloat(document.getElementById("budget").value)||0,
-  },{merge:true});
-  showToast("تم حفظ إعدادات العملة ✅","success");
+window.selectDisplay = code => {
+  if(currentSettings.displayCurrency === code) return;
+  // If selecting different from base, ask for exchange rate
+  if(code === currentSettings.baseCurrency){
+    currentSettings.displayCurrency = code;
+    renderCurrencies();
+    return;
+  }
+  // Open rate modal
+  pendingDispCurrency = code;
+  const baseCur = getCurrencyInfo(currentSettings.baseCurrency);
+  const newCur = getCurrencyInfo(code);
+  document.getElementById("oldCur").innerHTML = `${getCurrencyInfo(currentSettings.displayCurrency).flag} ${currentSettings.displayCurrency}`;
+  document.getElementById("newCur").innerHTML = `${newCur.flag} ${code}`;
+  document.getElementById("rateBase").textContent = currentSettings.baseCurrency;
+  document.getElementById("rateNew").textContent = code;
+  document.getElementById("rateInput").value = currentSettings.exchangeRates?.[code] || 1;
+  document.getElementById("rateHint").textContent = `مثال: إذا 1 ${currentSettings.baseCurrency} = X ${code}، اكتب X`;
+  openModal("currChangeModal");
 };
 
-window.saveNotif=async()=>{
-  await setDoc(doc(db,"settings","general"),{
-    alertOffline:document.getElementById("alertOffline").checked,
-    alertIp:document.getElementById("alertIp").checked,
-    alertBudget:document.getElementById("alertBudget").checked,
-  },{merge:true});
-  showToast("تم حفظ إعدادات التنبيهات ✅","success");
+window.confirmCurrencyChange = () => {
+  const rate = parseFloat(document.getElementById("rateInput").value);
+  if(!rate || rate <= 0){ toast("سعر الصرف مطلوب وصحيح","error"); return; }
+  currentSettings.displayCurrency = pendingDispCurrency;
+  currentSettings.exchangeRates = { ...currentSettings.exchangeRates, [pendingDispCurrency]: rate };
+  closeModal("currChangeModal");
+  renderCurrencies();
+  renderRates();
+  toast("تم تغيير العملة — اضغط حفظ للتثبيت","info");
 };
 
-function showToast(msg,type="info"){const w=document.getElementById("toastWrap"),t=document.createElement("div");t.className="toast "+type;t.innerHTML=`<span>${{success:"✅",error:"❌",info:"ℹ️"}[type]}</span><span>${msg}</span>`;w.appendChild(t);setTimeout(()=>{t.classList.add("out");setTimeout(()=>t.remove(),350)},3500);}
+window.saveBasic = async () => {
+  const netName = document.getElementById("netName").value.trim();
+  const ownerName = document.getElementById("ownerName").value.trim();
+  if(!netName){ toast("اسم الشبكة مطلوب","error"); return; }
+  try{
+    await setDoc(doc(db,"settings","main"),{
+      netName, ownerName, isSetup: true,
+      updatedAt: serverTimestamp()
+    },{merge:true});
+    toast("تم الحفظ ✓","success");
+  }catch(e){ toast("خطأ: "+e.message,"error"); }
+};
+
+window.saveCurrency = async () => {
+  // Collect all rates from inputs
+  const rates = { [currentSettings.baseCurrency]: 1 };
+  document.querySelectorAll(".rate-input").forEach(inp => {
+    const code = inp.dataset.code;
+    const v = parseFloat(inp.value);
+    if(v > 0) rates[code] = v;
+  });
+  try{
+    await setDoc(doc(db,"settings","main"),{
+      baseCurrency: currentSettings.baseCurrency,
+      displayCurrency: currentSettings.displayCurrency,
+      exchangeRates: rates,
+      isSetup: true,
+      updatedAt: serverTimestamp()
+    },{merge:true});
+    toast("تم الحفظ ✓","success");
+  }catch(e){ toast("خطأ: "+e.message,"error"); }
+};
+
+window.closeM = closeModal;
 </script>
 </body>
 </html>
