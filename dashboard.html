@@ -3,275 +3,242 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>المدى نت — لوحة التحكم</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>لوحة التحكم — المدى نت</title>
+<link rel="stylesheet" href="theme.css">
 <style>
-:root{
-  --bg:#0a0e1a;--bg2:#0f1525;--bg3:#141c30;
-  --surface:#1a2440;--surface2:#1e2b4a;
-  --border:#243058;--border2:#2e3d6e;
-  --accent:#00d4ff;--accent2:#0099cc;
-  --green:#00e5a0;--yellow:#ffd166;--red:#ff4d6a;--purple:#a78bfa;
-  --text:#e2e8f4;--text2:#8899b8;
-  --mono:'JetBrains Mono',monospace;
-  --sans:'IBM Plex Sans Arabic',sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.welcome-banner{background:linear-gradient(135deg,rgba(6,182,212,.08) 0%,rgba(139,92,246,.05) 100%);border:1px solid var(--accent-soft);border-radius:var(--r-xl);padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:14px;animation:fadeUp .4s ease both}
+.wb-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;color:white;flex-shrink:0;box-shadow:0 6px 16px rgba(6,182,212,.3)}
+.wb-text{flex:1;min-width:0}
+.wb-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:2px}
+.wb-sub{font-size:12px;color:var(--text-2)}
+.wb-time{font-size:11px;color:var(--text-3);font-family:var(--mono);white-space:nowrap}
 
-.sidebar{position:fixed;right:0;top:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
-.sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.logo-text h1{font-size:14px;font-weight:700;line-height:1.2}
-.logo-text span{font-size:10px;color:var(--accent);font-family:var(--mono)}
-.sidebar-nav{padding:12px 10px;flex:1;overflow-y:auto}
-.nav-section-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;padding:8px 8px 4px;margin-top:6px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:all .2s;margin-bottom:2px;color:var(--text2);font-size:13px;text-decoration:none}
-.nav-item:hover{background:var(--surface);color:var(--text)}
-.nav-item.active{background:rgba(0,212,255,.12);color:var(--accent)}
-.nav-icon{font-size:15px;width:18px;text-align:center}
-.nav-badge{margin-right:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
-.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
-.net-status{background:var(--surface);border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px}
-.sdot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pg 2s infinite}
-@keyframes pg{0%,100%{opacity:1;box-shadow:0 0 8px var(--green)}50%{opacity:.5;box-shadow:0 0 16px var(--green)}}
+.alerts-list{display:flex;flex-direction:column;gap:8px;padding:16px}
+.alert-item{display:flex;gap:11px;padding:11px 13px;border-radius:10px;font-size:12px;border:1px solid;align-items:flex-start;transition:all .15s}
+.alert-item:hover{transform:translateX(-2px)}
+.alert-critical{background:var(--danger-soft);border-color:rgba(239,68,68,.25)}
+.alert-warn{background:var(--warn-soft);border-color:rgba(245,158,11,.25)}
+.alert-info{background:var(--info-soft);border-color:rgba(59,130,246,.2)}
+.alert-success{background:var(--success-soft);border-color:rgba(16,185,129,.25)}
+.alert-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:rgba(255,255,255,.05)}
+.alert-content{flex:1;min-width:0}
+.alert-title{font-weight:600;margin-bottom:2px}
+.alert-critical .alert-title{color:var(--danger)}
+.alert-warn .alert-title{color:var(--warn)}
+.alert-info .alert-title{color:var(--info)}
+.alert-success .alert-title{color:var(--success)}
+.alert-desc{color:var(--text-2);line-height:1.5}
+.alert-time{font-size:10px;color:var(--text-3);white-space:nowrap;margin-top:2px;font-family:var(--mono)}
 
-.main{margin-right:240px;min-height:100vh;position:relative;z-index:1}
-.topbar{position:sticky;top:0;background:rgba(10,14,26,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:50}
-.topbar-title{font-size:17px;font-weight:600;flex:1}
-.topbar-title span{color:var(--accent)}
-.last-updated{font-size:11px;color:var(--text2);font-family:var(--mono)}
-.tbtn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 14px;font-family:var(--sans);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;text-decoration:none}
-.tbtn:hover{background:var(--surface2);border-color:var(--border2)}
-.tbtn.primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700}
-.tbtn.primary:hover{background:var(--accent2)}
+.topo-preview{height:340px;background:radial-gradient(ellipse at center,rgba(6,182,212,.04) 0%,transparent 70%);position:relative;overflow:hidden;cursor:pointer}
+.topo-preview canvas{width:100%;height:100%;display:block}
+.topo-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-3);background:linear-gradient(180deg,transparent 0%,rgba(13,20,36,.6) 100%);opacity:0;transition:opacity .3s;pointer-events:none}
+.topo-preview:hover .topo-overlay{opacity:1}
 
-.content{padding:24px}
+.tx-row{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:1px solid var(--border);transition:background .15s}
+.tx-row:last-child{border-bottom:none}
+.tx-row:hover{background:rgba(255,255,255,.015)}
+.tx-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.tx-info{flex:1;min-width:0}
+.tx-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-date{font-size:11px;color:var(--text-3);font-family:var(--mono)}
+.tx-amount{font-family:var(--mono);font-weight:700;font-size:13px;white-space:nowrap}
+.tx-amount.neg{color:var(--danger)}
+.tx-amount.pos{color:var(--success)}
 
-/* KPI */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
-.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;animation:fiu .4s ease both;cursor:default}
-.kpi:hover{border-color:var(--border2);transform:translateY(-2px)}
-@keyframes fiu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.kpi:nth-child(1){animation-delay:.05s}.kpi:nth-child(2){animation-delay:.1s}.kpi:nth-child(3){animation-delay:.15s}.kpi:nth-child(4){animation-delay:.2s}
-.kpi-corner{position:absolute;top:0;right:0;width:60px;height:60px;border-radius:0 13px 0 60px;opacity:.07}
-.kpi-lbl{font-size:11px;color:var(--text2);font-weight:500;margin-bottom:6px;display:flex;align-items:center;gap:5px}
-.kpi-val{font-size:28px;font-weight:700;font-family:var(--mono);line-height:1;margin-bottom:6px}
-.kpi.ck-blue .kpi-val{color:var(--accent)}.kpi.ck-green .kpi-val{color:var(--green)}.kpi.ck-red .kpi-val{color:var(--red)}.kpi.ck-yellow .kpi-val{color:var(--yellow)}.kpi.ck-purple .kpi-val{color:var(--purple)}
-.kpi.ck-blue .kpi-corner{background:var(--accent)}.kpi.ck-green .kpi-corner{background:var(--green)}.kpi.ck-red .kpi-corner{background:var(--red)}.kpi.ck-yellow .kpi-corner{background:var(--yellow)}.kpi.ck-purple .kpi-corner{background:var(--purple)}
-.kpi-sub{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px}
-.kpi-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
-.kpi-badge.up{background:rgba(0,229,160,.15);color:var(--green)}
-.kpi-badge.down{background:rgba(255,77,106,.15);color:var(--red)}
-
-/* GRIDS */
-.grid-3-1{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
-
-/* PANEL */
-.panel{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;animation:fiu .4s ease .25s both}
-.ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.ph-title{font-size:14px;font-weight:600;flex:1}
-.ph-link{font-size:12px;color:var(--accent);text-decoration:none}
-.ph-link:hover{text-decoration:underline}
-
-/* TOPOLOGY PREVIEW */
-.topo-preview{height:280px;overflow:hidden;background:radial-gradient(ellipse at 50% 60%,rgba(0,212,255,.04)0%,transparent 70%);position:relative}
-canvas#miniTopo{width:100%;height:100%;display:block}
-
-/* ALERTS */
-.alert-list{padding:12px 14px;display:flex;flex-direction:column;gap:7px}
-.alert-item{display:flex;gap:9px;padding:9px 11px;border-radius:8px;font-size:12px;border:1px solid;transition:border-color .2s}
-.alert-item:hover{filter:brightness(1.1)}
-.alert-item.critical{background:rgba(255,77,106,.07);border-color:rgba(255,77,106,.2)}
-.alert-item.warn{background:rgba(255,209,102,.07);border-color:rgba(255,209,102,.2)}
-.alert-item.info{background:rgba(0,212,255,.07);border-color:rgba(0,212,255,.15)}
-.alert-item.success{background:rgba(0,229,160,.07);border-color:rgba(0,229,160,.2)}
-.al-icon{font-size:14px;flex-shrink:0;margin-top:1px}
-.al-content{flex:1}
-.al-title{font-weight:600;margin-bottom:1px}
-.alert-item.critical .al-title{color:var(--red)}
-.alert-item.warn .al-title{color:var(--yellow)}
-.alert-item.info .al-title{color:var(--accent)}
-.alert-item.success .al-title{color:var(--green)}
-.al-desc{color:var(--text2);line-height:1.4}
-.al-time{font-size:10px;color:var(--text2);white-space:nowrap;margin-top:1px}
-
-/* DEVICE TABLE */
-table{width:100%;border-collapse:collapse}
-th{padding:8px 14px;text-align:right;font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.02)}
-.ip-code{font-family:var(--mono);font-size:11px;color:var(--accent);background:rgba(0,212,255,.08);padding:2px 7px;border-radius:4px}
-.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
-.online{background:rgba(0,229,160,.12);color:var(--green)}.offline{background:rgba(255,77,106,.12);color:var(--red)}.warning{background:rgba(255,209,102,.12);color:var(--yellow)}
-.sdot2{width:5px;height:5px;border-radius:50%}
-.online .sdot2{background:var(--green)}.offline .sdot2{background:var(--red)}.warning .sdot2{background:var(--yellow)}
-
-/* FINANCE MINI */
-.finance-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
-.finance-row:last-child{border-bottom:none}
-.fc-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.fc-info{flex:1}
-.fc-name{font-size:13px;font-weight:500}
-.fc-date{font-size:11px;color:var(--text2)}
-.fc-amt{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--red)}
-
-/* SUBNET BARS */
-.subnet-rows{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-.sn-row{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:11px 13px;transition:border-color .2s}
-.sn-row:hover{border-color:var(--border2)}
+.subnet-rows{padding:14px;display:flex;flex-direction:column;gap:9px}
+.sn-card{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;transition:all .15s}
+.sn-card:hover{border-color:var(--border-2);transform:translateY(-1px)}
 .sn-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .sn-name{font-size:13px;font-weight:600}
-.sn-cidr{font-family:var(--mono);font-size:11px;color:var(--accent)}
-.sn-meta{display:flex;gap:14px;font-size:11px;color:var(--text2);margin-bottom:6px}
-.sn-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.sn-pct{font-size:10px;font-family:var(--mono);font-weight:700;padding:2px 6px;border-radius:4px}
+.sn-meta{display:flex;gap:14px;font-size:11px;color:var(--text-3);margin-bottom:7px}
+.sn-bar{height:5px;background:var(--surface-3);border-radius:3px;overflow:hidden}
 .sn-bar-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
 
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.profit-banner{padding:24px;border-radius:var(--r-xl);position:relative;overflow:hidden;margin-bottom:20px}
+.profit-banner.profit{background:linear-gradient(135deg,rgba(16,185,129,.08) 0%,rgba(6,182,212,.04) 100%);border:1px solid rgba(16,185,129,.25)}
+.profit-banner.loss{background:linear-gradient(135deg,rgba(239,68,68,.08) 0%,rgba(245,158,11,.04) 100%);border:1px solid rgba(239,68,68,.25)}
+.profit-banner.neutral{background:linear-gradient(135deg,rgba(245,158,11,.08) 0%,rgba(6,182,212,.04) 100%);border:1px solid rgba(245,158,11,.25)}
+.pb-row{display:flex;align-items:center;gap:18px}
+.pb-emoji{font-size:42px;flex-shrink:0}
+.pb-text{flex:1}
+.pb-label{font-size:12px;color:var(--text-2);margin-bottom:4px}
+.pb-amount{font-size:30px;font-weight:700;font-family:var(--mono);line-height:1.1;margin-bottom:6px}
+.profit-banner.profit .pb-amount{color:var(--success)}
+.profit-banner.loss .pb-amount{color:var(--danger)}
+.profit-banner.neutral .pb-amount{color:var(--warn)}
+.pb-sub{font-size:12px;color:var(--text-3)}
+
+.quick-actions{display:flex;gap:8px;flex-wrap:wrap}
+.qa-btn{flex:1;min-width:130px;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:13px;font-family:inherit;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .15s;text-decoration:none}
+.qa-btn:hover{border-color:var(--accent);background:var(--accent-soft);transform:translateY(-2px)}
+.qa-icon{width:28px;height:28px;background:var(--accent-soft);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:13px}
 </style>
 </head>
 <body>
 
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">🌐</div>
-    <div class="logo-text"><h1>المدى نت</h1><span>ALMADA NET v1.0</span></div>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section-title">الرئيسية</div>
-    <a href="dashboard.html" class="nav-item active"><span class="nav-icon">📊</span> لوحة التحكم</a>
-    <a href="topology.html" class="nav-item"><span class="nav-icon">🗺️</span> توبولوجيا الشبكة</a>
-    <div class="nav-section-title">الأجهزة والشبكة</div>
-    <a href="devices.html" class="nav-item"><span class="nav-icon">🖥️</span> إدارة الأجهزة</a>
-    <a href="subnets.html" class="nav-item"><span class="nav-icon">🔌</span> الشبكات الفرعية</a>
-    <div class="nav-section-title">الإدارة المالية</div>
-    <a href="finances.html" class="nav-item"><span class="nav-icon">💰</span> الإدارة المالية</a>
-    <a href="finances.html" class="nav-item"><span class="nav-icon">🛒</span> المشتريات</a>
-    <a href="finances.html" class="nav-item"><span class="nav-icon">📈</span> التقارير المالية</a>
-    <div class="nav-section-title">الإعدادات</div>
-    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> الإعدادات</a>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="net-status">
-      <div class="sdot"></div>
-      <div>
-        <div style="font-size:12px;font-weight:600" id="fbStatus">جاري الاتصال...</div>
-        <div style="font-size:11px;color:var(--text2)">Firebase Firestore</div>
-      </div>
-    </div>
-  </div>
-</aside>
+<aside class="sidebar" id="sidebar"></aside>
 
 <main class="main">
   <header class="topbar">
-    <div class="topbar-title">لوحة التحكم <span>/ نظرة عامة</span></div>
-    <div class="last-updated">آخر تحديث: <span id="lastUpdate">—</span></div>
-    <a href="devices.html" class="tbtn primary">＋ إضافة جهاز</a>
+    <h1 class="tb-title">لوحة التحكم <span class="breadcrumb">/ نظرة عامة</span></h1>
+    <div class="text-xs text-3 text-mono" id="lastUpdate">—</div>
+    <a href="devices.html" class="btn btn-primary btn-sm">＋ إضافة جهاز</a>
   </header>
 
   <div class="content">
 
+    <!-- WELCOME BANNER -->
+    <div class="welcome-banner">
+      <div class="wb-icon">◉</div>
+      <div class="wb-text">
+        <div class="wb-title" id="wbTitle">جاري التحميل...</div>
+        <div class="wb-sub" id="wbSub">مرحباً بك في لوحة التحكم</div>
+      </div>
+      <div class="wb-time" id="wbTime">—</div>
+    </div>
+
     <!-- KPIs -->
     <div class="kpi-grid">
-      <div class="kpi ck-blue">
-        <div class="kpi-corner"></div>
-        <div class="kpi-lbl">🖥️ إجمالي الأجهزة</div>
-        <div class="kpi-val" id="k-total">—</div>
-        <div class="kpi-sub"><span class="kpi-badge up" id="k-total-sub">—</span></div>
+      <div class="kpi kpi-blue">
+        <div class="kpi-label"><span class="kpi-icon">▤</span> إجمالي الأجهزة</div>
+        <div class="kpi-value" id="k-total">0</div>
+        <div class="kpi-sub" id="k-total-sub">في قاعدة البيانات</div>
       </div>
-      <div class="kpi ck-green">
-        <div class="kpi-corner"></div>
-        <div class="kpi-lbl">✅ الأجهزة المتصلة</div>
-        <div class="kpi-val" id="k-online">—</div>
-        <div class="kpi-sub" id="k-pct">—</div>
+      <div class="kpi kpi-green">
+        <div class="kpi-label"><span class="kpi-icon">●</span> أجهزة متصلة</div>
+        <div class="kpi-value" id="k-online">0</div>
+        <div class="kpi-sub" id="k-online-sub">—</div>
       </div>
-      <div class="kpi ck-yellow">
-        <div class="kpi-corner"></div>
-        <div class="kpi-lbl">💵 إجمالي التكاليف</div>
-        <div class="kpi-val" id="k-cost" style="font-size:20px">—</div>
-        <div class="kpi-sub" id="k-cost-sub">—</div>
+      <div class="kpi kpi-yellow">
+        <div class="kpi-label"><span class="kpi-icon">◈</span> الشبكات الفرعية</div>
+        <div class="kpi-value" id="k-subnets">0</div>
+        <div class="kpi-sub" id="k-ips-sub">—</div>
       </div>
-      <div class="kpi ck-purple">
-        <div class="kpi-corner"></div>
-        <div class="kpi-lbl">🔌 الشبكات الفرعية</div>
-        <div class="kpi-val" id="k-subnets">—</div>
-        <div class="kpi-sub" id="k-ips">—</div>
+      <div class="kpi kpi-purple">
+        <div class="kpi-label"><span class="kpi-icon">◆</span> صافي الميزانية</div>
+        <div class="kpi-value" id="k-net" style="font-size:22px">—</div>
+        <div class="kpi-sub" id="k-net-sub">—</div>
+      </div>
+    </div>
+
+    <!-- PROFIT BANNER -->
+    <div class="profit-banner" id="profitBanner" style="display:none">
+      <div class="pb-row">
+        <div class="pb-emoji" id="pbEmoji">📊</div>
+        <div class="pb-text">
+          <div class="pb-label" id="pbLabel">الوضع المالي</div>
+          <div class="pb-amount" id="pbAmount">—</div>
+          <div class="pb-sub" id="pbSub">—</div>
+        </div>
+        <a href="reports.html" class="btn btn-sm">عرض التقرير الكامل ←</a>
       </div>
     </div>
 
     <!-- TOPOLOGY + ALERTS -->
-    <div class="grid-3-1">
-      <div class="panel">
-        <div class="ph">
-          <span>🗺️</span>
-          <div class="ph-title">توبولوجيا الشبكة</div>
-          <a href="topology.html" class="ph-link">عرض التفاعلي ←</a>
+    <div class="grid-2-1 mb-5">
+      <div class="panel fade-up" style="animation-delay:.1s">
+        <div class="panel-header">
+          <span class="panel-icon">◈</span>
+          <div class="panel-title">توبولوجيا الشبكة</div>
+          <a href="topology.html" class="panel-link">عرض تفاعلي ←</a>
         </div>
-        <div class="topo-preview">
-          <canvas id="miniTopo"></canvas>
-          <div id="topoEmpty" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text2)">
-            <div style="font-size:32px">🔌</div><div style="font-size:13px">لا توجد أجهزة بعد</div>
+        <a href="topology.html" style="text-decoration:none">
+          <div class="topo-preview">
+            <canvas id="miniTopo"></canvas>
+            <div id="topoEmptyMsg" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text-3)">
+              <div style="font-size:36px;opacity:.5">◈</div>
+              <div style="font-size:13px">لا توجد أجهزة بعد</div>
+            </div>
+            <div class="topo-overlay">
+              <span style="font-size:24px">⊕</span>
+              <span style="font-size:13px;font-weight:600">انقر للعرض التفاعلي</span>
+            </div>
           </div>
-        </div>
+        </a>
       </div>
 
-      <div class="panel">
-        <div class="ph">
-          <span>🔔</span>
-          <div class="ph-title">التنبيهات</div>
-          <span id="alertBadge" style="font-size:11px;background:rgba(255,77,106,.2);color:var(--red);padding:2px 8px;border-radius:10px;font-weight:700;display:none">0</span>
+      <div class="panel fade-up" style="animation-delay:.15s">
+        <div class="panel-header">
+          <span class="panel-icon">⚠</span>
+          <div class="panel-title">التنبيهات</div>
+          <span id="alertCount" class="badge badge-red" style="display:none">0</span>
         </div>
-        <div class="alert-list" id="alertList">
-          <div style="padding:20px;text-align:center;color:var(--text2)">جاري التحميل...</div>
+        <div class="alerts-list" id="alertList">
+          <div class="alert-item alert-info">
+            <div class="alert-icon">ℹ</div>
+            <div class="alert-content">
+              <div class="alert-title">جاري التحميل</div>
+              <div class="alert-desc">يتم فحص حالة الشبكة...</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- DEVICES + FINANCES -->
-    <div class="grid-3-1">
-      <div class="panel">
-        <div class="ph">
-          <span>🖥️</span>
-          <div class="ph-title">آخر الأجهزة المضافة</div>
-          <a href="devices.html" class="ph-link">عرض الكل ←</a>
+    <!-- DEVICES + RIGHT COLUMN -->
+    <div class="grid-2-1">
+      <div class="panel fade-up" style="animation-delay:.2s">
+        <div class="panel-header">
+          <span class="panel-icon">▤</span>
+          <div class="panel-title">آخر الأجهزة المضافة</div>
+          <a href="devices.html" class="panel-link">عرض الكل ←</a>
         </div>
-        <table>
-          <thead><tr>
-            <th>الجهاز</th><th>IP</th><th>الشبكة</th><th>الحالة</th><th>التكلفة</th>
-          </tr></thead>
-          <tbody id="recentDevices">
-            <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text2)">جاري التحميل...</td></tr>
-          </tbody>
-        </table>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>الجهاز</th>
+              <th>عنوان IP</th>
+              <th>الشبكة</th>
+              <th>الحالة</th>
+              <th>التكلفة</th>
+            </tr></thead>
+            <tbody id="recentDevices">
+              <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-3)">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <!-- SUBNETS -->
-        <div class="panel">
-          <div class="ph">
-            <span>🔌</span>
-            <div class="ph-title">الشبكات الفرعية</div>
-            <a href="subnets.html" class="ph-link">إدارة ←</a>
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <!-- QUICK ACTIONS -->
+        <div class="panel fade-up" style="animation-delay:.25s">
+          <div class="panel-header">
+            <span class="panel-icon">⚡</span>
+            <div class="panel-title">إجراءات سريعة</div>
           </div>
-          <div class="subnet-rows" id="subnetRows">
-            <div style="padding:16px;text-align:center;color:var(--text2);font-size:13px">جاري التحميل...</div>
+          <div style="padding:14px">
+            <div class="quick-actions">
+              <a href="devices.html" class="qa-btn"><div class="qa-icon">＋</div><div><div class="fw-600">جهاز</div><div class="text-3 text-xs">إضافة</div></div></a>
+              <a href="finances.html" class="qa-btn"><div class="qa-icon">◆</div><div><div class="fw-600">مصروف</div><div class="text-3 text-xs">تسجيل</div></div></a>
+              <a href="topology.html" class="qa-btn"><div class="qa-icon">◈</div><div><div class="fw-600">ربط</div><div class="text-3 text-xs">أجهزة</div></div></a>
+              <a href="reports.html" class="qa-btn"><div class="qa-icon">▣</div><div><div class="fw-600">تقرير</div><div class="text-3 text-xs">عرض</div></div></a>
+            </div>
           </div>
         </div>
 
-        <!-- RECENT FINANCE -->
-        <div class="panel">
-          <div class="ph">
-            <span>💰</span>
-            <div class="ph-title">آخر المصاريف</div>
-            <a href="finances.html" class="ph-link">عرض الكل ←</a>
+        <!-- SUBNETS -->
+        <div class="panel fade-up" style="animation-delay:.3s">
+          <div class="panel-header">
+            <span class="panel-icon">▦</span>
+            <div class="panel-title">الشبكات الفرعية</div>
+            <a href="subnets.html" class="panel-link">إدارة ←</a>
+          </div>
+          <div class="subnet-rows" id="subnetRows">
+            <div style="padding:18px;text-align:center;color:var(--text-3);font-size:13px">جاري التحميل...</div>
+          </div>
+        </div>
+
+        <!-- LATEST FINANCE -->
+        <div class="panel fade-up" style="animation-delay:.35s">
+          <div class="panel-header">
+            <span class="panel-icon">◆</span>
+            <div class="panel-title">آخر المعاملات</div>
+            <a href="finances.html" class="panel-link">الكل ←</a>
           </div>
           <div id="recentFinance">
-            <div style="padding:20px;text-align:center;color:var(--text2);font-size:13px">جاري التحميل...</div>
+            <div style="padding:18px;text-align:center;color:var(--text-3);font-size:13px">جاري التحميل...</div>
           </div>
         </div>
       </div>
@@ -281,227 +248,409 @@ tr:hover td{background:rgba(255,255,255,.02)}
 </main>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  db, collection, onSnapshot, query, orderBy, limit,
+  watchSettings, getSettings, fmt, fmtNoSymbol, getCurrencySymbol, esc, renderSidebar, toast
+} from "./app.js";
 
-const firebaseConfig={apiKey:"AIzaSyDdYIiZcithhvDRLwHwahV6-W_puXHN4rs",authDomain:"almadadashboard.firebaseapp.com",projectId:"almadadashboard",storageBucket:"almadadashboard.firebasestorage.app",messagingSenderId:"172655018085",appId:"1:172655018085:web:6b956408061985c3ccc68c"};
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
+// ── Init ────────────────────────────────────────────────
+document.getElementById("sidebar").innerHTML = renderSidebar("dashboard");
 
-let devices=[], subnets=[], transactions=[];
+let devices = [], subnets = [], transactions = [];
 
-document.getElementById("fbStatus").textContent="متصل بـ Firebase";
-
-// ── Listeners ──────────────────────────────────────────
-onSnapshot(query(collection(db,"devices"),orderBy("createdAt","desc")), snap=>{
-  devices=snap.docs.map(d=>({id:d.id,...d.data()}));
-  updateKPIs(); renderAlerts(); renderRecentDevices(); renderSubnetRows(); drawMiniTopo();
-  document.getElementById("lastUpdate").textContent=new Date().toLocaleTimeString("ar-SA");
+watchSettings(s => {
+  document.getElementById("wbTitle").textContent = "أهلاً في " + s.netName;
+  document.getElementById("wbSub").textContent = s.ownerName ? `مرحباً ${s.ownerName} — هذه نظرة عامة على شبكتك` : "نظرة عامة على شبكتك ومعاملاتك المالية";
+  // Update sidebar logo name
+  const sn = document.getElementById("sbNetName");
+  if (sn) sn.textContent = s.netName;
+  // Re-render
+  updateAll();
 });
 
-onSnapshot(collection(db,"subnets"), snap=>{
-  subnets=snap.docs.map(d=>({id:d.id,...d.data()}));
-  renderSubnetRows(); updateKPIs();
+function updateTime() {
+  const now = new Date();
+  document.getElementById("wbTime").textContent = now.toLocaleString("ar-SA",{weekday:"long",hour:"2-digit",minute:"2-digit"});
+  document.getElementById("lastUpdate").textContent = "تحديث: " + now.toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"});
+}
+updateTime(); setInterval(updateTime, 60000);
+
+// ── Listeners ───────────────────────────────────────────
+onSnapshot(query(collection(db,"devices"), orderBy("createdAt","desc")), snap => {
+  devices = snap.docs.map(d=>({id:d.id,...d.data()}));
+  updateAll();
 });
 
-onSnapshot(query(collection(db,"transactions"),orderBy("date","desc"),limit(50)), snap=>{
-  transactions=snap.docs.map(d=>({id:d.id,...d.data()}));
-  updateKPIs(); renderRecentFinance();
+onSnapshot(collection(db,"subnets"), snap => {
+  subnets = snap.docs.map(d=>({id:d.id,...d.data()}));
+  updateAll();
 });
 
-// ── KPIs ───────────────────────────────────────────────
-function updateKPIs(){
-  const total   = devices.length;
-  const online  = devices.filter(d=>d.status==="online").length;
-  const offline = devices.filter(d=>d.status==="offline").length;
-  const devCost = devices.reduce((s,d)=>s+(parseFloat(d.cost)||0),0);
-  const txCost  = transactions.filter(t=>t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
-  const totalCost= devCost+txCost;
+onSnapshot(query(collection(db,"transactions"), orderBy("date","desc"), limit(50)), snap => {
+  transactions = snap.docs.map(d=>({id:d.id,...d.data()}));
+  updateAll();
+});
 
-  document.getElementById("k-total").textContent  = total||"0";
-  document.getElementById("k-total-sub").textContent = offline>0?offline+" غير متصل":"كلهم متصلون";
-  document.getElementById("k-total-sub").className = offline>0?"kpi-badge down":"kpi-badge up";
-  document.getElementById("k-online").textContent  = online||"0";
-  document.getElementById("k-pct").textContent     = total?Math.round(online/total*100)+"%  معدل الاتصال":"—";
-  document.getElementById("k-cost").textContent    = "ر.ي"+totalCost.toLocaleString("ar-YE",{minimumFractionDigits:0});
-  document.getElementById("k-cost-sub").textContent= "أجهزة + مصاريف تشغيل";
-  document.getElementById("k-subnets").textContent = subnets.length||"0";
-  document.getElementById("k-ips").textContent     = devices.length+" جهاز مسجل";
+function updateAll() {
+  updateKPIs();
+  updateAlerts();
+  renderRecentDevices();
+  renderSubnets();
+  renderRecentFinance();
+  drawMiniTopo();
+  updateProfit();
 }
 
-// ── Alerts ─────────────────────────────────────────────
-function renderAlerts(){
-  const wrap    = document.getElementById("alertList");
-  const offline = devices.filter(d=>d.status==="offline");
-  const warning = devices.filter(d=>d.status==="warning");
-  const alerts  = [];
+// ── KPIs ────────────────────────────────────────────────
+function updateKPIs() {
+  const total = devices.length;
+  const online = devices.filter(d=>d.status==="online").length;
+  const offline = devices.filter(d=>d.status==="offline").length;
+  const devCost = devices.reduce((s,d)=>s+(parseFloat(d.cost)||0), 0);
+  const inc = transactions.filter(t=>t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
+  const exp = transactions.filter(t=>t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
+  const net = inc - exp - devCost;
 
-  offline.forEach(d=>alerts.push({type:"critical",icon:"🔴",title:d.name+" — غير متصل",desc:"IP: "+(d.ip||"—")+" | "+( d.subnet||"—"),time:"الآن"}));
-  warning.forEach(d=>alerts.push({type:"warn",icon:"⚠️",title:d.name+" — تحذير",desc:"IP: "+(d.ip||"—"),time:"الآن"}));
+  document.getElementById("k-total").textContent = total;
+  document.getElementById("k-total-sub").textContent = offline > 0 ? `${offline} غير متصل` : (total>0?"كلهم متصلون ✓":"لا توجد أجهزة");
+  document.getElementById("k-online").textContent = online;
+  document.getElementById("k-online-sub").textContent = total ? `${Math.round(online/total*100)}% معدل الاتصال` : "—";
+  document.getElementById("k-subnets").textContent = subnets.length || (new Set(devices.map(d=>d.subnet).filter(Boolean))).size;
+  document.getElementById("k-ips-sub").textContent = `${devices.filter(d=>d.ip).length} IP مستخدم`;
+  document.getElementById("k-net").textContent = fmt(Math.abs(net), {decimals:0});
+  document.getElementById("k-net-sub").textContent = net >= 0 ? "في الربح ✓" : "في الخسارة";
+}
 
-  const totalOffline=offline.length;
-  const badge=document.getElementById("alertBadge");
-  if(totalOffline>0){badge.style.display="";badge.textContent=totalOffline+" تنبيه";}
-  else badge.style.display="none";
-  document.querySelector('.nav-badge')&&(document.querySelector('.nav-badge').textContent=totalOffline);
-
-  if(!alerts.length){
-    wrap.innerHTML=`<div class="alert-item success"><span class="al-icon">✅</span><div class="al-content"><div class="al-title">كل الأجهزة تعمل</div><div class="al-desc">لا توجد مشاكل في الشبكة</div></div></div>`;
+// ── Profit Banner ───────────────────────────────────────
+function updateProfit() {
+  const inc = transactions.filter(t=>t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const exp = transactions.filter(t=>t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const devCost = devices.reduce((s,d)=>s+(parseFloat(d.cost)||0),0);
+  const net = inc - exp - devCost;
+  
+  const banner = document.getElementById("profitBanner");
+  if (transactions.length === 0 && devices.length === 0) {
+    banner.style.display = "none";
     return;
   }
-  wrap.innerHTML=alerts.slice(0,5).map(a=>`
-    <div class="alert-item ${a.type}">
-      <span class="al-icon">${a.icon}</span>
-      <div class="al-content"><div class="al-title">${esc(a.title)}</div><div class="al-desc">${esc(a.desc)}</div></div>
-      <div class="al-time">${a.time}</div>
-    </div>`).join("");
-}
-
-// ── Recent Devices ─────────────────────────────────────
-function renderRecentDevices(){
-  const tbody=document.getElementById("recentDevices");
-  const recent=devices.slice(0,8);
-  if(!recent.length){tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--text2)">لا توجد أجهزة — <a href="devices.html" style="color:var(--accent)">أضف الأول</a></td></tr>`;return;}
-  const typeEmoji={router:"🌐",switch:"🔀",ap:"📡",server:"🖧",other:"⚙️"};
-  tbody.innerHTML=recent.map(d=>`<tr>
-    <td><div style="display:flex;align-items:center;gap:8px"><span>${typeEmoji[d.type]||"⚙️"}</span><div><div style="font-weight:600">${esc(d.name)}</div><div style="font-size:11px;color:var(--text2)">${esc(d.model||"")}</div></div></div></td>
-    <td><span class="ip-code">${esc(d.ip||"—")}</span></td>
-    <td><span style="font-size:12px;color:var(--text2)">${esc(d.subnet||"—")}</span></td>
-    <td><span class="status-badge ${d.status||'warning'}"><span class="sdot2"></span>${{online:"متصل",offline:"غير متصل",warning:"تحذير"}[d.status]||d.status}</span></td>
-    <td><span style="font-family:var(--mono);font-size:12px;color:var(--yellow)">${d.cost?"ر.ي"+parseFloat(d.cost).toLocaleString("ar-YE"):"—"}</span></td>
-  </tr>`).join("");
-}
-
-// ── Subnet Rows ────────────────────────────────────────
-function renderSubnetRows(){
-  const wrap=document.getElementById("subnetRows");
-  if(!subnets.length){
-    const unique=[...new Set(devices.map(d=>d.subnet).filter(Boolean))];
-    if(!unique.length){wrap.innerHTML=`<div style="text-align:center;color:var(--text2);font-size:13px;padding:12px"><a href="subnets.html" style="color:var(--accent)">إضافة شبكة فرعية</a></div>`;return;}
-    wrap.innerHTML=unique.map(sn=>{
-      const snDevs=devices.filter(d=>d.subnet===sn);
-      const pct=Math.min(snDevs.length*4,100);
-      return `<div class="sn-row"><div class="sn-top"><div class="sn-name">${esc(sn)}</div></div><div class="sn-meta"><span>${snDevs.length} جهاز</span></div><div class="sn-bar"><div class="sn-bar-fill" style="width:${pct}%;background:var(--accent)"></div></div></div>`;
-    }).join(""); return;
+  banner.style.display = "block";
+  
+  let cls, emoji, label, sub;
+  if (net > 0) {
+    cls = "profit"; emoji = "📈"; label = "أنت في ربح حالياً ✓";
+    sub = `إيرادات ${fmt(inc)} − تكاليف ${fmt(exp+devCost)}`;
+  } else if (net < 0) {
+    cls = "loss"; emoji = "📉"; label = "أنت في خسارة";
+    sub = `التكاليف تجاوزت الإيرادات بـ ${fmt(Math.abs(net))}`;
+  } else {
+    cls = "neutral"; emoji = "⚖️"; label = "نقطة التعادل";
+    sub = "الإيرادات تساوي التكاليف";
   }
-  wrap.innerHTML=subnets.map(sn=>{
-    const snDevs=devices.filter(d=>d.subnet===sn.name);
-    const total=cidrCount(sn.cidr||"");
-    const pct=total?Math.min(Math.round(snDevs.length/total*100),100):Math.min(snDevs.length*4,100);
-    const col=sn.color||"#00d4ff";
-    const isWarn=pct>85;
-    return `<div class="sn-row"><div class="sn-top"><div class="sn-name">${esc(sn.name)}</div><div style="font-family:var(--mono);font-size:10px;color:${isWarn?'var(--red)':col}">${pct}%</div></div><div class="sn-meta"><span>${snDevs.length} جهاز</span>${sn.cidr?`<span style="font-family:var(--mono);font-size:10px;color:var(--accent)">${sn.cidr}</span>`:""}</div><div class="sn-bar"><div class="sn-bar-fill" style="width:${pct}%;background:${isWarn?'var(--red)':col}"></div></div></div>`;
+  banner.className = "profit-banner " + cls;
+  document.getElementById("pbEmoji").textContent = emoji;
+  document.getElementById("pbLabel").textContent = label;
+  document.getElementById("pbAmount").textContent = (net>0?"+":net<0?"−":"") + fmt(Math.abs(net));
+  document.getElementById("pbSub").textContent = sub;
+}
+
+// ── Alerts ──────────────────────────────────────────────
+function updateAlerts() {
+  const list = document.getElementById("alertList");
+  const offline = devices.filter(d=>d.status==="offline");
+  const warning = devices.filter(d=>d.status==="warning");
+  const alerts = [];
+  
+  offline.slice(0,3).forEach(d => alerts.push({
+    type: "critical", icon: "✕",
+    title: `${d.name} غير متصل`,
+    desc: `IP: ${d.ip || '—'} في ${d.subnet || 'الشبكة'}`,
+    time: "الآن"
+  }));
+  
+  warning.slice(0,2).forEach(d => alerts.push({
+    type: "warn", icon: "⚠",
+    title: `${d.name} — تحذير`,
+    desc: `IP: ${d.ip || '—'}`,
+    time: "الآن"
+  }));
+  
+  // Subnet alerts
+  subnets.forEach(s => {
+    const snDevs = devices.filter(d => d.subnet === s.name);
+    const total = cidrCount(s.cidr || "");
+    if (total && snDevs.length / total > 0.85) {
+      alerts.push({
+        type: "warn", icon: "▦",
+        title: `Subnet ${s.name} ممتلئ`,
+        desc: `${snDevs.length} من ${total} IP مستخدم (${Math.round(snDevs.length/total*100)}%)`,
+        time: "الآن"
+      });
+    }
+  });
+
+  const badge = document.getElementById("alertCount");
+  if (offline.length > 0) {
+    badge.style.display = "";
+    badge.textContent = offline.length + " تنبيه";
+  } else {
+    badge.style.display = "none";
+  }
+
+  if (!alerts.length) {
+    list.innerHTML = `
+      <div class="alert-item alert-success">
+        <div class="alert-icon">✓</div>
+        <div class="alert-content">
+          <div class="alert-title">كل الأجهزة تعمل</div>
+          <div class="alert-desc">لا توجد مشاكل في الشبكة حالياً</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = alerts.slice(0,5).map(a => `
+    <div class="alert-item alert-${a.type}">
+      <div class="alert-icon">${a.icon}</div>
+      <div class="alert-content">
+        <div class="alert-title">${esc(a.title)}</div>
+        <div class="alert-desc">${esc(a.desc)}</div>
+      </div>
+      <div class="alert-time">${a.time}</div>
+    </div>
+  `).join("");
+}
+
+// ── Recent Devices ──────────────────────────────────────
+function renderRecentDevices() {
+  const tbody = document.getElementById("recentDevices");
+  const recent = devices.slice(0, 6);
+  if (!recent.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:36px;color:var(--text-3)">
+      <div style="font-size:32px;margin-bottom:8px;opacity:.4">▤</div>
+      لا توجد أجهزة بعد —
+      <a href="devices.html" style="color:var(--accent)">أضف الأول</a>
+    </td></tr>`;
+    return;
+  }
+  const typeIcons = {router:"🌐",modem:"📡",switch:"🔀",ap:"📶",client:"💻",server:"🖧",other:"⚙️"};
+  const typeColors = {router:"badge-blue",modem:"badge-pink",switch:"badge-purple",ap:"badge-green",client:"badge-yellow",server:"badge-yellow",other:"badge-gray"};
+  
+  tbody.innerHTML = recent.map(d => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="font-size:16px">${typeIcons[d.type]||"⚙️"}</span>
+          <div>
+            <div class="fw-600">${esc(d.name)}</div>
+            <div class="text-xs text-3">${esc(d.model || "—")}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="code-pill">${esc(d.ip || "—")}</span></td>
+      <td class="text-2 text-sm">${esc(d.subnet || "—")}</td>
+      <td><span class="badge badge-${d.status==='online'?'green':d.status==='offline'?'red':'yellow'}"><span class="badge-dot"></span>${{online:"متصل",offline:"غير متصل",warning:"تحذير",planned:"مخطط"}[d.status]||"—"}</span></td>
+      <td class="text-mono text-warn text-sm">${d.cost ? fmt(d.cost) : "—"}</td>
+    </tr>
+  `).join("");
+}
+
+// ── Subnets ─────────────────────────────────────────────
+function renderSubnets() {
+  const wrap = document.getElementById("subnetRows");
+  let snList = subnets.length ? subnets : null;
+  
+  if (!snList) {
+    const unique = [...new Set(devices.map(d=>d.subnet).filter(Boolean))];
+    if (!unique.length) {
+      wrap.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-3);font-size:12px"><a href="subnets.html" style="color:var(--accent)">إضافة شبكة فرعية ←</a></div>`;
+      return;
+    }
+    wrap.innerHTML = unique.slice(0,4).map(sn => {
+      const snDevs = devices.filter(d=>d.subnet===sn);
+      const pct = Math.min(snDevs.length * 4, 100);
+      return `
+        <div class="sn-card">
+          <div class="sn-top">
+            <div class="sn-name">${esc(sn)}</div>
+            <div class="sn-pct" style="background:var(--accent-soft);color:var(--accent)">${pct}%</div>
+          </div>
+          <div class="sn-meta"><span>${snDevs.length} جهاز</span></div>
+          <div class="sn-bar"><div class="sn-bar-fill" style="width:${pct}%;background:var(--accent)"></div></div>
+        </div>`;
+    }).join("");
+    return;
+  }
+  
+  wrap.innerHTML = snList.slice(0,4).map(sn => {
+    const snDevs = devices.filter(d=>d.subnet===sn.name);
+    const total = cidrCount(sn.cidr || "");
+    const pct = total ? Math.min(Math.round(snDevs.length/total*100), 100) : Math.min(snDevs.length*4, 100);
+    const col = sn.color || "#06b6d4";
+    const isWarn = pct > 85;
+    return `
+      <div class="sn-card">
+        <div class="sn-top">
+          <div class="sn-name">${esc(sn.name)}</div>
+          <div class="sn-pct" style="background:${isWarn?'var(--danger-soft)':col+'22'};color:${isWarn?'var(--danger)':col}">${pct}%</div>
+        </div>
+        <div class="sn-meta"><span>${snDevs.length} جهاز</span>${sn.cidr?`<span class="text-mono text-xs text-accent">${sn.cidr}</span>`:""}</div>
+        <div class="sn-bar"><div class="sn-bar-fill" style="width:${pct}%;background:${isWarn?'var(--danger)':col}"></div></div>
+      </div>`;
   }).join("");
 }
 
-// ── Recent Finance ─────────────────────────────────────
-function renderRecentFinance(){
-  const wrap=document.getElementById("recentFinance");
-  const recent=transactions.filter(t=>t.txType==="expense").slice(0,4);
-  if(!recent.length){wrap.innerHTML=`<div style="padding:20px;text-align:center;color:var(--text2);font-size:13px"><a href="finances.html" style="color:var(--accent)">تسجيل أول مصروف</a></div>`;return;}
-  const catEmoji={device:"🖥️",maintenance:"🔧",electricity:"⚡",rent:"🏢",misc:"📦"};
-  const catBg={device:"rgba(0,212,255,.1)",maintenance:"rgba(167,139,250,.1)",electricity:"rgba(255,209,102,.1)",rent:"rgba(255,154,60,.1)",misc:"rgba(136,153,184,.1)"};
-  wrap.innerHTML=recent.map(t=>`<div class="finance-row">
-    <div class="fc-icon" style="background:${catBg[t.category]||'rgba(136,153,184,.1)'}">${catEmoji[t.category]||"📋"}</div>
-    <div class="fc-info"><div class="fc-name">${esc(t.description||"—")}</div><div class="fc-date">${t.date||"—"}</div></div>
-    <div class="fc-amt">-$${parseFloat(t.amount||0).toLocaleString("ar-YE",{minimumFractionDigits:2})}</div>
-  </div>`).join("");
+// ── Recent Finance ──────────────────────────────────────
+function renderRecentFinance() {
+  const wrap = document.getElementById("recentFinance");
+  const recent = transactions.slice(0, 5);
+  if (!recent.length) {
+    wrap.innerHTML = `<div style="padding:18px;text-align:center;color:var(--text-3);font-size:12px"><a href="finances.html" style="color:var(--accent)">تسجيل أول معاملة ←</a></div>`;
+    return;
+  }
+  const catIcons = {device:"▤",maintenance:"🔧",electricity:"⚡",rent:"🏢",misc:"📦",salary:"👥",internet:"📡",income:"💵"};
+  const catColors = {device:"#06b6d4",maintenance:"#8b5cf6",electricity:"#f59e0b",rent:"#ec4899",misc:"#64748b",salary:"#a855f7",internet:"#10b981",income:"#10b981"};
+  
+  wrap.innerHTML = recent.map(t => {
+    const isIncome = t.txType === "income";
+    const col = isIncome ? "#10b981" : (catColors[t.category] || "#64748b");
+    return `
+      <div class="tx-row">
+        <div class="tx-icon" style="background:${col}1a;color:${col}">${isIncome?"💰":(catIcons[t.category]||"📋")}</div>
+        <div class="tx-info">
+          <div class="tx-name">${esc(t.description || "—")}</div>
+          <div class="tx-date">${t.date || "—"}</div>
+        </div>
+        <div class="tx-amount ${isIncome?'pos':'neg'}">${isIncome?"+":"−"}${fmt(t.amount)}</div>
+      </div>`;
+  }).join("");
 }
 
-// ── Mini Topology ──────────────────────────────────────
-function drawMiniTopo(){
-  const canvas=document.getElementById("miniTopo");
-  const wrap=canvas.parentElement;
-  canvas.width=wrap.clientWidth; canvas.height=wrap.clientHeight;
-  const ctx=canvas.getContext("2d");
+// ── Mini Topology ───────────────────────────────────────
+function drawMiniTopo() {
+  const canvas = document.getElementById("miniTopo");
+  if (!canvas) return;
+  const wrap = canvas.parentElement;
+  canvas.width = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  const ctx = canvas.getContext("2d");
   ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  if(!devices.length){document.getElementById("topoEmpty").style.display="flex";return;}
-  document.getElementById("topoEmpty").style.display="none";
-
-  const W=canvas.width, H=canvas.height;
-  // Grid background
-  ctx.strokeStyle="rgba(0,212,255,.03)"; ctx.lineWidth=1;
-  for(let x=0;x<W;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-
-  // Build simple tree layout
-  const roots  = devices.filter(d=>!d.parent||d.type==="router");
-  const others = devices.filter(d=>d.parent&&d.type!=="router");
-  const positions={};
-  const rootCount=Math.max(roots.length,1);
-  roots.forEach((d,i)=>{
-    positions[d.name]={x:W*(i+1)/(rootCount+1), y:H*0.22};
+  
+  if (!devices.length) {
+    document.getElementById("topoEmptyMsg").style.display = "flex";
+    return;
+  }
+  document.getElementById("topoEmptyMsg").style.display = "none";
+  
+  const W = canvas.width, H = canvas.height;
+  
+  // Grid
+  ctx.strokeStyle = "rgba(6,182,212,.04)";
+  ctx.lineWidth = 1;
+  for (let x=0; x<W; x+=40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y=0; y<H; y+=40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  
+  // Build tree
+  const roots = devices.filter(d => !d.parent || d.type === "router" || d.type === "modem");
+  const positions = {};
+  const rootCount = Math.max(roots.length, 1);
+  roots.forEach((d,i) => {
+    positions[d.name] = { x: W*(i+1)/(rootCount+1), y: H*0.22, dev: d };
   });
-  const childrenByParent={};
-  others.forEach(d=>{
-    if(!childrenByParent[d.parent]) childrenByParent[d.parent]=[];
-    childrenByParent[d.parent].push(d);
+  
+  const childrenByParent = {};
+  devices.filter(d => d.parent).forEach(d => {
+    (childrenByParent[d.parent] = childrenByParent[d.parent] || []).push(d);
   });
-  roots.forEach(r=>{
-    const children=childrenByParent[r.name]||[];
-    children.forEach((c,ci)=>{
-      const px=positions[r.name]?.x||W/2;
-      const spread=Math.min(180,(W*0.8)/Math.max(children.length,1));
-      const startX=px-(children.length-1)*spread/2;
-      positions[c.name]={x:startX+ci*spread, y:H*0.55};
-      const grandchildren=childrenByParent[c.name]||[];
-      grandchildren.forEach((gc,gci)=>{
-        const cpx=positions[c.name].x;
-        const gs=Math.min(100,(W*0.6)/Math.max(grandchildren.length,1));
-        const gStartX=cpx-(grandchildren.length-1)*gs/2;
-        positions[gc.name]={x:gStartX+gci*gs, y:H*0.82};
+  
+  roots.forEach(r => {
+    const children = childrenByParent[r.name] || [];
+    children.forEach((c, ci) => {
+      const px = positions[r.name]?.x || W/2;
+      const spread = Math.min(140, (W*0.7)/Math.max(children.length,1));
+      const startX = px - (children.length-1)*spread/2;
+      positions[c.name] = { x: startX + ci*spread, y: H*0.55, dev: c };
+      const grandchildren = childrenByParent[c.name] || [];
+      grandchildren.forEach((gc, gi) => {
+        const cpx = positions[c.name].x;
+        const gs = Math.min(80, (W*0.5)/Math.max(grandchildren.length,1));
+        const gStartX = cpx - (grandchildren.length-1)*gs/2;
+        positions[gc.name] = { x: gStartX + gi*gs, y: H*0.84, dev: gc };
       });
     });
   });
-  // position remaining
-  devices.forEach((d,i)=>{
-    if(!positions[d.name]) positions[d.name]={x:W*(i%8+1)/9, y:H*0.5};
+  
+  devices.forEach((d,i) => {
+    if (!positions[d.name]) {
+      positions[d.name] = { x: W*((i%6)+1)/7, y: H*0.5, dev: d };
+    }
   });
-
+  
   // Draw edges
-  devices.forEach(d=>{
-    if(d.parent&&positions[d.name]&&positions[d.parent]){
-      const from=positions[d.parent], to=positions[d.name];
-      const isActive=devices.find(x=>x.name===d.parent)?.status==="online"&&d.status==="online";
-      ctx.strokeStyle=isActive?"rgba(0,212,255,.4)":"rgba(46,61,110,.6)"; ctx.lineWidth=1.5;
-      ctx.setLineDash(isActive?[]:[4,3]);
-      ctx.beginPath(); ctx.moveTo(from.x,from.y); ctx.lineTo(to.x,to.y); ctx.stroke();
+  devices.forEach(d => {
+    if (d.parent && positions[d.name] && positions[d.parent]) {
+      const from = positions[d.parent], to = positions[d.name];
+      const active = devices.find(x=>x.name===d.parent)?.status==="online" && d.status==="online";
+      ctx.strokeStyle = active ? "rgba(6,182,212,.5)" : "rgba(42,58,94,.5)";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash(active ? [] : [4,3]);
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.stroke();
       ctx.setLineDash([]);
     }
   });
-
+  
   // Draw nodes
-  const colors={
-    online:{router:"#00d4ff",switch:"#a78bfa",ap:"#00e5a0",server:"#ffd166",other:"#00e5a0"},
-    offline:{router:"#ff4d6a",switch:"#ff4d6a",ap:"#ff4d6a",server:"#ff4d6a",other:"#ff4d6a"},
-    warning:{router:"#ffd166",switch:"#ffd166",ap:"#ffd166",server:"#ffd166",other:"#ffd166"}
+  const colors = {
+    online:  {router:"#06b6d4",modem:"#ec4899",switch:"#8b5cf6",ap:"#10b981",client:"#f59e0b",server:"#f59e0b",other:"#64748b"},
+    offline: {default:"#ef4444"},
+    warning: {default:"#f59e0b"}
   };
-  const sizes={router:14,switch:10,ap:8,server:10,other:8};
-  devices.forEach(d=>{
-    const pos=positions[d.name]; if(!pos) return;
-    const col=(colors[d.status||"warning"]||colors.warning)[d.type||"other"]||"#8899b8";
-    const r=(sizes[d.type||"other"]||8);
-    // glow
-    if(d.type==="router"){
-      const g=ctx.createRadialGradient(pos.x,pos.y,0,pos.x,pos.y,r*3);
-      g.addColorStop(0,col+"44"); g.addColorStop(1,"transparent");
-      ctx.beginPath(); ctx.arc(pos.x,pos.y,r*3,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+  const sizes = {router:14,modem:13,switch:11,ap:9,client:7,server:11,other:8};
+  
+  devices.forEach(d => {
+    const pos = positions[d.name]; if (!pos) return;
+    const c = d.status === "online"
+      ? (colors.online[d.type] || colors.online.other)
+      : (d.status === "offline" ? colors.offline.default : colors.warning.default);
+    const r = sizes[d.type] || 8;
+    
+    // Glow for routers
+    if (d.type === "router" || d.type === "modem") {
+      const g = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, r*3);
+      g.addColorStop(0, c+"44");
+      g.addColorStop(1, "transparent");
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, r*3, 0, Math.PI*2);
+      ctx.fillStyle = g;
+      ctx.fill();
     }
-    ctx.beginPath(); ctx.arc(pos.x,pos.y,r,0,Math.PI*2);
-    ctx.fillStyle=col+"22"; ctx.fill();
-    ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.stroke();
-    if(W>400){
-      ctx.font=`${r*0.75}px serif`; ctx.textAlign="center"; ctx.textBaseline="middle";
-      ctx.fillStyle="#fff"; ctx.fillText({router:"🌐",switch:"🔀",ap:"📡",server:"🖧",other:"⚙️"}[d.type||"other"]||"⚙️",pos.x,pos.y);
-    }
+    
+    // Circle
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, r, 0, Math.PI*2);
+    ctx.fillStyle = c+"22";
+    ctx.fill();
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    
+    // Inner dot
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, r*0.4, 0, Math.PI*2);
+    ctx.fillStyle = c;
+    ctx.fill();
   });
 }
 
 window.addEventListener("resize", drawMiniTopo);
 
-function cidrCount(cidr){if(!cidr.includes("/"))return 0;return Math.min(Math.pow(2,32-parseInt(cidr.split("/")[1])),256);}
-function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+// ── Helpers ─────────────────────────────────────────────
+function cidrCount(cidr) {
+  if (!cidr || !cidr.includes("/")) return 0;
+  return Math.min(Math.pow(2, 32 - parseInt(cidr.split("/")[1])), 256);
+}
 </script>
 </body>
 </html>

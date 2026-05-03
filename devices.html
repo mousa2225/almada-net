@@ -3,558 +3,257 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>المدى نت — إدارة الأجهزة</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>إدارة الأجهزة — المدى نت</title>
+<link rel="stylesheet" href="theme.css">
 <style>
-:root {
-  --bg:#0a0e1a; --bg2:#0f1525; --bg3:#141c30;
-  --surface:#1a2440; --surface2:#1e2b4a;
-  --border:#243058; --border2:#2e3d6e;
-  --accent:#00d4ff; --accent2:#0099cc;
-  --green:#00e5a0; --yellow:#ffd166; --red:#ff4d6a; --purple:#a78bfa;
-  --text:#e2e8f4; --text2:#8899b8;
-  --mono:'JetBrains Mono',monospace;
-  --sans:'IBM Plex Sans Arabic',sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.dev-cell{display:flex;align-items:center;gap:10px}
+.dev-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.dev-icon.router  { background: rgba(6,182,212,.15);  color: var(--type-router); }
+.dev-icon.modem   { background: rgba(236,72,153,.15); color: var(--type-modem); }
+.dev-icon.switch  { background: rgba(139,92,246,.15); color: var(--type-switch); }
+.dev-icon.ap      { background: rgba(16,185,129,.15); color: var(--type-ap); }
+.dev-icon.client  { background: rgba(245,158,11,.15); color: var(--type-client); }
+.dev-icon.server  { background: rgba(245,158,11,.15); color: var(--type-client); }
+.dev-icon.other   { background: rgba(100,116,139,.15); color: var(--text-2); }
+.dev-info { min-width: 0; }
+.dev-name { font-weight: 600; font-size: 13px; }
+.dev-model{ font-size: 11px; color: var(--text-3); }
 
-/* SIDEBAR */
-.sidebar{position:fixed;right:0;top:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
-.sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.logo-text h1{font-size:14px;font-weight:700;line-height:1.2}
-.logo-text span{font-size:10px;color:var(--accent);font-family:var(--mono)}
-.sidebar-nav{padding:12px 10px;flex:1;overflow-y:auto}
-.nav-section-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;padding:8px 8px 4px;margin-top:6px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:all .2s;margin-bottom:2px;color:var(--text2);font-size:13px;text-decoration:none}
-.nav-item:hover{background:var(--surface);color:var(--text)}
-.nav-item.active{background:rgba(0,212,255,.12);color:var(--accent)}
-.nav-icon{font-size:15px;width:18px;text-align:center}
-.nav-badge{margin-right:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
-.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
-.net-status{background:var(--surface);border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px}
-.sdot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pg 2s infinite}
-@keyframes pg{0%,100%{opacity:1;box-shadow:0 0 8px var(--green)}50%{opacity:.6;box-shadow:0 0 16px var(--green)}}
-
-/* MAIN */
-.main{margin-right:240px;min-height:100vh;position:relative;z-index:1}
-.topbar{position:sticky;top:0;background:rgba(10,14,26,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:50}
-.topbar-title{font-size:17px;font-weight:600;flex:1}
-.topbar-title span{color:var(--accent)}
-.search-box{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 12px;width:240px;transition:border-color .2s}
-.search-box:focus-within{border-color:var(--accent)}
-.search-box input{background:none;border:none;outline:none;color:var(--text);font-family:var(--sans);font-size:13px;width:100%}
-.search-box input::placeholder{color:var(--text2)}
-.tbtn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 14px;font-family:var(--sans);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s}
-.tbtn:hover{background:var(--surface2);border-color:var(--border2)}
-.tbtn.primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700}
-.tbtn.primary:hover{background:var(--accent2);border-color:var(--accent2)}
-.tbtn.danger{background:rgba(255,77,106,.12);color:var(--red);border-color:rgba(255,77,106,.3)}
-.tbtn.danger:hover{background:rgba(255,77,106,.2)}
-
-/* CONTENT */
-.content{padding:24px}
-
-/* STATS ROW */
-.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:4px;transition:border-color .2s,transform .2s;cursor:default;animation:fiu .4s ease both}
-.stat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
-@keyframes fiu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.stat-card:nth-child(1){animation-delay:.05s}
-.stat-card:nth-child(2){animation-delay:.1s}
-.stat-card:nth-child(3){animation-delay:.15s}
-.stat-card:nth-child(4){animation-delay:.2s}
-.stat-card:nth-child(5){animation-delay:.25s}
-.stat-lbl{font-size:11px;color:var(--text2);font-weight:500}
-.stat-val{font-size:26px;font-weight:700;font-family:var(--mono);line-height:1}
-.stat-card.c-blue .stat-val{color:var(--accent)}
-.stat-card.c-green .stat-val{color:var(--green)}
-.stat-card.c-red .stat-val{color:var(--red)}
-.stat-card.c-yellow .stat-val{color:var(--yellow)}
-.stat-card.c-purple .stat-val{color:var(--purple)}
-.stat-sub{font-size:11px;color:var(--text2)}
-
-/* PANEL */
-.panel{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;animation:fiu .4s ease .3s both}
-.panel-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.panel-title{font-size:14px;font-weight:600;flex:1}
-
-/* FILTER BAR */
-.filter-bar{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--bg3)}
-.chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:transparent;font-family:var(--sans);transition:all .2s}
-.chip:hover{border-color:var(--border2);color:var(--text)}
-.chip.active{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent)}
-.chip.red{border-color:rgba(255,77,106,.3);color:var(--red)}
-.chip.red.active{background:rgba(255,77,106,.12)}
-
-/* TABLE */
-.tbl-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:900px}
-th{padding:9px 14px;text-align:right;font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;transition:color .2s}
-th:hover{color:var(--accent)}
-th .sort-icon{display:inline-block;margin-right:4px;opacity:.4;transition:opacity .2s}
-th.sorted .sort-icon{opacity:1;color:var(--accent)}
-td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.02)}
-tr.selected td{background:rgba(0,212,255,.05)}
-
-/* DEVICE CELL */
-.dname{display:flex;align-items:center;gap:9px}
-.dicon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.dicon.router{background:rgba(0,212,255,.15)}
-.dicon.switch{background:rgba(167,139,250,.15)}
-.dicon.ap{background:rgba(0,229,160,.15)}
-.dicon.server{background:rgba(255,209,102,.15)}
-.dicon.other{background:rgba(136,153,184,.12)}
-.dname-text{font-weight:600;font-size:13px}
-.dname-model{font-size:11px;color:var(--text2)}
-
-.ip-code{font-family:var(--mono);font-size:11px;color:var(--accent);background:rgba(0,212,255,.08);padding:2px 7px;border-radius:4px}
-
-.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
-.badge.router{background:rgba(0,212,255,.1);color:var(--accent)}
-.badge.switch{background:rgba(167,139,250,.1);color:var(--purple)}
-.badge.ap{background:rgba(0,229,160,.1);color:var(--green)}
-.badge.server{background:rgba(255,209,102,.1);color:var(--yellow)}
-.badge.other{background:rgba(136,153,184,.1);color:var(--text2)}
-
-.status{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
-.status.online{background:rgba(0,229,160,.12);color:var(--green)}
-.status.offline{background:rgba(255,77,106,.12);color:var(--red)}
-.status.warning{background:rgba(255,209,102,.12);color:var(--yellow)}
-.sdot2{width:5px;height:5px;border-radius:50%}
-.online .sdot2{background:var(--green)}
-.offline .sdot2{background:var(--red)}
-.warning .sdot2{background:var(--yellow)}
-
-.price-cell{font-family:var(--mono);font-size:12px;color:var(--yellow)}
-
+.action-btn{background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.action-btn.danger:hover{border-color:var(--danger);color:var(--danger)}
 .row-actions{display:flex;gap:5px;align-items:center}
-.act-btn{background:none;border:1px solid var(--border);color:var(--text2);border-radius:5px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .2s;white-space:nowrap}
-.act-btn:hover{border-color:var(--accent);color:var(--accent)}
-.act-btn.del:hover{border-color:var(--red);color:var(--red)}
 
-/* EMPTY / LOADING */
-.table-msg{padding:48px;text-align:center;color:var(--text2)}
-.table-msg .icon{font-size:36px;margin-bottom:12px}
-.table-msg p{font-size:14px}
-.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* PAGINATION */
-.pagination{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
-.page-info{font-size:12px;color:var(--text2)}
-.page-btns{display:flex;gap:4px}
-.page-btn{background:none;border:1px solid var(--border);color:var(--text2);border-radius:5px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:var(--sans);transition:all .2s}
-.page-btn:hover{border-color:var(--border2);color:var(--text)}
-.page-btn.active{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent)}
-.page-btn:disabled{opacity:.3;cursor:not-allowed}
-
-/* CHECKBOX */
 input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer}
-
-/* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
-.overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:580px;max-width:95vw;max-height:92vh;overflow-y:auto;transform:scale(.95) translateY(20px);transition:transform .3s}
-.overlay.open .modal{transform:scale(1) translateY(0)}
-.modal-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.modal-hdr h2{font-size:15px;font-weight:600;flex:1}
-.modal-close{background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;border-radius:5px;padding:3px;transition:color .2s;line-height:1}
-.modal-close:hover{color:var(--text)}
-.modal-body{padding:22px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.fg{display:flex;flex-direction:column;gap:5px}
-.fg.full{grid-column:1/-1}
-.fg label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
-.fg input,.fg select,.fg textarea{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .2s;width:100%}
-.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent)}
-.fg select option{background:var(--bg2)}
-.fg textarea{resize:vertical;min-height:70px}
-.fg .hint{font-size:11px;color:var(--text2);margin-top:2px}
-.modal-ftr{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
-.btn-cancel{background:none;border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:8px 18px;font-family:var(--sans);font-size:13px;cursor:pointer;transition:all .2s}
-.btn-cancel:hover{border-color:var(--border2);color:var(--text)}
-.btn-save{background:var(--accent);border:none;color:var(--bg);border-radius:7px;padding:8px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:background .2s;display:flex;align-items:center;gap:6px}
-.btn-save:hover{background:var(--accent2)}
-.btn-save:disabled{opacity:.5;cursor:not-allowed}
-.saving-spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,.3);border-top-color:var(--bg);border-radius:50%;animation:spin .7s linear infinite}
-
-/* TOAST */
-.toast-wrap{position:fixed;bottom:24px;left:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-.toast{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:8px;min-width:220px;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:slideIn .3s ease;transition:opacity .3s}
-.toast.out{opacity:0}
-@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-.toast.success{border-color:rgba(0,229,160,.3);color:var(--green)}
-.toast.error{border-color:rgba(255,77,106,.3);color:var(--red)}
-.toast.info{border-color:rgba(0,212,255,.3);color:var(--accent)}
-
-/* DELETE CONFIRM */
-.del-modal{width:400px}
-.del-body{padding:24px;text-align:center}
-.del-icon{font-size:40px;margin-bottom:12px}
-.del-title{font-size:16px;font-weight:700;color:var(--red);margin-bottom:8px}
-.del-desc{font-size:13px;color:var(--text2);line-height:1.6}
-.del-name{color:var(--text);font-weight:600;font-family:var(--mono)}
-.btn-del-confirm{background:var(--red);border:none;color:#fff;border-radius:7px;padding:8px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer}
-
-/* DETAIL PANEL */
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.detail-row{background:var(--bg3);border-radius:8px;padding:10px 14px}
-.detail-lbl{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;font-weight:600}
-.detail-val{font-size:13px;font-weight:500}
-
-/* SCROLLBAR */
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--text2)}
 </style>
 </head>
 <body>
-
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">🌐</div>
-    <div class="logo-text">
-      <h1>المدى نت</h1>
-      <span>ALMADA NET v1.0</span>
-    </div>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section-title">الرئيسية</div>
-    <a href="almada-net-dashboard.html" class="nav-item"><span class="nav-icon">📊</span> لوحة التحكم</a>
-    <a href="#" class="nav-item"><span class="nav-icon">🗺️</span> توبولوجيا الشبكة</a>
-    <div class="nav-section-title">الأجهزة والشبكة</div>
-    <a href="#" class="nav-item active"><span class="nav-icon">🖥️</span> إدارة الأجهزة</a>
-    <a href="#" class="nav-item"><span class="nav-icon">🔌</span> الشبكات الفرعية</a>
-    <a href="#" class="nav-item"><span class="nav-icon">📡</span> إدارة الـ IPs</a>
-    <a href="#" class="nav-item"><span class="nav-icon">⚠️</span> التنبيهات <span class="nav-badge" id="alertCount">0</span></a>
-    <div class="nav-section-title">الإدارة المالية</div>
-    <a href="#" class="nav-item"><span class="nav-icon">💰</span> الميزانية العامة</a>
-    <a href="#" class="nav-item"><span class="nav-icon">🛒</span> سجل المشتريات</a>
-    <a href="#" class="nav-item"><span class="nav-icon">🔧</span> مصاريف الصيانة</a>
-    <a href="#" class="nav-item"><span class="nav-icon">📈</span> التقارير المالية</a>
-    <div class="nav-section-title">الإعدادات</div>
-    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> الإعدادات</a>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="net-status">
-      <div class="sdot"></div>
-      <div>
-        <div style="font-size:12px;font-weight:600" id="fbStatus">جاري الاتصال...</div>
-        <div style="font-size:11px;color:var(--text2)">Firebase Firestore</div>
-      </div>
-    </div>
-  </div>
-</aside>
-
-<!-- MAIN -->
+<aside class="sidebar" id="sidebar"></aside>
 <main class="main">
   <header class="topbar">
-    <div class="topbar-title">إدارة الأجهزة <span>/ الكل</span></div>
-    <div class="search-box">
-      <span>🔍</span>
-      <input type="text" id="searchInput" placeholder="ابحث بالاسم، IP، نوع...">
-    </div>
-    <button class="tbtn" id="exportBtn">📤 تصدير CSV</button>
-    <button class="tbtn" id="bulkDelBtn" style="display:none" onclick="bulkDelete()">🗑️ حذف المحدد (<span id="selCount">0</span>)</button>
-    <button class="tbtn primary" onclick="openAdd()">＋ إضافة جهاز</button>
+    <h1 class="tb-title">إدارة الأجهزة <span class="breadcrumb">/ الكل</span></h1>
+    <input type="search" id="searchInput" class="search-input" placeholder="🔍 ابحث بالاسم، IP، الموديل...">
+    <button class="btn btn-sm" id="exportBtn">📤 تصدير CSV</button>
+    <button class="btn btn-danger btn-sm" id="bulkDelBtn" style="display:none" onclick="bulkDelete()">🗑️ حذف <span id="selCount">0</span></button>
+    <button class="btn btn-primary btn-sm" onclick="openAdd()">＋ إضافة جهاز</button>
   </header>
 
   <div class="content">
-    <!-- STATS -->
-    <div class="stats-row">
-      <div class="stat-card c-blue">
-        <div class="stat-lbl">إجمالي الأجهزة</div>
-        <div class="stat-val" id="st-total">—</div>
-        <div class="stat-sub">في قاعدة البيانات</div>
-      </div>
-      <div class="stat-card c-green">
-        <div class="stat-lbl">✅ متصل</div>
-        <div class="stat-val" id="st-online">—</div>
-        <div class="stat-sub" id="st-online-pct">—</div>
-      </div>
-      <div class="stat-card c-red">
-        <div class="stat-lbl">❌ غير متصل</div>
-        <div class="stat-val" id="st-offline">—</div>
-        <div class="stat-sub">يحتاج فحص</div>
-      </div>
-      <div class="stat-card c-yellow">
-        <div class="stat-lbl">💵 إجمالي التكاليف</div>
-        <div class="stat-val" id="st-cost" style="font-size:18px">—</div>
-        <div class="stat-sub">تكلفة الأجهزة</div>
-      </div>
-      <div class="stat-card c-purple">
-        <div class="stat-lbl">🔀 الشبكات الفرعية</div>
-        <div class="stat-val" id="st-subnets">—</div>
-        <div class="stat-sub">subnet نشط</div>
-      </div>
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi kpi-blue"><div class="kpi-label"><span class="kpi-icon">▤</span> الإجمالي</div><div class="kpi-value" id="st-total">0</div><div class="kpi-sub">في قاعدة البيانات</div></div>
+      <div class="kpi kpi-green"><div class="kpi-label"><span class="kpi-icon">✓</span> متصل</div><div class="kpi-value" id="st-online">0</div><div class="kpi-sub" id="st-online-sub">—</div></div>
+      <div class="kpi kpi-red"><div class="kpi-label"><span class="kpi-icon">✕</span> غير متصل</div><div class="kpi-value" id="st-offline">0</div><div class="kpi-sub">يحتاج فحص</div></div>
+      <div class="kpi kpi-yellow"><div class="kpi-label"><span class="kpi-icon">◆</span> الاستثمار</div><div class="kpi-value" id="st-cost" style="font-size:20px">—</div><div class="kpi-sub">قيمة الأجهزة</div></div>
+      <div class="kpi kpi-purple"><div class="kpi-label"><span class="kpi-icon">▦</span> الشبكات</div><div class="kpi-value" id="st-subnets">0</div><div class="kpi-sub">subnet نشط</div></div>
     </div>
 
-    <!-- TABLE PANEL -->
-    <div class="panel">
+    <!-- TABLE -->
+    <div class="panel fade-up" style="animation-delay:.1s">
       <div class="panel-header">
-        <span style="font-size:16px">🖥️</span>
+        <span class="panel-icon">▤</span>
         <div class="panel-title">قائمة الأجهزة</div>
-        <span id="recordCount" style="font-size:12px;color:var(--text2);background:var(--bg3);padding:3px 10px;border-radius:10px">0 جهاز</span>
+        <span id="recordCount" class="badge badge-gray">0 جهاز</span>
       </div>
 
-      <!-- FILTERS -->
       <div class="filter-bar">
         <button class="chip active" data-filter="all">الكل</button>
         <button class="chip" data-filter="router">🌐 راوتر</button>
+        <button class="chip" data-filter="modem">📡 موديم</button>
         <button class="chip" data-filter="switch">🔀 سويتش</button>
-        <button class="chip" data-filter="ap">📡 AP</button>
+        <button class="chip" data-filter="ap">📶 AP</button>
+        <button class="chip" data-filter="client">💻 عميل</button>
         <button class="chip" data-filter="server">🖧 خادم</button>
-        <button class="chip" data-filter="other">⚙️ أخرى</button>
-        <div style="margin-right:auto;display:flex;gap:6px">
-          <button class="chip red" data-filter="offline">⛔ غير متصل</button>
-          <button class="chip" data-filter="warning">⚠️ تحذير</button>
-        </div>
+        <div style="width:1px;height:18px;background:var(--border);margin:0 4px"></div>
+        <button class="chip chip-red" data-filter="offline">⛔ غير متصل</button>
+        <button class="chip" data-filter="warning">⚠ تحذير</button>
       </div>
 
-      <!-- TABLE -->
       <div class="tbl-wrap">
         <table id="devTable">
-          <thead>
-            <tr>
-              <th style="width:32px"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>
-              <th data-col="name">الجهاز <span class="sort-icon">↕</span></th>
-              <th data-col="type">النوع <span class="sort-icon">↕</span></th>
-              <th data-col="ip">عنوان IP <span class="sort-icon">↕</span></th>
-              <th data-col="subnet">الشبكة الفرعية <span class="sort-icon">↕</span></th>
-              <th data-col="parent">الجهاز الرئيسي</th>
-              <th data-col="status">الحالة <span class="sort-icon">↕</span></th>
-              <th data-col="cost">التكلفة <span class="sort-icon">↕</span></th>
-              <th data-col="createdAt">تاريخ الإضافة <span class="sort-icon">↕</span></th>
-              <th style="width:130px">الإجراءات</th>
-            </tr>
-          </thead>
+          <thead><tr>
+            <th style="width:34px"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>
+            <th data-col="name">الجهاز</th>
+            <th data-col="type">النوع</th>
+            <th data-col="ip">عنوان IP</th>
+            <th data-col="subnet">الشبكة</th>
+            <th data-col="parent">الجهاز الرئيسي</th>
+            <th data-col="status">الحالة</th>
+            <th data-col="cost">التكلفة</th>
+            <th data-col="createdAt">التاريخ</th>
+            <th style="width:140px">الإجراءات</th>
+          </tr></thead>
           <tbody id="tableBody">
-            <tr>
-              <td colspan="10">
-                <div class="table-msg">
-                  <div class="spinner"></div>
-                  <p>جاري تحميل البيانات من Firebase...</p>
-                </div>
-              </td>
-            </tr>
+            <tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-3)">جاري التحميل...</td></tr>
           </tbody>
         </table>
       </div>
       <div class="pagination">
-        <div class="page-info" id="pageInfo">عرض 0 من 0 جهاز</div>
+        <div class="page-info" id="pageInfo">0 جهاز</div>
         <div class="page-btns" id="pageBtns"></div>
       </div>
     </div>
   </div>
 </main>
 
-<!-- TOAST CONTAINER -->
-<div class="toast-wrap" id="toastWrap"></div>
-
-<!-- ADD / EDIT MODAL -->
-<div class="overlay" id="deviceOverlay">
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="deviceModal">
   <div class="modal">
-    <div class="modal-hdr">
-      <span id="modalIcon" style="font-size:20px">🖥️</span>
-      <h2 id="modalTitle">إضافة جهاز جديد</h2>
-      <button class="modal-close" onclick="closeDevModal()">✕</button>
+    <div class="modal-header">
+      <div class="modal-icon" id="modalIcon">▤</div>
+      <div class="modal-title" id="modalTitle">إضافة جهاز جديد</div>
+      <button class="modal-close" onclick="closeM('deviceModal')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="form-grid">
+      <div class="fg-row">
         <div class="fg">
-          <label>اسم الجهاز *</label>
+          <label>اسم الجهاز <span class="req">*</span></label>
           <input type="text" id="f-name" placeholder="مثال: AP-North-05">
           <span class="hint">يجب أن يكون فريداً</span>
         </div>
         <div class="fg">
-          <label>نوع الجهاز *</label>
+          <label>نوع الجهاز <span class="req">*</span></label>
           <select id="f-type">
             <option value="router">🌐 راوتر (Router)</option>
+            <option value="modem">📡 موديم (Modem)</option>
             <option value="switch">🔀 سويتش (Switch)</option>
-            <option value="ap">📡 نقطة وصول (AP)</option>
+            <option value="ap">📶 نقطة وصول (AP)</option>
+            <option value="client">💻 عميل (Client)</option>
             <option value="server">🖧 خادم (Server)</option>
             <option value="other">⚙️ أخرى</option>
           </select>
         </div>
+      </div>
+      <div class="fg-row">
         <div class="fg">
-          <label>عنوان IP *</label>
-          <input type="text" id="f-ip" placeholder="192.168.X.X" style="font-family:var(--mono)">
+          <label>عنوان IP</label>
+          <input type="text" id="f-ip" class="input-mono" placeholder="192.168.X.X">
         </div>
         <div class="fg">
-          <label>الشبكة الفرعية *</label>
+          <label>الشبكة الفرعية</label>
           <input type="text" id="f-subnet" placeholder="مثال: Subnet-North">
         </div>
+      </div>
+      <div class="fg-row">
         <div class="fg">
           <label>الجهاز الرئيسي (Parent)</label>
           <select id="f-parent">
-            <option value="">— لا يوجد (Core) —</option>
+            <option value="">— لا يوجد —</option>
           </select>
         </div>
         <div class="fg">
+          <label>الحالة</label>
+          <select id="f-status">
+            <option value="online">✓ متصل</option>
+            <option value="offline">✕ غير متصل</option>
+            <option value="warning">⚠ تحذير</option>
+            <option value="planned">📋 مخطط</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg">
           <label>الموديل / الماركة</label>
-          <input type="text" id="f-model" placeholder="مثال: Ubiquiti UAP-AC-Pro">
+          <input type="text" id="f-model" placeholder="مثال: Mikrotik RB4011">
         </div>
         <div class="fg">
-          <label>تكلفة الشراء ($)</label>
-          <input type="number" id="f-cost" placeholder="0.00" min="0" step="0.01">
+          <label>الموقع</label>
+          <input type="text" id="f-location" placeholder="مثال: الطابق 3">
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg">
+          <label>تكلفة الشراء</label>
+          <input type="number" id="f-cost" placeholder="0" min="0" step="0.01">
+          <span class="hint" id="costHint">بالعملة المعروضة</span>
         </div>
         <div class="fg">
           <label>تاريخ الشراء</label>
           <input type="date" id="f-buydate">
         </div>
-        <div class="fg">
-          <label>الحالة</label>
-          <select id="f-status">
-            <option value="online">✅ متصل (Online)</option>
-            <option value="offline">❌ غير متصل (Offline)</option>
-            <option value="warning">⚠️ تحذير (Warning)</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label>الموقع الفيزيائي</label>
-          <input type="text" id="f-location" placeholder="مثال: برج الشمال - الطابق 3">
-        </div>
-        <div class="fg full">
-          <label>ملاحظات</label>
-          <textarea id="f-notes" placeholder="معلومات إضافية..."></textarea>
-        </div>
+      </div>
+      <div class="fg">
+        <label>ملاحظات</label>
+        <textarea id="f-notes" placeholder="معلومات إضافية..."></textarea>
       </div>
     </div>
-    <div class="modal-ftr">
-      <button class="btn-cancel" onclick="closeDevModal()">إلغاء</button>
-      <button class="btn-save" id="saveBtn" onclick="saveDevice()">
-        <span id="saveBtnText">💾 حفظ الجهاز</span>
-      </button>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeM('deviceModal')">إلغاء</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveDevice()"><span id="saveBtnText">💾 حفظ</span></button>
     </div>
   </div>
 </div>
 
-<!-- VIEW DEVICE MODAL -->
-<div class="overlay" id="viewOverlay">
+<!-- VIEW MODAL -->
+<div class="modal-overlay" id="viewModal">
   <div class="modal">
-    <div class="modal-hdr">
-      <span id="viewIcon" style="font-size:20px">🖥️</span>
-      <h2 id="viewTitle">تفاصيل الجهاز</h2>
-      <button class="modal-close" onclick="closeModal('viewOverlay')">✕</button>
+    <div class="modal-header">
+      <div class="modal-icon" id="viewIcon">▤</div>
+      <div class="modal-title" id="viewTitle">تفاصيل الجهاز</div>
+      <button class="modal-close" onclick="closeM('viewModal')">✕</button>
     </div>
     <div class="modal-body" id="viewBody"></div>
-    <div class="modal-ftr">
-      <button class="btn-cancel" onclick="closeModal('viewOverlay')">إغلاق</button>
-      <button class="btn-save" id="viewEditBtn">✏️ تعديل</button>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeM('viewModal')">إغلاق</button>
+      <button class="btn btn-primary" id="viewEditBtn">✏️ تعديل</button>
     </div>
   </div>
 </div>
 
-<!-- DELETE CONFIRM MODAL -->
-<div class="overlay" id="delOverlay">
-  <div class="modal del-modal">
-    <div class="modal-hdr">
-      <h2 style="color:var(--red)">⚠️ تأكيد الحذف</h2>
-      <button class="modal-close" onclick="closeModal('delOverlay')">✕</button>
-    </div>
-    <div class="del-body">
-      <div class="del-icon">🗑️</div>
-      <div class="del-title">هل أنت متأكد من الحذف؟</div>
-      <div class="del-desc">سيتم حذف الجهاز <span class="del-name" id="delDevName"></span> نهائياً من قاعدة البيانات.<br>لا يمكن التراجع عن هذه العملية.</div>
-    </div>
-    <div class="modal-ftr" style="justify-content:center;gap:12px">
-      <button class="btn-cancel" onclick="closeModal('delOverlay')">إلغاء</button>
-      <button class="btn-del-confirm" id="confirmDelBtn">نعم، احذف</button>
-    </div>
-  </div>
-</div>
-
-<!-- ======================================================
-     FIREBASE + APP LOGIC
-====================================================== -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, getDocs, doc,
-  updateDoc, deleteDoc, onSnapshot, serverTimestamp, query, orderBy
-} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+  db, collection, addDoc, doc, updateDoc, deleteDoc,
+  onSnapshot, serverTimestamp, query, orderBy,
+  watchSettings, getSettings, fmt, getCurrencySymbol, convertToBase, convertFromBase,
+  esc, renderSidebar, toast, openModal, closeModal, confirmDialog
+} from "./app.js";
 
-// ── Firebase Init ──────────────────────────────────────
-const firebaseConfig = {
-  apiKey: "AIzaSyDdYIiZcithhvDRLwHwahV6-W_puXHN4rs",
-  authDomain: "almadadashboard.firebaseapp.com",
-  projectId: "almadadashboard",
-  storageBucket: "almadadashboard.firebasestorage.app",
-  messagingSenderId: "172655018085",
-  appId: "1:172655018085:web:6b956408061985c3ccc68c",
-  measurementId: "G-Q1KK4JCG3S"
-};
+document.getElementById("sidebar").innerHTML = renderSidebar("devices");
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-const COL = "devices"; // Firestore collection name
+let allDevices = [], filtered = [];
+let currentFilter = "all", searchTerm = "";
+let sortCol = "createdAt", sortDir = -1;
+let currentPage = 1;
+const PAGE_SIZE = 15;
+let editingId = null;
+let selectedIds = new Set();
 
-// ── State ──────────────────────────────────────────────
-let allDevices   = [];   // raw from Firestore
-let filtered     = [];   // after search/filter
-let currentFilter = "all";
-let searchTerm   = "";
-let sortCol      = "createdAt";
-let sortDir      = -1;   // -1 = desc, 1 = asc
-let currentPage  = 1;
-const PAGE_SIZE  = 15;
-let editingId    = null; // null = add, string = edit
-let pendingDelId = null;
-let selectedIds  = new Set();
+watchSettings(s => {
+  document.getElementById("costHint").textContent = `بالعملة المعروضة (${getCurrencySymbol()})`;
+  applyFilters();
+});
 
-// ── Firebase Status ────────────────────────────────────
-document.getElementById("fbStatus").textContent = "متصل بـ Firebase";
-
-// ── Real-time listener ─────────────────────────────────
-const q = query(collection(db, COL), orderBy("createdAt", "desc"));
-onSnapshot(q, snap => {
+const qDevices = query(collection(db, "devices"), orderBy("createdAt", "desc"));
+onSnapshot(qDevices, snap => {
   allDevices = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   applyFilters();
   updateStats();
   populateParentSelect();
-}, err => {
-  document.getElementById("fbStatus").textContent = "خطأ في الاتصال";
-  showToast("خطأ في الاتصال بـ Firebase: " + err.message, "error");
 });
 
-// ── Stats ──────────────────────────────────────────────
 function updateStats() {
-  const total   = allDevices.length;
-  const online  = allDevices.filter(d => d.status === "online").length;
-  const offline = allDevices.filter(d => d.status === "offline").length;
-  const cost    = allDevices.reduce((s, d) => s + (parseFloat(d.cost) || 0), 0);
-  const subnets = new Set(allDevices.map(d => d.subnet).filter(Boolean)).size;
-
-  document.getElementById("st-total").textContent   = total;
-  document.getElementById("st-online").textContent  = online;
-  document.getElementById("st-offline").textContent = offline;
-  document.getElementById("st-cost").textContent    = "ر.ي" + cost.toLocaleString("ar-YE", {minimumFractionDigits:0, maximumFractionDigits:0});
-  document.getElementById("st-subnets").textContent = subnets;
-  document.getElementById("st-online-pct").textContent = total ? Math.round(online/total*100) + "% معدل الاتصال" : "—";
-  document.getElementById("alertCount").textContent = offline;
+  const t = allDevices.length;
+  const on = allDevices.filter(d=>d.status==="online").length;
+  const off = allDevices.filter(d=>d.status==="offline").length;
+  const cost = allDevices.reduce((s,d)=>s+(parseFloat(d.cost)||0), 0);
+  const sn = new Set(allDevices.map(d=>d.subnet).filter(Boolean)).size;
+  document.getElementById("st-total").textContent = t;
+  document.getElementById("st-online").textContent = on;
+  document.getElementById("st-offline").textContent = off;
+  document.getElementById("st-cost").textContent = fmt(cost);
+  document.getElementById("st-subnets").textContent = sn;
+  document.getElementById("st-online-sub").textContent = t ? `${Math.round(on/t*100)}% معدل` : "—";
 }
 
-// ── Filters & Search ───────────────────────────────────
 function applyFilters() {
   let data = [...allDevices];
-
-  // type/status filter
   if (currentFilter !== "all") {
     if (["online","offline","warning"].includes(currentFilter)) {
-      data = data.filter(d => d.status === currentFilter);
+      data = data.filter(d=>d.status===currentFilter);
     } else {
-      data = data.filter(d => d.type === currentFilter);
+      data = data.filter(d=>d.type===currentFilter);
     }
   }
-
-  // search
   if (searchTerm) {
     const q = searchTerm.toLowerCase();
     data = data.filter(d =>
@@ -565,107 +264,110 @@ function applyFilters() {
       (d.location||"").toLowerCase().includes(q)
     );
   }
-
-  // sort
-  data.sort((a, b) => {
-    let av = a[sortCol] ?? "", bv = b[sortCol] ?? "";
-    if (sortCol === "cost") { av = parseFloat(av)||0; bv = parseFloat(bv)||0; }
-    if (sortCol === "createdAt") {
-      av = av?.seconds ?? 0; bv = bv?.seconds ?? 0;
-    }
-    if (av < bv) return -sortDir;
-    if (av > bv) return  sortDir;
+  data.sort((a,b)=>{
+    let av=a[sortCol]??"", bv=b[sortCol]??"";
+    if (sortCol==="cost"){av=parseFloat(av)||0;bv=parseFloat(bv)||0;}
+    if (sortCol==="createdAt"){av=av?.seconds??0;bv=bv?.seconds??0;}
+    if (av<bv) return -sortDir;
+    if (av>bv) return sortDir;
     return 0;
   });
-
   filtered = data;
   currentPage = 1;
   renderTable();
 }
 
-// ── Table Render ───────────────────────────────────────
 function renderTable() {
   const tbody = document.getElementById("tableBody");
   const total = filtered.length;
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const slice = filtered.slice(start, start + PAGE_SIZE);
-
+  const start = (currentPage-1)*PAGE_SIZE;
+  const slice = filtered.slice(start, start+PAGE_SIZE);
   document.getElementById("recordCount").textContent = total + " جهاز";
-  document.getElementById("pageInfo").textContent    =
-    `عرض ${start+1}–${Math.min(start+PAGE_SIZE, total)} من ${total} جهاز`;
-
-  if (total === 0) {
-    tbody.innerHTML = `<tr><td colspan="10"><div class="table-msg"><div class="icon">🔍</div><p>${allDevices.length===0?"لا توجد أجهزة بعد — أضف أول جهاز!":"لا توجد نتائج تطابق البحث."}</p></div></td></tr>`;
+  document.getElementById("pageInfo").textContent = total ? `${start+1}–${Math.min(start+PAGE_SIZE,total)} من ${total}` : "0";
+  
+  if (!total) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-3)">
+      <div style="font-size:36px;margin-bottom:10px;opacity:.4">▤</div>
+      ${allDevices.length===0?"لا توجد أجهزة بعد":"لا توجد نتائج تطابق البحث"}
+    </td></tr>`;
     renderPagination(0);
     return;
   }
-
-  tbody.innerHTML = slice.map(dev => {
-    const typeMap = {router:"🌐",switch:"🔀",ap:"📡",server:"🖧",other:"⚙️"};
-    const icon    = typeMap[dev.type] || "⚙️";
-    const checked = selectedIds.has(dev.id) ? "checked" : "";
-    const date    = dev.createdAt?.seconds
-      ? new Date(dev.createdAt.seconds*1000).toLocaleDateString("ar-SA")
-      : "—";
-    const cost    = dev.cost ? "ر.ي" + parseFloat(dev.cost).toLocaleString("ar-YE") : "—";
-
-    return `<tr class="${selectedIds.has(dev.id)?'selected':''}">
-      <td><input type="checkbox" ${checked} onchange="toggleSelect('${dev.id}',this)"></td>
+  
+  const typeIcons = {router:"🌐",modem:"📡",switch:"🔀",ap:"📶",client:"💻",server:"🖧",other:"⚙️"};
+  const typeBadges = {router:"badge-blue",modem:"badge-pink",switch:"badge-purple",ap:"badge-green",client:"badge-yellow",server:"badge-yellow",other:"badge-gray"};
+  const typeLabels = {router:"راوتر",modem:"موديم",switch:"سويتش",ap:"AP",client:"عميل",server:"خادم",other:"أخرى"};
+  
+  tbody.innerHTML = slice.map(d => {
+    const checked = selectedIds.has(d.id) ? "checked" : "";
+    const date = d.createdAt?.seconds ? new Date(d.createdAt.seconds*1000).toLocaleDateString("ar-SA") : "—";
+    return `<tr>
+      <td><input type="checkbox" ${checked} onchange="toggleSelect('${d.id}',this)"></td>
       <td>
-        <div class="dname">
-          <div class="dicon ${dev.type||'other'}">${icon}</div>
-          <div>
-            <div class="dname-text">${esc(dev.name)}</div>
-            <div class="dname-model">${esc(dev.model||"—")}</div>
+        <div class="dev-cell">
+          <div class="dev-icon ${d.type||'other'}">${typeIcons[d.type]||"⚙️"}</div>
+          <div class="dev-info">
+            <div class="dev-name">${esc(d.name)}</div>
+            <div class="dev-model">${esc(d.model||"—")}</div>
           </div>
         </div>
       </td>
-      <td><span class="badge ${dev.type||'other'}">${typeLabel(dev.type)}</span></td>
-      <td><span class="ip-code">${esc(dev.ip||"—")}</span></td>
-      <td><span style="font-size:12px;color:var(--text2)">${esc(dev.subnet||"—")}</span></td>
-      <td><span style="font-size:12px;color:var(--text2)">${esc(dev.parent||"Core")}</span></td>
-      <td><span class="status ${dev.status||'warning'}"><span class="sdot2"></span>${statusLabel(dev.status)}</span></td>
-      <td><span class="price-cell">${cost}</span></td>
-      <td><span style="font-size:12px;color:var(--text2)">${date}</span></td>
+      <td><span class="badge ${typeBadges[d.type]||'badge-gray'}">${typeLabels[d.type]||"—"}</span></td>
+      <td><span class="code-pill">${esc(d.ip||"—")}</span></td>
+      <td class="text-2 text-sm">${esc(d.subnet||"—")}</td>
+      <td class="text-2 text-sm">${esc(d.parent||"Core")}</td>
+      <td><span class="badge badge-${d.status==='online'?'green':d.status==='offline'?'red':d.status==='planned'?'blue':'yellow'}"><span class="badge-dot"></span>${{online:"متصل",offline:"غير متصل",warning:"تحذير",planned:"مخطط"}[d.status]||"—"}</span></td>
+      <td class="text-mono text-warn text-sm">${d.cost?fmt(d.cost):"—"}</td>
+      <td class="text-3 text-sm text-mono">${date}</td>
       <td>
         <div class="row-actions">
-          <button class="act-btn" onclick="viewDevice('${dev.id}')">👁 عرض</button>
-          <button class="act-btn" onclick="editDevice('${dev.id}')">✏️</button>
-          <button class="act-btn del" onclick="confirmDelete('${dev.id}','${esc(dev.name)}')">🗑️</button>
+          <button class="action-btn" onclick="viewDevice('${d.id}')">👁</button>
+          <button class="action-btn" onclick="editDevice('${d.id}')">✏️</button>
+          <button class="action-btn danger" onclick="confirmDelete('${d.id}','${esc(d.name)}')">🗑️</button>
         </div>
       </td>
     </tr>`;
   }).join("");
-
   renderPagination(total);
 }
 
 function renderPagination(total) {
-  const pages = Math.ceil(total / PAGE_SIZE);
-  const wrap  = document.getElementById("pageBtns");
+  const pages = Math.ceil(total/PAGE_SIZE);
+  const wrap = document.getElementById("pageBtns");
   if (pages <= 1) { wrap.innerHTML = ""; return; }
-  let btns = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?"disabled":""}>→</button>`;
-  for (let i=1; i<=pages; i++) {
-    btns += `<button class="page-btn ${i===currentPage?"active":""}" onclick="goPage(${i})">${i}</button>`;
+  let btns = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?"disabled":""}>‹</button>`;
+  // Show smart page numbers
+  const maxVisible = 7;
+  let startP = Math.max(1, currentPage - 3);
+  let endP = Math.min(pages, startP + maxVisible - 1);
+  if (endP - startP < maxVisible - 1) startP = Math.max(1, endP - maxVisible + 1);
+  if (startP > 1) {
+    btns += `<button class="page-btn" onclick="goPage(1)">1</button>`;
+    if (startP > 2) btns += `<span class="page-btn" style="border:none;cursor:default">…</span>`;
   }
-  btns += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?"disabled":""}>←</button>`;
+  for (let i=startP; i<=endP; i++) {
+    btns += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  if (endP < pages) {
+    if (endP < pages-1) btns += `<span class="page-btn" style="border:none;cursor:default">…</span>`;
+    btns += `<button class="page-btn" onclick="goPage(${pages})">${pages}</button>`;
+  }
+  btns += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?"disabled":""}>›</button>`;
   wrap.innerHTML = btns;
 }
 
 window.goPage = p => { currentPage = p; renderTable(); };
 
-// ── Select ─────────────────────────────────────────────
 window.toggleSelect = (id, cb) => {
-  cb.checked ? selectedIds.add(id) : selectedIds.delete(id);
+  if (cb.checked) selectedIds.add(id); else selectedIds.delete(id);
   updateBulkBar();
-  renderTable();
 };
 
 window.toggleSelectAll = cb => {
   const page = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
   page.forEach(d => cb.checked ? selectedIds.add(d.id) : selectedIds.delete(d.id));
-  updateBulkBar();
   renderTable();
+  updateBulkBar();
 };
 
 function updateBulkBar() {
@@ -675,139 +377,133 @@ function updateBulkBar() {
 }
 
 window.bulkDelete = async () => {
-  if (!confirm(`هل تريد حذف ${selectedIds.size} جهاز نهائياً؟`)) return;
-  for (const id of selectedIds) await deleteDoc(doc(db, COL, id));
+  const ok = await confirmDialog(`حذف ${selectedIds.size} جهاز نهائياً؟ لا يمكن التراجع.`, true);
+  if (!ok) return;
+  for (const id of selectedIds) await deleteDoc(doc(db, "devices", id));
   selectedIds.clear();
   updateBulkBar();
-  showToast("تم حذف الأجهزة المحددة ✅", "success");
+  toast("تم حذف الأجهزة المحددة", "success");
 };
 
-// ── Sorting ────────────────────────────────────────────
 document.querySelectorAll("th[data-col]").forEach(th => {
   th.addEventListener("click", () => {
     const col = th.dataset.col;
     if (sortCol === col) sortDir *= -1;
     else { sortCol = col; sortDir = 1; }
-    document.querySelectorAll("th").forEach(t => t.classList.remove("sorted"));
-    th.classList.add("sorted");
-    th.querySelector(".sort-icon").textContent = sortDir === 1 ? "↑" : "↓";
     applyFilters();
   });
 });
 
-// ── Filter chips ───────────────────────────────────────
 document.querySelectorAll(".chip[data-filter]").forEach(chip => {
   chip.addEventListener("click", () => {
-    document.querySelectorAll(".chip[data-filter]").forEach(c => c.classList.remove("active"));
+    document.querySelectorAll(".chip[data-filter]").forEach(c=>c.classList.remove("active"));
     chip.classList.add("active");
     currentFilter = chip.dataset.filter;
     applyFilters();
   });
 });
 
-// ── Search ─────────────────────────────────────────────
 let searchTimeout;
 document.getElementById("searchInput").addEventListener("input", e => {
   clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => { searchTerm = e.target.value.trim(); applyFilters(); }, 250);
+  searchTimeout = setTimeout(() => { searchTerm = e.target.value.trim(); applyFilters(); }, 200);
 });
 
-// ── Parent Select ──────────────────────────────────────
 function populateParentSelect() {
   const sel = document.getElementById("f-parent");
   const cur = sel.value;
-  sel.innerHTML = '<option value="">— لا يوجد (Core) —</option>';
+  sel.innerHTML = '<option value="">— لا يوجد —</option>';
   allDevices
-    .filter(d => d.type === "router" || d.type === "switch")
+    .filter(d => ["router","switch","modem","ap"].includes(d.type))
     .forEach(d => {
       const o = document.createElement("option");
-      o.value = d.name; o.textContent = d.name + " (" + d.ip + ")";
+      o.value = d.name;
+      o.textContent = d.name + (d.ip ? " (" + d.ip + ")" : "");
       sel.appendChild(o);
     });
   sel.value = cur;
 }
 
-// ── Add Modal ──────────────────────────────────────────
 window.openAdd = () => {
   editingId = null;
   document.getElementById("modalTitle").textContent = "إضافة جهاز جديد";
-  document.getElementById("modalIcon").textContent  = "🖥️";
-  document.getElementById("saveBtnText").textContent = "💾 حفظ الجهاز";
-  clearForm();
+  document.getElementById("modalIcon").textContent = "▤";
+  document.getElementById("saveBtnText").textContent = "💾 حفظ";
+  ["f-name","f-ip","f-subnet","f-model","f-cost","f-location","f-notes"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("f-type").value = "router";
+  document.getElementById("f-status").value = "online";
+  document.getElementById("f-parent").value = "";
   document.getElementById("f-buydate").value = new Date().toISOString().split("T")[0];
-  openModal("deviceOverlay");
+  openModal("deviceModal");
+  setTimeout(() => document.getElementById("f-name").focus(), 100);
 };
 
 window.editDevice = id => {
-  const dev = allDevices.find(d => d.id === id);
-  if (!dev) return;
+  const d = allDevices.find(x=>x.id===id); if (!d) return;
   editingId = id;
-  document.getElementById("modalTitle").textContent = "تعديل: " + dev.name;
-  document.getElementById("modalIcon").textContent  = "✏️";
+  document.getElementById("modalTitle").textContent = "تعديل: " + d.name;
+  document.getElementById("modalIcon").textContent = "✏";
   document.getElementById("saveBtnText").textContent = "💾 حفظ التعديلات";
-  document.getElementById("f-name").value     = dev.name || "";
-  document.getElementById("f-type").value     = dev.type || "other";
-  document.getElementById("f-ip").value       = dev.ip || "";
-  document.getElementById("f-subnet").value   = dev.subnet || "";
-  document.getElementById("f-parent").value   = dev.parent || "";
-  document.getElementById("f-model").value    = dev.model || "";
-  document.getElementById("f-cost").value     = dev.cost || "";
-  document.getElementById("f-buydate").value  = dev.buyDate || "";
-  document.getElementById("f-status").value   = dev.status || "online";
-  document.getElementById("f-location").value = dev.location || "";
-  document.getElementById("f-notes").value    = dev.notes || "";
-  openModal("deviceOverlay");
+  document.getElementById("f-name").value = d.name||"";
+  document.getElementById("f-type").value = d.type||"router";
+  document.getElementById("f-ip").value = d.ip||"";
+  document.getElementById("f-subnet").value = d.subnet||"";
+  document.getElementById("f-parent").value = d.parent||"";
+  document.getElementById("f-model").value = d.model||"";
+  // Convert from base to display for editing
+  document.getElementById("f-cost").value = d.cost ? convertFromBase(d.cost).toFixed(2) : "";
+  document.getElementById("f-buydate").value = d.buyDate||"";
+  document.getElementById("f-status").value = d.status||"online";
+  document.getElementById("f-location").value = d.location||"";
+  document.getElementById("f-notes").value = d.notes||"";
+  openModal("deviceModal");
 };
 
-// ── View Device ────────────────────────────────────────
 window.viewDevice = id => {
-  const dev = allDevices.find(d => d.id === id);
-  if (!dev) return;
-  const typeMap = {router:"🌐",switch:"🔀",ap:"📡",server:"🖧",other:"⚙️"};
-  document.getElementById("viewIcon").textContent  = typeMap[dev.type]||"⚙️";
-  document.getElementById("viewTitle").textContent = dev.name;
-  const date = dev.createdAt?.seconds
-    ? new Date(dev.createdAt.seconds*1000).toLocaleString("ar-SA") : "—";
-
+  const d = allDevices.find(x=>x.id===id); if (!d) return;
+  const typeIcons = {router:"🌐",modem:"📡",switch:"🔀",ap:"📶",client:"💻",server:"🖧",other:"⚙️"};
+  const typeLabels = {router:"راوتر",modem:"موديم",switch:"سويتش",ap:"نقطة وصول",client:"عميل",server:"خادم",other:"أخرى"};
+  document.getElementById("viewIcon").textContent = typeIcons[d.type]||"⚙️";
+  document.getElementById("viewTitle").textContent = d.name;
+  const date = d.createdAt?.seconds ? new Date(d.createdAt.seconds*1000).toLocaleString("ar-SA") : "—";
   document.getElementById("viewBody").innerHTML = `
-    <div class="detail-grid">
-      <div class="detail-row"><div class="detail-lbl">اسم الجهاز</div><div class="detail-val" style="font-family:var(--mono)">${esc(dev.name)}</div></div>
-      <div class="detail-row"><div class="detail-lbl">النوع</div><div class="detail-val"><span class="badge ${dev.type||'other'}">${typeLabel(dev.type)}</span></div></div>
-      <div class="detail-row"><div class="detail-lbl">عنوان IP</div><div class="detail-val"><span class="ip-code">${esc(dev.ip||"—")}</span></div></div>
-      <div class="detail-row"><div class="detail-lbl">الشبكة الفرعية</div><div class="detail-val">${esc(dev.subnet||"—")}</div></div>
-      <div class="detail-row"><div class="detail-lbl">الجهاز الرئيسي</div><div class="detail-val">${esc(dev.parent||"Core")}</div></div>
-      <div class="detail-row"><div class="detail-lbl">الموديل</div><div class="detail-val">${esc(dev.model||"—")}</div></div>
-      <div class="detail-row"><div class="detail-lbl">الحالة</div><div class="detail-val"><span class="status ${dev.status||'warning'}"><span class="sdot2"></span>${statusLabel(dev.status)}</span></div></div>
-      <div class="detail-row"><div class="detail-lbl">التكلفة</div><div class="detail-val" style="color:var(--yellow);font-family:var(--mono)">${dev.cost ? "ر.ي"+parseFloat(dev.cost).toLocaleString("ar-YE") : "—"}</div></div>
-      <div class="detail-row"><div class="detail-lbl">تاريخ الشراء</div><div class="detail-val">${esc(dev.buyDate||"—")}</div></div>
-      <div class="detail-row"><div class="detail-lbl">الموقع</div><div class="detail-val">${esc(dev.location||"—")}</div></div>
-      <div class="detail-row" style="grid-column:1/-1"><div class="detail-lbl">الملاحظات</div><div class="detail-val" style="white-space:pre-wrap">${esc(dev.notes||"—")}</div></div>
-      <div class="detail-row" style="grid-column:1/-1"><div class="detail-lbl">تاريخ الإضافة</div><div class="detail-val" style="font-size:12px;color:var(--text2)">${date}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">الاسم</div><div class="text-mono fw-600">${esc(d.name)}</div></div>
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">النوع</div><div>${typeLabels[d.type]||"—"}</div></div>
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">عنوان IP</div><div><span class="code-pill">${esc(d.ip||"—")}</span></div></div>
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">الشبكة</div><div>${esc(d.subnet||"—")}</div></div>
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">الجهاز الرئيسي</div><div>${esc(d.parent||"Core")}</div></div>
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">الموديل</div><div>${esc(d.model||"—")}</div></div>
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">الحالة</div><div><span class="badge badge-${d.status==='online'?'green':d.status==='offline'?'red':d.status==='planned'?'blue':'yellow'}"><span class="badge-dot"></span>${{online:"متصل",offline:"غير متصل",warning:"تحذير",planned:"مخطط"}[d.status]||"—"}</span></div></div>
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">التكلفة</div><div class="text-mono text-warn fw-700">${d.cost?fmt(d.cost):"—"}</div></div>
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">تاريخ الشراء</div><div class="text-mono">${esc(d.buyDate||"—")}</div></div>
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">الموقع</div><div>${esc(d.location||"—")}</div></div>
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px;grid-column:1/-1"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">ملاحظات</div><div style="white-space:pre-wrap;line-height:1.6">${esc(d.notes||"—")}</div></div>
+      <div style="background:var(--surface-2);border-radius:9px;padding:10px 14px;grid-column:1/-1"><div class="text-xs text-3 mb-2 fw-700" style="text-transform:uppercase;letter-spacing:.5px">تاريخ الإضافة</div><div class="text-mono text-3 text-xs">${date}</div></div>
     </div>`;
-  document.getElementById("viewEditBtn").onclick = () => { closeModal("viewOverlay"); editDevice(id); };
-  openModal("viewOverlay");
+  document.getElementById("viewEditBtn").onclick = () => { closeModal("viewModal"); editDevice(id); };
+  openModal("viewModal");
 };
 
-// ── Save Device ────────────────────────────────────────
 window.saveDevice = async () => {
-  const name   = document.getElementById("f-name").value.trim();
-  const type   = document.getElementById("f-type").value;
-  const ip     = document.getElementById("f-ip").value.trim();
-  const subnet = document.getElementById("f-subnet").value.trim();
-
-  if (!name || !type || !ip || !subnet) {
-    showToast("يرجى ملء الحقول المطلوبة (*)","error"); return;
-  }
-
-  // duplicate name check (except self)
+  const name = document.getElementById("f-name").value.trim();
+  const type = document.getElementById("f-type").value;
+  if (!name) { toast("اسم الجهاز مطلوب", "error"); return; }
+  // Check duplicate
   const dup = allDevices.find(d => d.name === name && d.id !== editingId);
-  if (dup) { showToast("يوجد جهاز آخر بنفس الاسم!","error"); return; }
+  if (dup) { toast("يوجد جهاز آخر بنفس الاسم!", "error"); return; }
+
+  // Convert cost from display to base for storage
+  const costDisplay = parseFloat(document.getElementById("f-cost").value) || 0;
+  const costInBase = costDisplay > 0 ? convertToBase(costDisplay) : 0;
 
   const payload = {
-    name, type, ip, subnet,
+    name, type,
+    ip:       document.getElementById("f-ip").value.trim(),
+    subnet:   document.getElementById("f-subnet").value.trim(),
     parent:   document.getElementById("f-parent").value,
     model:    document.getElementById("f-model").value.trim(),
-    cost:     parseFloat(document.getElementById("f-cost").value) || 0,
+    cost:     costInBase,
     buyDate:  document.getElementById("f-buydate").value,
     status:   document.getElementById("f-status").value,
     location: document.getElementById("f-location").value.trim(),
@@ -816,93 +512,47 @@ window.saveDevice = async () => {
 
   const btn = document.getElementById("saveBtn");
   btn.disabled = true;
-  document.getElementById("saveBtnText").innerHTML = '<span class="saving-spinner"></span> جاري الحفظ...';
-
+  document.getElementById("saveBtnText").textContent = "جاري الحفظ...";
   try {
     if (editingId) {
-      await updateDoc(doc(db, COL, editingId), { ...payload, updatedAt: serverTimestamp() });
-      showToast("تم تحديث الجهاز ✅","success");
+      await updateDoc(doc(db,"devices",editingId), {...payload, updatedAt: serverTimestamp()});
+      toast("تم تحديث الجهاز ✓", "success");
     } else {
-      await addDoc(collection(db, COL), { ...payload, createdAt: serverTimestamp() });
-      showToast("تمت إضافة الجهاز ✅","success");
+      await addDoc(collection(db,"devices"), {...payload, createdAt: serverTimestamp()});
+      toast("تمت إضافة الجهاز ✓", "success");
     }
-    closeDevModal();
+    closeModal("deviceModal");
   } catch(e) {
-    showToast("خطأ: " + e.message,"error");
+    toast("خطأ: "+e.message, "error");
   } finally {
     btn.disabled = false;
-    document.getElementById("saveBtnText").textContent = editingId ? "💾 حفظ التعديلات" : "💾 حفظ الجهاز";
+    document.getElementById("saveBtnText").textContent = editingId ? "💾 حفظ التعديلات" : "💾 حفظ";
   }
 };
 
-// ── Delete ─────────────────────────────────────────────
-window.confirmDelete = (id, name) => {
-  pendingDelId = id;
-  document.getElementById("delDevName").textContent = name;
-  document.getElementById("confirmDelBtn").onclick = async () => {
-    try {
-      await deleteDoc(doc(db, COL, pendingDelId));
-      showToast("تم حذف الجهاز ✅","success");
-      closeModal("delOverlay");
-    } catch(e) {
-      showToast("خطأ في الحذف: "+e.message,"error");
-    }
-  };
-  openModal("delOverlay");
+window.confirmDelete = async (id, name) => {
+  const ok = await confirmDialog(`حذف "${name}" نهائياً؟ لا يمكن التراجع.`, true);
+  if (!ok) return;
+  await deleteDoc(doc(db,"devices",id));
+  toast("تم حذف الجهاز ✓", "success");
 };
 
-// ── Export CSV ─────────────────────────────────────────
 document.getElementById("exportBtn").onclick = () => {
   const headers = ["الاسم","النوع","IP","الشبكة","الرئيسي","الحالة","التكلفة","الموقع","الموديل","ملاحظات"];
   const rows = filtered.map(d => [
-    d.name,d.type,d.ip,d.subnet,d.parent||"Core",d.status,
-    d.cost||0,d.location||"",d.model||"",d.notes||""
+    d.name, d.type, d.ip, d.subnet, d.parent||"Core", d.status,
+    d.cost ? convertFromBase(d.cost).toFixed(2) : 0,
+    d.location||"", d.model||"", d.notes||""
   ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(","));
   const csv = "\uFEFF" + headers.join(",") + "\n" + rows.join("\n");
-  const a   = document.createElement("a");
-  a.href    = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  const a = document.createElement("a");
+  a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
   a.download = "almada-devices-" + new Date().toISOString().split("T")[0] + ".csv";
   a.click();
-  showToast("تم تصدير " + filtered.length + " جهاز 📤","info");
+  toast(`تم تصدير ${filtered.length} جهاز`, "info");
 };
 
-// ── Helpers ────────────────────────────────────────────
-function clearForm() {
-  ["f-name","f-ip","f-subnet","f-model","f-cost","f-buydate","f-location","f-notes"]
-    .forEach(id => document.getElementById(id).value = "");
-  document.getElementById("f-type").value   = "ap";
-  document.getElementById("f-status").value = "online";
-  document.getElementById("f-parent").value = "";
-}
-
-window.closeDevModal = () => closeModal("deviceOverlay");
-
-function openModal(id) { document.getElementById(id).classList.add("open"); }
-window.closeModal = id => document.getElementById(id).classList.remove("open");
-
-document.querySelectorAll(".overlay").forEach(o => {
-  o.addEventListener("click", e => { if (e.target===o) o.classList.remove("open"); });
-});
-
-function typeLabel(t) {
-  return {router:"راوتر",switch:"سويتش",ap:"AP",server:"خادم",other:"أخرى"}[t] || t || "—";
-}
-function statusLabel(s) {
-  return {online:"متصل",offline:"غير متصل",warning:"تحذير"}[s] || s || "—";
-}
-function esc(str) {
-  return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
-
-function showToast(msg, type="info") {
-  const wrap = document.getElementById("toastWrap");
-  const t = document.createElement("div");
-  t.className = "toast " + type;
-  const icons = {success:"✅",error:"❌",info:"ℹ️"};
-  t.innerHTML = `<span>${icons[type]||"ℹ️"}</span><span>${msg}</span>`;
-  wrap.appendChild(t);
-  setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 350); }, 3500);
-}
+window.closeM = closeModal;
 </script>
 </body>
 </html>

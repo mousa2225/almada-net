@@ -1,11 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=dashboard.html">
-<title>المدى نت</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المدى نت — مرحباً</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+.welcome-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;z-index:1}
+.welcome-card{background:linear-gradient(180deg,var(--surface) 0%,rgba(13,20,36,.6) 100%);border:1px solid var(--border);border-radius:24px;padding:48px 40px;width:480px;max-width:96vw;text-align:center;box-shadow:var(--sh-lg);animation:fadeUp .5s ease both}
+.brand-mark{width:80px;height:80px;background:linear-gradient(135deg,var(--accent) 0%,#8b5cf6 100%);border-radius:20px;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;color:white;box-shadow:0 16px 40px rgba(6,182,212,.4);position:relative}
+.brand-mark::after{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,transparent,rgba(255,255,255,.2));pointer-events:none}
+.welcome-title{font-size:28px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#fff 0%,var(--accent-3) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.welcome-sub{font-size:14px;color:var(--text-2);margin-bottom:32px;line-height:1.6}
+.setup-form{text-align:right;margin-bottom:24px}
+.divider-line{height:1px;background:var(--border);margin:20px 0;position:relative}
+.divider-line span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);padding:0 12px;font-size:11px;color:var(--text-3);font-family:var(--mono);text-transform:uppercase;letter-spacing:1px}
+.feature-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;text-align:right}
+.feature-item{display:flex;align-items:center;gap:11px;padding:11px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px}
+.feature-icon{width:30px;height:30px;background:var(--accent-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:14px;flex-shrink:0}
+.feature-text{flex:1}
+.feature-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px}
+.feature-desc{font-size:11px;color:var(--text-3)}
+.full-btn{width:100%;justify-content:center}
+.skip-link{display:inline-block;margin-top:14px;font-size:12px;color:var(--text-3);text-decoration:none}
+.skip-link:hover{color:var(--accent)}
+</style>
 </head>
 <body>
-<script>window.location.href = "dashboard.html";</script>
+<div class="welcome-wrap">
+  <div class="welcome-card">
+    <div class="brand-mark">
+      <svg viewBox="0 0 40 40" width="44" height="44">
+        <circle cx="20" cy="20" r="6" fill="currentColor" opacity=".95"/>
+        <circle cx="20" cy="20" r="14" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"/>
+        <circle cx="20" cy="20" r="19" fill="none" stroke="currentColor" stroke-width="1" opacity=".25"/>
+      </svg>
+    </div>
+    <div class="welcome-title">مرحباً بك في المدى نت</div>
+    <div class="welcome-sub">نظام احترافي لإدارة شبكتك بالكامل — أجهزة، شبكات فرعية، ومالية في مكان واحد</div>
+
+    <div id="setupForm" class="setup-form" style="display:none">
+      <div class="fg">
+        <label>اسم شبكتك <span class="req">*</span></label>
+        <input type="text" id="netName" placeholder="مثال: شبكة المدى نت" autocomplete="off">
+      </div>
+      <div class="fg">
+        <label>اسم المالك</label>
+        <input type="text" id="ownerName" placeholder="اسمك (اختياري)" autocomplete="off">
+      </div>
+      <div class="fg">
+        <label>العملة الأساسية <span class="req">*</span></label>
+        <select id="baseCurrency">
+          <option value="SAR" selected>🇸🇦 ريال سعودي (ر.س)</option>
+          <option value="USD">🇺🇸 دولار أمريكي ($)</option>
+          <option value="YER">🇾🇪 ريال يمني (ر.ي)</option>
+          <option value="AED">🇦🇪 درهم إماراتي (د.إ)</option>
+        </select>
+        <span class="hint">العملة الأساسية للحفظ في قاعدة البيانات — تقدر تغيّرها لاحقاً</span>
+      </div>
+      <button class="btn btn-primary btn-lg full-btn" onclick="completeSetup()">
+        ابدأ الآن ←
+      </button>
+      <a href="#" class="skip-link" onclick="skipSetup();return false;">تخطي وذهاب للوحة التحكم</a>
+    </div>
+
+    <div id="welcomeView">
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon">◈</div>
+          <div class="feature-text">
+            <div class="feature-name">توبولوجيا الشبكة</div>
+            <div class="feature-desc">رسم تفاعلي لكامل الشبكة مع توصيلات سلكية ولاسلكية</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">▤</div>
+          <div class="feature-text">
+            <div class="feature-name">إدارة الأجهزة</div>
+            <div class="feature-desc">راوترات، موديمات، سويتشات، APs، عملاء — كلها في مكان واحد</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">◆</div>
+          <div class="feature-text">
+            <div class="feature-name">المالية والأرباح</div>
+            <div class="feature-desc">تتبّع كل ريال — اعرف أنت في ربح أم خسارة بدقة</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">▣</div>
+          <div class="feature-text">
+            <div class="feature-name">تقارير ذكية</div>
+            <div class="feature-desc">رسوم بيانية شهرية، توزيع الفئات، تصدير CSV</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-lg full-btn" id="startBtn" onclick="startSetup()">
+        ابدأ بإعداد شبكتك ←
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { db, doc, getDoc, setDoc, serverTimestamp, watchSettings, toast } from "./app.js";
+
+// Check if setup is already done
+async function checkSetup() {
+  try {
+    const snap = await getDoc(doc(db, "settings", "main"));
+    if (snap.exists() && snap.data().isSetup) {
+      // Already setup, redirect to dashboard
+      window.location.href = "dashboard.html";
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+checkSetup();
+
+window.startSetup = () => {
+  document.getElementById("welcomeView").style.display = "none";
+  document.getElementById("setupForm").style.display = "block";
+  document.getElementById("netName").focus();
+};
+
+window.completeSetup = async () => {
+  const netName = document.getElementById("netName").value.trim();
+  const ownerName = document.getElementById("ownerName").value.trim();
+  const baseCurrency = document.getElementById("baseCurrency").value;
+
+  if (!netName) {
+    toast("اسم الشبكة مطلوب", "error");
+    return;
+  }
+
+  try {
+    await setDoc(doc(db, "settings", "main"), {
+      netName, ownerName, baseCurrency,
+      displayCurrency: baseCurrency,
+      exchangeRates: { SAR: 1, USD: 0.27, YER: 67.5, AED: 0.98 },
+      isSetup: true,
+      createdAt: serverTimestamp()
+    });
+    toast("تم إنشاء شبكتك بنجاح!", "success");
+    setTimeout(() => { window.location.href = "dashboard.html"; }, 800);
+  } catch (e) {
+    toast("خطأ: " + e.message, "error");
+  }
+};
+
+window.skipSetup = () => {
+  window.location.href = "dashboard.html";
+};
+</script>
 </body>
 </html>

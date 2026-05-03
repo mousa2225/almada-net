@@ -3,596 +3,1010 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>المدى نت — توبولوجيا الشبكة</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>توبولوجيا الشبكة — المدى نت</title>
+<link rel="stylesheet" href="theme.css">
 <style>
-:root{
-  --bg:#0a0e1a;--bg2:#0f1525;--bg3:#141c30;
-  --surface:#1a2440;--surface2:#1e2b4a;
-  --border:#243058;--border2:#2e3d6e;
-  --accent:#00d4ff;--accent2:#0099cc;
-  --green:#00e5a0;--yellow:#ffd166;--red:#ff4d6a;--purple:#a78bfa;
-  --text:#e2e8f4;--text2:#8899b8;
-  --mono:'JetBrains Mono',monospace;
-  --sans:'IBM Plex Sans Arabic',sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);height:100vh;overflow:hidden}
-
-/* SIDEBAR */
-.sidebar{position:fixed;right:0;top:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
-.sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.logo-text h1{font-size:14px;font-weight:700;line-height:1.2}
-.logo-text span{font-size:10px;color:var(--accent);font-family:var(--mono)}
-.sidebar-nav{padding:12px 10px;flex:1;overflow-y:auto}
-.nav-section-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;padding:8px 8px 4px;margin-top:6px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:all .2s;margin-bottom:2px;color:var(--text2);font-size:13px;text-decoration:none}
-.nav-item:hover{background:var(--surface);color:var(--text)}
-.nav-item.active{background:rgba(0,212,255,.12);color:var(--accent)}
-.nav-icon{font-size:15px;width:18px;text-align:center}
-.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
-.net-status{background:var(--surface);border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px}
-.sdot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pg 2s infinite}
-@keyframes pg{0%,100%{opacity:1}50%{opacity:.5}}
-
-/* MAIN */
-.main{margin-right:240px;height:100vh;display:flex;flex-direction:column;position:relative}
-
-/* TOPBAR */
-.topbar{background:rgba(10,14,26,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:50;flex-shrink:0}
-.topbar-title{font-size:17px;font-weight:600;flex:1}
-.topbar-title span{color:var(--accent)}
-.tbtn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:6px 14px;font-family:var(--sans);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s}
-.tbtn:hover{background:var(--surface2);border-color:var(--border2)}
-.tbtn.active{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent)}
-
-/* CANVAS AREA */
-.topo-wrap{flex:1;position:relative;overflow:hidden}
-#topoCanvas{width:100%;height:100%;cursor:grab;display:block}
-#topoCanvas:active{cursor:grabbing}
-#topoCanvas.moving{cursor:grabbing}
-
-/* LEGEND */
-.legend{position:absolute;bottom:20px;right:20px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;gap:7px;z-index:10}
-.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
-.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.legend-line{width:20px;height:2px;flex-shrink:0}
-
-/* MINIMAP */
-.minimap-wrap{position:absolute;bottom:20px;left:20px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;z-index:10}
-#minimap{display:block}
-
-/* CONTROLS */
-.zoom-controls{position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:4px;z-index:10}
-.zoom-btn{width:32px;height:32px;background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:var(--mono)}
-.zoom-btn:hover{background:var(--surface2);border-color:var(--border2)}
-
-/* DETAIL PANEL */
-.detail-panel{position:absolute;top:16px;right:260px;width:280px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:0;z-index:20;transform:translateX(20px);opacity:0;pointer-events:none;transition:all .3s;max-height:calc(100vh - 100px);overflow-y:auto}
-.detail-panel.open{transform:translateX(0);opacity:1;pointer-events:all}
-.dp-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.dp-icon{font-size:20px}
-.dp-title{font-size:14px;font-weight:700;flex:1}
-.dp-close{background:none;border:none;color:var(--text2);font-size:16px;cursor:pointer;padding:2px}
-.dp-body{padding:14px 16px}
-.dp-row{margin-bottom:10px}
-.dp-lbl{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:2px}
-.dp-val{font-size:13px;font-weight:500}
-.ip-code{font-family:var(--mono);font-size:11px;color:var(--accent);background:rgba(0,212,255,.1);padding:2px 7px;border-radius:4px}
-.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
-.online{background:rgba(0,229,160,.12);color:var(--green)}
-.offline{background:rgba(255,77,106,.12);color:var(--red)}
-.warning{background:rgba(255,209,102,.12);color:var(--yellow)}
-.sdot2{width:5px;height:5px;border-radius:50%}
-.online .sdot2{background:var(--green)}
-.offline .sdot2{background:var(--red)}
-.warning .sdot2{background:var(--yellow)}
-.dp-children{margin-top:8px}
-.dp-child{font-size:12px;color:var(--text2);padding:4px 8px;background:var(--bg3);border-radius:5px;margin-bottom:3px;display:flex;align-items:center;gap:6px}
-.dp-child-dot{width:5px;height:5px;border-radius:50%;background:var(--border2)}
-
-/* STATS BAR */
-.stats-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 16px;display:flex;align-items:center;gap:20px;z-index:10;white-space:nowrap}
-.sb-item{display:flex;align-items:center;gap:6px;font-size:12px}
-.sb-val{font-family:var(--mono);font-weight:700}
-.sb-val.blue{color:var(--accent)}
-.sb-val.green{color:var(--green)}
-.sb-val.red{color:var(--red)}
-.sb-val.yellow{color:var(--yellow)}
-
-/* LOADING */
-.topo-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:5}
-.big-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+body{height:100vh;overflow:hidden;display:flex}
+.sidebar{position:relative;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;margin-right:0}
+.topbar{flex-wrap:wrap;flex-shrink:0}
+.canvas-area{flex:1;position:relative;overflow:hidden;background:radial-gradient(ellipse at center,rgba(6,182,212,.03) 0%,transparent 70%)}
+canvas{display:block;width:100%;height:100%;cursor:grab}
+canvas.grabbing{cursor:grabbing}
+canvas.connecting{cursor:crosshair}
+.hud{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(13,20,36,.85);border:1px solid var(--border);border-radius:10px;padding:7px 14px;display:flex;align-items:center;gap:18px;z-index:10;backdrop-filter:blur(20px);box-shadow:var(--sh-md)}
+.hud-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-2)}
+.hud-val{font-family:var(--mono);font-weight:700}
+.hud-sep{width:1px;height:14px;background:var(--border-2)}
+.controls{position:absolute;bottom:18px;left:18px;display:flex;flex-direction:column;gap:4px;z-index:10}
+.zbtn{width:34px;height:34px;background:rgba(13,20,36,.9);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:var(--mono);backdrop-filter:blur(10px)}
+.zbtn:hover{background:var(--surface-3);border-color:var(--accent)}
+.zbtn:active{transform:scale(.95)}
+.zlvl{font-size:10px;cursor:default;font-weight:600}
+.legend{position:absolute;bottom:18px;right:18px;background:rgba(13,20,36,.9);border:1px solid var(--border);border-radius:10px;padding:13px 16px;z-index:10;backdrop-filter:blur(10px);min-width:200px}
+.leg-title{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.leg-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-2);margin-bottom:6px}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:1.5px solid;background:transparent}
+.leg-line{width:24px;flex-shrink:0;border-top-width:2px;border-top-style:solid}
+.mode-pill{position:absolute;top:14px;right:18px;background:rgba(245,158,11,.15);border:1px solid var(--warn);color:var(--warn);border-radius:9px;padding:8px 16px;font-size:12px;font-weight:700;z-index:10;display:none;backdrop-filter:blur(10px)}
+.mode-pill.show{display:flex;align-items:center;gap:8px}
+.right-panel{position:absolute;top:0;left:0;bottom:0;width:300px;background:var(--surface);border-right:1px solid var(--border);z-index:20;transform:translateX(-100%);transition:transform .3s;overflow-y:auto;display:flex;flex-direction:column}
+.right-panel.open{transform:translateX(0)}
+.rp-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;flex-shrink:0;background:rgba(6,9,18,.4)}
+.rp-icon{width:32px;height:32px;background:var(--accent-soft);color:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.rp-title{font-size:14px;font-weight:700;flex:1}
+.rp-close{background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);width:28px;height:28px;border-radius:7px;cursor:pointer}
+.rp-body{padding:12px 14px;flex:1;overflow-y:auto}
+.rp-section{margin-bottom:14px}
+.rp-section-title{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+.rp-row{display:flex;align-items:center;gap:9px;padding:9px 11px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;margin-bottom:5px;cursor:pointer;transition:all .15s}
+.rp-row:hover{border-color:var(--accent);background:var(--accent-soft);transform:translateX(2px)}
+.rp-row-icon{font-size:14px;flex-shrink:0;width:24px;text-align:center}
+.rp-row-info{flex:1;min-width:0}
+.rp-row-name{font-weight:600;margin-bottom:1px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-row-sub{font-size:10px;color:var(--text-3);font-family:var(--mono)}
+.loading-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--bg);z-index:30}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.topo-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:5;display:none}
-
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.empty-overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:5}
+.empty-icon{font-size:60px;opacity:.3}
+#tooltip{position:fixed;background:var(--surface);border:1px solid var(--border-2);border-radius:11px;padding:11px 14px;font-size:12px;z-index:1000;pointer-events:none;opacity:0;transition:opacity .15s;min-width:200px;box-shadow:var(--sh-md)}
+#tooltip.show{opacity:1}
+.tt-name{font-weight:700;font-size:13px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.tt-row{display:flex;justify-content:space-between;gap:10px;font-size:11px;margin-bottom:3px}
+.tt-row span:first-child{color:var(--text-3)}
+.tt-row span:last-child{color:var(--text);font-weight:500}
+.ctx-menu{position:fixed;background:var(--surface);border:1px solid var(--border-2);border-radius:10px;padding:5px;z-index:1000;min-width:180px;box-shadow:var(--sh-md);display:none}
+.ctx-menu.show{display:block}
+.ctx-item{padding:8px 14px;font-size:12px;cursor:pointer;border-radius:7px;display:flex;align-items:center;gap:9px;color:var(--text);transition:all .1s;font-family:inherit}
+.ctx-item:hover{background:var(--surface-2)}
+.ctx-item.danger{color:var(--danger)}
+.ctx-item.danger:hover{background:var(--danger-soft)}
+.ctx-icon{font-size:14px;width:18px;text-align:center}
+.ctx-sep{height:1px;background:var(--border);margin:4px 0}
+.suggest-box{background:linear-gradient(135deg,rgba(6,182,212,.08),rgba(139,92,246,.05));border:1px solid var(--accent-soft);border-radius:10px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:var(--text-2);line-height:1.6}
+.suggest-box b{color:var(--accent);font-weight:700}
 </style>
 </head>
 <body>
-
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">🌐</div>
-    <div class="logo-text"><h1>المدى نت</h1><span>ALMADA NET v1.0</span></div>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section-title">الرئيسية</div>
-    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> لوحة التحكم</a>
-    <a href="topology.html" class="nav-item active"><span class="nav-icon">🗺️</span> توبولوجيا الشبكة</a>
-    <div class="nav-section-title">الأجهزة والشبكة</div>
-    <a href="devices.html" class="nav-item"><span class="nav-icon">🖥️</span> إدارة الأجهزة</a>
-    <a href="subnets.html" class="nav-item"><span class="nav-icon">🔌</span> الشبكات الفرعية</a>
-    <div class="nav-section-title">الإدارة المالية</div>
-    <a href="finances.html" class="nav-item"><span class="nav-icon">💰</span> الإدارة المالية</a>
-    <div class="nav-section-title">الإعدادات</div>
-    <a href="#" class="nav-item"><span class="nav-icon">⚙️</span> الإعدادات</a>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="net-status">
-      <div class="sdot"></div>
-      <div>
-        <div style="font-size:12px;font-weight:600" id="fbStatus">جاري الاتصال...</div>
-        <div style="font-size:11px;color:var(--text2)">Firebase Firestore</div>
-      </div>
-    </div>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<main class="main">
+<aside class="sidebar" id="sidebar"></aside>
+<div class="main">
   <header class="topbar">
-    <div class="topbar-title">توبولوجيا الشبكة <span>/ الخريطة التفاعلية</span></div>
-    <button class="tbtn" id="btnHierarchy" onclick="setLayout('hierarchy')">🌳 هرمي</button>
-    <button class="tbtn active" id="btnTree" onclick="setLayout('tree')">🔀 شجري</button>
-    <button class="tbtn" onclick="resetView()">⟳ إعادة ضبط</button>
-    <button class="tbtn" onclick="fitAll()">⊡ عرض الكل</button>
+    <h1 class="tb-title">توبولوجيا الشبكة <span class="breadcrumb">/ تفاعلية</span></h1>
+    <button class="btn btn-primary btn-sm" onclick="openAddDevice()">＋ إضافة جهاز</button>
+    <button class="btn btn-sm" id="connectModeBtn" onclick="toggleConnectMode()">🔗 وضع الربط</button>
+    <button class="btn btn-sm" onclick="autoLayout()">🔀 ترتيب تلقائي</button>
+    <button class="btn btn-sm" onclick="fitAll()">⊡ توسيط</button>
+    <button class="btn btn-sm" onclick="toggleDevList()">📋 الأجهزة</button>
   </header>
 
-  <div class="topo-wrap">
-
-    <!-- LOADING -->
-    <div class="topo-loading" id="topoLoading">
-      <div class="big-spinner"></div>
-      <div style="font-size:14px;color:var(--text2)">جاري تحميل بيانات الشبكة...</div>
+  <div class="canvas-area">
+    <div class="loading-overlay" id="topoLoading">
+      <div class="spinner"></div>
+      <div class="text-2">جاري تحميل الشبكة...</div>
     </div>
 
-    <!-- EMPTY STATE -->
-    <div class="topo-empty" id="topoEmpty">
-      <div style="font-size:48px">🔌</div>
-      <div style="font-size:16px;font-weight:600">لا توجد أجهزة</div>
-      <div style="font-size:13px;color:var(--text2)">أضف أجهزة من صفحة إدارة الأجهزة أولاً</div>
-      <a href="devices.html" style="margin-top:8px;background:var(--accent);color:var(--bg);border-radius:7px;padding:8px 18px;text-decoration:none;font-size:13px;font-weight:700">إضافة جهاز</a>
+    <div class="empty-overlay" id="topoEmpty">
+      <div class="empty-icon">◈</div>
+      <div class="text-lg fw-700">الشبكة فارغة</div>
+      <div class="text-2">أضف أول جهاز لبناء توبولوجيا الشبكة</div>
+      <button class="btn btn-primary" onclick="openAddDevice()">＋ إضافة جهاز</button>
     </div>
 
-    <!-- CANVAS -->
     <canvas id="topoCanvas"></canvas>
 
-    <!-- STATS BAR -->
-    <div class="stats-bar" id="statsBar" style="display:none">
-      <div class="sb-item"><span>🖥️</span><span class="sb-val blue" id="sbTotal">0</span><span style="color:var(--text2)">جهاز</span></div>
-      <div style="width:1px;height:16px;background:var(--border)"></div>
-      <div class="sb-item"><span class="sb-val green" id="sbOnline">0</span><span style="color:var(--text2)">متصل</span></div>
-      <div class="sb-item"><span class="sb-val red" id="sbOffline">0</span><span style="color:var(--text2)">غير متصل</span></div>
-      <div class="sb-item"><span class="sb-val yellow" id="sbWarn">0</span><span style="color:var(--text2)">تحذير</span></div>
+    <div class="hud">
+      <div class="hud-item">◉ <span class="hud-val text-accent" id="sbTotal">0</span> جهاز</div>
+      <div class="hud-sep"></div>
+      <div class="hud-item"><span class="sdot sdot-online"></span> <span class="hud-val text-success" id="sbOn">0</span></div>
+      <div class="hud-item"><span class="sdot sdot-warning"></span> <span class="hud-val text-warn" id="sbPlan">0</span></div>
+      <div class="hud-item"><span class="sdot sdot-offline"></span> <span class="hud-val text-danger" id="sbOff">0</span></div>
+      <div class="hud-sep"></div>
+      <div class="hud-item">⊸ <span class="hud-val" style="color:#a855f7" id="sbLinks">0</span></div>
     </div>
 
-    <!-- ZOOM CONTROLS -->
-    <div class="zoom-controls">
-      <button class="zoom-btn" onclick="zoom(1.2)" title="تكبير">+</button>
-      <button class="zoom-btn" id="zoomLevel" style="font-size:10px;cursor:default">100%</button>
-      <button class="zoom-btn" onclick="zoom(0.8)" title="تصغير">−</button>
+    <div class="mode-pill" id="modePill">⚡ <span id="modePillText">وضع الربط — اختر جهازين</span></div>
+
+    <div class="controls">
+      <button class="zbtn" onclick="zoomIn()">＋</button>
+      <div class="zbtn zlvl" id="zoomLvl">100%</div>
+      <button class="zbtn" onclick="zoomOut()">−</button>
+      <div style="height:6px"></div>
+      <button class="zbtn" onclick="fitAll()" title="إعادة">⟲</button>
     </div>
 
-    <!-- LEGEND -->
     <div class="legend">
-      <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.8px">المفتاح</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> راوتر (Master)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> سويتش (L2)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> AP نشط</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div> AP تحذير</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> غير متصل</div>
-      <div class="legend-item"><div class="legend-line" style="background:var(--accent);opacity:.7"></div> اتصال نشط</div>
-      <div class="legend-item"><div class="legend-line" style="background:var(--border2);border-top:2px dashed var(--border2)"></div> اتصال عادي</div>
+      <div class="leg-title">الأجهزة</div>
+      <div class="leg-row"><div class="leg-dot" style="border-color:#06b6d4;background:rgba(6,182,212,.2)"></div> راوتر</div>
+      <div class="leg-row"><div class="leg-dot" style="border-color:#ec4899;background:rgba(236,72,153,.2)"></div> موديم</div>
+      <div class="leg-row"><div class="leg-dot" style="border-color:#8b5cf6;background:rgba(139,92,246,.2)"></div> سويتش</div>
+      <div class="leg-row"><div class="leg-dot" style="border-color:#10b981;background:rgba(16,185,129,.2)"></div> Access Point</div>
+      <div class="leg-row"><div class="leg-dot" style="border-color:#f59e0b;background:rgba(245,158,11,.2)"></div> عميل</div>
+      <div class="leg-title" style="margin-top:10px">الاتصالات</div>
+      <div class="leg-row"><div class="leg-line" style="border-color:#06b6d4"></div> سلكي</div>
+      <div class="leg-row"><div class="leg-line" style="border-color:#a855f7;border-top-style:dashed"></div> واي فاي</div>
     </div>
 
-    <!-- DETAIL PANEL -->
-    <div class="detail-panel" id="detailPanel">
-      <div class="dp-header">
-        <div class="dp-icon" id="dpIcon">🖥️</div>
-        <div class="dp-title" id="dpTitle">—</div>
-        <button class="dp-close" onclick="closeDetail()">✕</button>
+    <div class="right-panel" id="devListPanel">
+      <div class="rp-head">
+        <div class="rp-icon">📋</div>
+        <div class="rp-title">الأجهزة</div>
+        <button class="rp-close" onclick="toggleDevList()">✕</button>
       </div>
-      <div class="dp-body" id="dpBody"></div>
+      <div class="rp-body" id="devListBody"></div>
     </div>
-
   </div>
-</main>
+</div>
+
+<div id="tooltip">
+  <div class="tt-name" id="ttName"></div>
+  <div class="tt-row"><span>النوع</span><span id="ttType"></span></div>
+  <div class="tt-row"><span>IP</span><span class="text-mono" id="ttIp"></span></div>
+  <div class="tt-row"><span>الحالة</span><span id="ttStatus"></span></div>
+  <div class="tt-row"><span>الروابط</span><span id="ttLinks"></span></div>
+</div>
+
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon" id="addModalIcon">▤</div>
+      <div class="modal-title" id="addModalTitle">إضافة جهاز جديد</div>
+      <button class="modal-close" onclick="closeM('addModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg-row">
+        <div class="fg">
+          <label>اسم الجهاز <span class="req">*</span></label>
+          <input type="text" id="f-name" placeholder="مثال: Router-Main">
+        </div>
+        <div class="fg">
+          <label>نوع الجهاز <span class="req">*</span></label>
+          <select id="f-type" onchange="updateTypeIcon()">
+            <option value="router">🌐 راوتر</option>
+            <option value="modem">📡 موديم</option>
+            <option value="switch">🔀 سويتش</option>
+            <option value="ap">📶 Access Point</option>
+            <option value="client">💻 عميل</option>
+            <option value="server">🖧 خادم</option>
+            <option value="other">⚙️ أخرى</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg">
+          <label>عنوان IP</label>
+          <input type="text" id="f-ip" class="input-mono" placeholder="192.168.X.X">
+        </div>
+        <div class="fg">
+          <label>الحالة <span class="req">*</span></label>
+          <select id="f-status">
+            <option value="online">✓ متصل (مركّب)</option>
+            <option value="planned">📋 مخطط (غير مركّب)</option>
+            <option value="offline">✕ غير متصل</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg">
+        <label>الموقع / الموديل</label>
+        <input type="text" id="f-location" placeholder="مثال: الطابق الأول - Mikrotik RB4011">
+      </div>
+      <div class="fg" id="connectToField">
+        <label>ربط مباشر بـ (اختياري)</label>
+        <select id="f-parent">
+          <option value="">— بدون ربط الآن، أربطه لاحقاً —</option>
+        </select>
+      </div>
+      <div class="fg-row" id="connTypeFields" style="display:none">
+        <div class="fg">
+          <label>نوع الاتصال</label>
+          <select id="f-conntype">
+            <option value="wired">🔌 سلكي</option>
+            <option value="wifi">📶 واي فاي</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>اتجاه الإشارة</label>
+          <select id="f-direction">
+            <option value="both">↔ ثنائي</option>
+            <option value="from">← يستقبل من</option>
+            <option value="to">→ يبث إلى</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeM('addModal')">إلغاء</button>
+      <button class="btn btn-primary" id="addSaveBtn" onclick="saveDevice()">💾 إضافة</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="connModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon" style="color:var(--accent)">🔗</div>
+      <div class="modal-title">إعدادات الرابط</div>
+      <button class="modal-close" onclick="closeM('connModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="suggest-box" id="connSuggest">💡 حدّد إعدادات الرابط</div>
+      <div class="fg-row">
+        <div class="fg">
+          <label>المصدر</label>
+          <input type="text" id="conn-from" readonly style="background:var(--accent-soft);color:var(--accent)">
+        </div>
+        <div class="fg">
+          <label>الهدف</label>
+          <input type="text" id="conn-to" readonly style="background:var(--success-soft);color:var(--success)">
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg">
+          <label>نوع الاتصال</label>
+          <select id="conn-type">
+            <option value="wired">🔌 سلكي (كابل)</option>
+            <option value="wifi">📶 واي فاي (لاسلكي)</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>اتجاه الإشارة</label>
+          <select id="conn-dir">
+            <option value="both">↔ ثنائي</option>
+            <option value="from">← من المصدر للهدف</option>
+            <option value="to">→ من الهدف للمصدر</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg">
+        <label>ملاحظة (اختياري)</label>
+        <input type="text" id="conn-note" placeholder="مثال: كابل Cat6...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeM('connModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveConnection()">🔗 ربط</button>
+    </div>
+  </div>
+</div>
+
+<div class="ctx-menu" id="ctxNode">
+  <div class="ctx-item" onclick="ctxEdit()"><span class="ctx-icon">✏</span> تعديل الجهاز</div>
+  <div class="ctx-item" onclick="ctxConnect()"><span class="ctx-icon">🔗</span> ربط بجهاز آخر</div>
+  <div class="ctx-item" onclick="ctxToggle()"><span class="ctx-icon">🔄</span> <span id="ctxStatusText">تغيير الحالة</span></div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item danger" onclick="ctxDelete()"><span class="ctx-icon">🗑</span> حذف الجهاز</div>
+</div>
+<div class="ctx-menu" id="ctxLink">
+  <div class="ctx-item" onclick="ctxEditLink()"><span class="ctx-icon">✏</span> تعديل الرابط</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item danger" onclick="ctxDeleteLink()"><span class="ctx-icon">🗑</span> حذف الرابط</div>
+</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  db, collection, addDoc, doc, updateDoc, deleteDoc,
+  onSnapshot, serverTimestamp,
+  watchSettings, esc, renderSidebar, toast, openModal, closeModal, confirmDialog
+} from "./app.js";
 
-const firebaseConfig = {
-  apiKey:"AIzaSyDdYIiZcithhvDRLwHwahV6-W_puXHN4rs",
-  authDomain:"almadadashboard.firebaseapp.com",
-  projectId:"almadadashboard",
-  storageBucket:"almadadashboard.firebasestorage.app",
-  messagingSenderId:"172655018085",
-  appId:"1:172655018085:web:6b956408061985c3ccc68c"
-};
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-
-// ── State ──────────────────────────────────────────────
-let devices    = [];
-let nodes      = [];
-let edges      = [];
-let layout     = "tree";
-let scale      = 1;
-let offsetX    = 0;
-let offsetY    = 0;
-let dragging   = false;
-let dragStart  = {x:0,y:0};
-let hoveredNode= null;
-let selectedNode=null;
-let animFrame  = null;
-let needsRedraw= false;
-
-const canvas = document.getElementById("topoCanvas");
-const ctx    = canvas.getContext("2d");
-
-// ── Firebase ───────────────────────────────────────────
-document.getElementById("fbStatus").textContent = "متصل بـ Firebase";
-onSnapshot(collection(db,"devices"), snap => {
-  devices = snap.docs.map(d=>({id:d.id,...d.data()}));
-  buildGraph();
-  document.getElementById("topoLoading").style.display = "none";
-  if (devices.length===0) {
-    document.getElementById("topoEmpty").style.display = "flex";
-    return;
-  }
-  document.getElementById("topoEmpty").style.display = "none";
-  document.getElementById("statsBar").style.display = "";
-  updateStatsBar();
-  computeLayout();
-  fitAll();
-  scheduleRedraw();
+document.getElementById("sidebar").innerHTML = renderSidebar("topology");
+watchSettings(s => {
+  const sn = document.getElementById("sbNetName");
+  if (sn) sn.textContent = s.netName;
 });
 
-// ── Build Graph ────────────────────────────────────────
-function buildGraph() {
-  nodes = devices.map(d => ({
-    id:     d.id,
-    name:   d.name||"—",
-    type:   d.type||"other",
-    ip:     d.ip||"",
-    subnet: d.subnet||"",
-    parent: d.parent||"",
-    status: d.status||"warning",
-    model:  d.model||"",
-    location: d.location||"",
-    cost:   d.cost||0,
-    x: 0, y: 0, vx:0, vy:0,
-    radius: nodeRadius({type:d.type}),
-  }));
-  edges = [];
-  nodes.forEach(n => {
-    if (n.parent) {
-      const p = nodes.find(x=>x.name===n.parent);
-      if (p) edges.push({from:p.id, to:n.id, active:p.status==="online"&&n.status==="online"});
-    }
-  });
+let nodes=[], links=[], scale=1, ox=0, oy=0;
+let dragging=false, dragNode=null, dragOffX=0, dragOffY=0;
+let panStart=null, panOx=0, panOy=0;
+let connectMode=false, connectFirst=null;
+let hovNode=null, hovLink=null, ctxNode=null, ctxLink=null;
+let editingId=null, mousePos=null, animFrame=null, initialized=false;
+
+const canvas = document.getElementById("topoCanvas");
+const ctx = canvas.getContext("2d");
+
+onSnapshot(collection(db,"topoNodes"), snap=>{
+  nodes = snap.docs.map(d=>({id:d.id,...d.data()}));
+  initLayout(); updateStats(); updateDevList(); populateParents(); redraw();
+  document.getElementById("topoLoading").style.display="none";
+  document.getElementById("topoEmpty").style.display = nodes.length===0?"flex":"none";
+});
+onSnapshot(collection(db,"topoLinks"), snap=>{
+  links = snap.docs.map(d=>({id:d.id,...d.data()}));
+  updateStats(); redraw();
+});
+
+function resize(){
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.offsetWidth * dpr;
+  canvas.height = canvas.offsetHeight * dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  redraw();
 }
+new ResizeObserver(resize).observe(canvas);
+resize();
 
-function nodeRadius(n) {
-  return {router:28,switch:22,server:22,ap:16,other:14}[n.type]||14;
-}
+function W(){return canvas.offsetWidth;}
+function H(){return canvas.offsetHeight;}
+function redraw(){if(animFrame)cancelAnimationFrame(animFrame);animFrame=requestAnimationFrame(draw);}
 
-// ── Layout ─────────────────────────────────────────────
-function computeLayout() {
-  const W = canvas.width/scale, H = canvas.height/scale;
-  // Build tree levels
-  const levels = {};
-  const roots  = nodes.filter(n=>!n.parent);
-  roots.forEach(n=>{ n._level=0; levels[0]=(levels[0]||[]).concat(n); });
-  let changed=true, iter=0;
-  while(changed && iter<10){
-    changed=false; iter++;
-    nodes.forEach(n=>{
-      if(n.parent){
-        const p=nodes.find(x=>x.name===n.parent);
-        if(p && (n._level===undefined||n._level<=p._level)){
-          n._level=(p._level||0)+1;
-          levels[n._level]=(levels[n._level]||[]).concat(n);
-          changed=true;
-        }
-      }
-    });
-  }
-  // nodes without parent or level
-  nodes.forEach(n=>{ if(n._level===undefined){ n._level=0; levels[0]=(levels[0]||[]).concat(n); }});
-
-  const maxLevel = Math.max(...nodes.map(n=>n._level||0));
-  const levelH   = Math.min(160, (H*0.8)/(maxLevel+1));
-  const startY   = levelH*0.8;
-
-  Object.entries(levels).forEach(([lvl,lvlNodes])=>{
-    // remove duplicates
-    const uniq=[...new Map(lvlNodes.map(n=>[n.id,n])).values()];
-    const spacing=Math.min(180,(W*0.85)/Math.max(uniq.length,1));
-    const totalW=(uniq.length-1)*spacing;
-    uniq.forEach((n,i)=>{
-      n.x = W/2 - totalW/2 + i*spacing;
-      n.y = startY + parseInt(lvl)*levelH;
-    });
-  });
-}
-
-// ── Canvas Setup ────────────────────────────────────────
-function resizeCanvas(){
-  const wrap=canvas.parentElement;
-  canvas.width=wrap.clientWidth;
-  canvas.height=wrap.clientHeight;
-  if(devices.length>0) computeLayout();
-  scheduleRedraw();
-}
-window.addEventListener("resize",resizeCanvas);
-resizeCanvas();
-
-// ── Draw ───────────────────────────────────────────────
 function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const dpr = window.devicePixelRatio || 1;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W(),H());
   ctx.save();
-  ctx.translate(offsetX,offsetY);
+  ctx.translate(ox,oy);
   ctx.scale(scale,scale);
-
-  // GRID
   drawGrid();
-
-  // EDGES
-  edges.forEach(e=>{
-    const from=nodes.find(n=>n.id===e.from);
-    const to  =nodes.find(n=>n.id===e.to);
-    if(!from||!to) return;
-    drawEdge(from,to,e.active);
-  });
-
-  // NODES
+  links.forEach(l=>{const f=nodes.find(n=>n.id===l.from),t=nodes.find(n=>n.id===l.to);if(f&&t)drawLink(f,t,l);});
+  if(connectMode&&connectFirst&&mousePos){
+    const n=nodes.find(x=>x.id===connectFirst);
+    if(n){
+      ctx.save();
+      ctx.strokeStyle="rgba(6,182,212,.6)";
+      ctx.lineWidth=2;
+      ctx.setLineDash([6,5]);
+      ctx.beginPath();
+      ctx.moveTo(n.x,n.y);
+      ctx.lineTo((mousePos.x-ox)/scale,(mousePos.y-oy)/scale);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+  }
   nodes.forEach(n=>drawNode(n));
-
   ctx.restore();
 }
 
 function drawGrid(){
-  const gridSize=60, W=canvas.width/scale, H=canvas.height/scale;
-  const startX=Math.floor(-offsetX/scale/gridSize)*gridSize;
-  const startY=Math.floor(-offsetY/scale/gridSize)*gridSize;
-  ctx.strokeStyle="rgba(0,212,255,0.04)"; ctx.lineWidth=1;
-  for(let x=startX;x<W+offsetX/scale;x+=gridSize){
-    ctx.beginPath(); ctx.moveTo(x,startY); ctx.lineTo(x,H+200); ctx.stroke();
-  }
-  for(let y=startY;y<H+offsetY/scale;y+=gridSize){
-    ctx.beginPath(); ctx.moveTo(startX,y); ctx.lineTo(W+200,y); ctx.stroke();
-  }
+  const gs=60;
+  const sx=Math.floor(-ox/scale/gs)*gs;
+  const sy=Math.floor(-oy/scale/gs)*gs;
+  ctx.strokeStyle="rgba(255,255,255,.018)";
+  ctx.lineWidth=1;
+  for(let x=sx;x<(W()-ox)/scale+gs;x+=gs){ctx.beginPath();ctx.moveTo(x,sy-gs);ctx.lineTo(x,(H()-oy)/scale+gs);ctx.stroke();}
+  for(let y=sy;y<(H()-oy)/scale+gs;y+=gs){ctx.beginPath();ctx.moveTo(sx-gs,y);ctx.lineTo((W()-ox)/scale+gs,y);ctx.stroke();}
 }
 
-function drawEdge(from,to,active){
-  const dx=to.x-from.x, dy=to.y-from.y;
-  const dist=Math.sqrt(dx*dx+dy*dy);
-  const ux=dx/dist, uy=dy/dist;
-  const sx=from.x+ux*from.radius, sy=from.y+uy*from.radius;
-  const ex=to.x-ux*to.radius,     ey=to.y-uy*to.radius;
-
-  if(active){
-    ctx.strokeStyle="rgba(0,212,255,0.5)"; ctx.lineWidth=2;
-    ctx.setLineDash([]);
-  } else {
-    ctx.strokeStyle="rgba(46,61,110,0.8)"; ctx.lineWidth=1.5;
-    ctx.setLineDash([5,4]);
-  }
-  ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(ex,ey); ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Arrow
-  const angle=Math.atan2(ey-sy,ex-sx);
-  const al=8, aw=5;
-  ctx.fillStyle=active?"rgba(0,212,255,0.6)":"rgba(46,61,110,0.8)";
-  ctx.beginPath();
-  ctx.moveTo(ex,ey);
-  ctx.lineTo(ex-al*Math.cos(angle-aw/10),ey-al*Math.sin(angle-aw/10));
-  ctx.lineTo(ex-al*Math.cos(angle+aw/10),ey-al*Math.sin(angle+aw/10));
-  ctx.closePath(); ctx.fill();
+const TYPE_COLORS={router:"#06b6d4",modem:"#ec4899",switch:"#8b5cf6",ap:"#10b981",client:"#f59e0b",server:"#f59e0b",other:"#64748b"};
+function nColor(n){
+  if(n.status==="offline")return{main:"#ef4444",border:"#ef4444",text:"#ef4444"};
+  if(n.status==="planned")return{main:"#f59e0b",border:"#f59e0b",text:"#f59e0b"};
+  const c=TYPE_COLORS[n.type]||TYPE_COLORS.other;
+  return{main:c,border:c,text:c};
 }
-
-function nodeColor(n){
-  if(n.status==="offline") return {main:"#ff4d6a",glow:"rgba(255,77,106,0.3)",border:"#ff4d6a"};
-  if(n.status==="warning") return {main:"#ffd166",glow:"rgba(255,209,102,0.3)",border:"#ffd166"};
-  switch(n.type){
-    case"router": return{main:"#00d4ff",glow:"rgba(0,212,255,0.4)",border:"#00d4ff"};
-    case"switch": return{main:"#a78bfa",glow:"rgba(167,139,250,0.3)",border:"#a78bfa"};
-    case"server": return{main:"#ffd166",glow:"rgba(255,209,102,0.3)",border:"#ffd166"};
-    default:      return{main:"#00e5a0",glow:"rgba(0,229,160,0.3)",border:"#00e5a0"};
-  }
-}
-
-function nodeEmoji(type){
-  return{router:"🌐",switch:"🔀",ap:"📡",server:"🖧",other:"⚙️"}[type]||"⚙️";
-}
+function nEmoji(t){return{router:"🌐",modem:"📡",switch:"🔀",ap:"📶",client:"💻",server:"🖧",other:"⚙️"}[t]||"⚙️";}
+function nRadius(t){return{router:28,modem:24,switch:22,ap:19,client:16,server:22,other:17}[t]||17;}
 
 function drawNode(n){
-  const col=nodeColor(n);
-  const r=n.radius;
-  const isHover=hoveredNode===n.id;
-  const isSel  =selectedNode===n.id;
-  const rScale = isHover||isSel ? 1.12 : 1;
-  const nr=r*rScale;
-
-  // GLOW
-  if(isHover||isSel||n.type==="router"){
-    const grd=ctx.createRadialGradient(n.x,n.y,nr*0.5,n.x,n.y,nr*2.5);
-    grd.addColorStop(0,col.glow); grd.addColorStop(1,"transparent");
-    ctx.beginPath(); ctx.arc(n.x,n.y,nr*2.5,0,Math.PI*2);
-    ctx.fillStyle=grd; ctx.fill();
+  const col=nColor(n);
+  const r=nRadius(n.type);
+  const isHov=hovNode===n.id;
+  const isSel=connectFirst===n.id;
+  const rr=r*(isHov||isSel?1.18:1);
+  if(isHov||isSel||n.type==="router"||n.type==="modem"){
+    const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,rr*3.2);
+    const intensity=isSel?"66":(isHov?"44":"30");
+    g.addColorStop(0,col.main+intensity);
+    g.addColorStop(1,"transparent");
+    ctx.beginPath();
+    ctx.arc(n.x,n.y,rr*3.2,0,Math.PI*2);
+    ctx.fillStyle=g;
+    ctx.fill();
   }
-
-  // BG CIRCLE
-  ctx.beginPath(); ctx.arc(n.x,n.y,nr,0,Math.PI*2);
-  const bgGrd=ctx.createRadialGradient(n.x-nr*0.3,n.y-nr*0.3,0,n.x,n.y,nr);
-  bgGrd.addColorStop(0,col.main+"33"); bgGrd.addColorStop(1,col.main+"11");
-  ctx.fillStyle=bgGrd; ctx.fill();
-
-  // BORDER
-  ctx.strokeStyle=isSel?col.main:col.main+"99";
-  ctx.lineWidth=isSel?2.5:1.5;
+  ctx.beginPath();
+  ctx.arc(n.x,n.y,rr,0,Math.PI*2);
+  const bgGrad=ctx.createRadialGradient(n.x-rr*.3,n.y-rr*.3,0,n.x,n.y,rr);
+  bgGrad.addColorStop(0,col.main+"30");
+  bgGrad.addColorStop(1,col.main+"12");
+  ctx.fillStyle=bgGrad;
+  ctx.fill();
+  ctx.strokeStyle=isSel?"#ffffff":col.border;
+  ctx.lineWidth=isSel?2.5:(n.status==="planned"?1.5:2);
+  if(n.status==="planned")ctx.setLineDash([5,3]);
   ctx.stroke();
-
-  // EMOJI
-  ctx.font=`${nr*0.85}px serif`;
-  ctx.textAlign="center"; ctx.textBaseline="middle";
-  ctx.fillStyle="#fff"; ctx.fillText(nodeEmoji(n.type),n.x,n.y);
-
-  // NAME
-  ctx.font=`600 ${Math.max(9,11/scale*0.9)}px IBM Plex Sans Arabic,sans-serif`;
-  ctx.textAlign="center"; ctx.textBaseline="top";
-  ctx.fillStyle=col.main;
-  ctx.fillText(n.name,n.x,n.y+nr+4);
-
-  // IP
-  if(scale>0.5){
-    ctx.font=`${Math.max(8,10/scale*0.8)}px JetBrains Mono,monospace`;
-    ctx.fillStyle="rgba(136,153,184,0.9)";
-    ctx.fillText(n.ip,n.x,n.y+nr+17);
+  ctx.setLineDash([]);
+  ctx.font=`${rr*0.85}px serif`;
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.globalAlpha=n.status==="offline"?0.4:1;
+  ctx.fillText(nEmoji(n.type),n.x,n.y);
+  ctx.globalAlpha=1;
+  if(scale>0.45){
+    const fs=Math.min(13,12/scale*0.9);
+    ctx.font=`600 ${fs}px IBM Plex Sans Arabic,sans-serif`;
+    ctx.textAlign="center";
+    ctx.textBaseline="top";
+    ctx.fillStyle=col.text;
+    ctx.globalAlpha=n.status==="offline"?0.5:1;
+    ctx.fillText(n.name,n.x,n.y+rr+6);
+    ctx.globalAlpha=1;
   }
+  if(scale>0.7&&n.ip){
+    const fs=Math.min(10,9/scale*0.85);
+    ctx.font=`${fs}px JetBrains Mono,monospace`;
+    ctx.fillStyle="rgba(148,163,184,.85)";
+    ctx.fillText(n.ip,n.x,n.y+rr+6+13);
+  }
+  const sdx=n.x+rr*0.72, sdy=n.y-rr*0.72;
+  const sc={online:"#10b981",offline:"#ef4444",planned:"#f59e0b"}[n.status]||"#f59e0b";
+  ctx.beginPath();
+  ctx.arc(sdx,sdy,4,0,Math.PI*2);
+  ctx.fillStyle=sc;
+  ctx.fill();
+  ctx.strokeStyle="#0d1424";
+  ctx.lineWidth=2;
+  ctx.stroke();
 }
 
-function scheduleRedraw(){
-  if(animFrame) cancelAnimationFrame(animFrame);
-  animFrame=requestAnimationFrame(()=>{draw();animFrame=null;});
+function drawLink(from,to,l){
+  const isHov=hovLink===l.id;
+  const isWifi=l.connType==="wifi";
+  const bothOn=from.status==="online"&&to.status==="online";
+  ctx.save();
+  ctx.strokeStyle=bothOn?(isWifi?"rgba(168,85,247,.7)":"rgba(6,182,212,.6)"):"rgba(58,77,119,.5)";
+  ctx.lineWidth=isHov?3:1.8;
+  if(isWifi)ctx.setLineDash([7,4]);
+  else ctx.setLineDash([]);
+  const dx=to.x-from.x, dy=to.y-from.y;
+  const dist=Math.hypot(dx,dy)||1;
+  const ux=dx/dist, uy=dy/dist;
+  const fr=nRadius(from.type), tr=nRadius(to.type);
+  const sx=from.x+ux*fr, sy=from.y+uy*fr;
+  const ex=to.x-ux*tr, ey=to.y-uy*tr;
+  ctx.beginPath();
+  ctx.moveTo(sx,sy);
+  ctx.lineTo(ex,ey);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  const angle=Math.atan2(ey-sy,ex-sx);
+  const mx=(sx+ex)/2, my=(sy+ey)/2;
+  const arrow=(ax,ay,a)=>{
+    ctx.fillStyle=ctx.strokeStyle;
+    ctx.beginPath();
+    ctx.moveTo(ax,ay);
+    ctx.lineTo(ax-9*Math.cos(a-0.4),ay-9*Math.sin(a-0.4));
+    ctx.lineTo(ax-9*Math.cos(a+0.4),ay-9*Math.sin(a+0.4));
+    ctx.closePath();
+    ctx.fill();
+  };
+  if(l.direction==="from"||l.direction==="both")arrow(mx+dx*0.08,my+dy*0.08,angle);
+  if(l.direction==="to"||l.direction==="both")arrow(mx-dx*0.08,my-dy*0.08,angle+Math.PI);
+  if(scale>0.7&&l.note){
+    ctx.font="10px IBM Plex Sans Arabic,sans-serif";
+    const tw=ctx.measureText(l.note).width;
+    ctx.fillStyle="rgba(13,20,36,.9)";
+    ctx.fillRect(mx-tw/2-4,my-8,tw+8,14);
+    ctx.fillStyle="rgba(148,163,184,.95)";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText(l.note,mx,my-1);
+  }
+  ctx.restore();
 }
 
-// ── Interaction ────────────────────────────────────────
-canvas.addEventListener("mousedown",e=>{
-  dragging=true; dragStart={x:e.clientX-offsetX, y:e.clientY-offsetY};
-  canvas.classList.add("moving");
-});
+function initLayout(){
+  if(initialized||!nodes.length)return;
+  const noPos=nodes.filter(n=>!n.x&&!n.y);
+  if(noPos.length)computeLayout();
+  if(!initialized){setTimeout(()=>{fitAll();initialized=true;},100);}
+}
+
+function computeLayout(){
+  const wd=W()/scale||800, ht=H()/scale||600;
+  const levels={};
+  nodes.forEach(n=>{if(!links.some(l=>l.to===n.id)){n._level=0;(levels[0]=levels[0]||[]).push(n);}});
+  let changed=true,iter=0;
+  while(changed&&iter<10){
+    changed=false;iter++;
+    links.forEach(l=>{
+      const f=nodes.find(n=>n.id===l.from), t=nodes.find(n=>n.id===l.to);
+      if(f&&t&&(t._level===undefined||t._level<=f._level)){
+        t._level=(f._level||0)+1;
+        (levels[t._level]=levels[t._level]||[]).push(t);
+        changed=true;
+      }
+    });
+  }
+  nodes.forEach(n=>{if(n._level===undefined){n._level=1;(levels[1]=levels[1]||[]).push(n);}});
+  const maxLvl=Math.max(...nodes.map(n=>n._level||0),0);
+  const lvlH=Math.min(160,(ht*0.8)/(maxLvl+1));
+  Object.entries(levels).forEach(([lvl,ns])=>{
+    const uniq=[...new Map(ns.map(n=>[n.id,n])).values()];
+    const sp=Math.min(180,(wd*0.85)/Math.max(uniq.length,1));
+    const totalW=(uniq.length-1)*sp;
+    uniq.forEach((n,i)=>{
+      if(!n.x||!n.y){
+        n.x=wd/2-totalW/2+i*sp;
+        n.y=lvlH*(parseInt(lvl)+0.8);
+      }
+    });
+  });
+}
+
+window.autoLayout=()=>{
+  nodes.forEach(n=>{n._level=undefined;n.x=0;n.y=0;});
+  computeLayout();
+  nodes.forEach(n=>updatePos(n));
+  setTimeout(fitAll,100);
+};
+
+window.fitAll=()=>{
+  if(!nodes.length)return;
+  const xs=nodes.map(n=>n.x||0), ys=nodes.map(n=>n.y||0);
+  const minX=Math.min(...xs)-80, maxX=Math.max(...xs)+80;
+  const minY=Math.min(...ys)-80, maxY=Math.max(...ys)+80;
+  scale=Math.min(W()/(maxX-minX),H()/(maxY-minY),1.5);
+  if(!isFinite(scale)||scale<=0)scale=1;
+  scale=Math.max(scale,0.15);
+  ox=W()/2-(minX+maxX)/2*scale;
+  oy=H()/2-(minY+maxY)/2*scale;
+  document.getElementById("zoomLvl").textContent=Math.round(scale*100)+"%";
+  redraw();
+};
+
+function updatePos(n){updateDoc(doc(db,"topoNodes",n.id),{x:n.x,y:n.y}).catch(()=>{});}
+
 canvas.addEventListener("mousemove",e=>{
-  if(dragging){
-    offsetX=e.clientX-dragStart.x; offsetY=e.clientY-dragStart.y;
-    scheduleRedraw(); return;
+  const rect=canvas.getBoundingClientRect();
+  mousePos={x:e.clientX-rect.left,y:e.clientY-rect.top};
+  const wx=(mousePos.x-ox)/scale, wy=(mousePos.y-oy)/scale;
+  if(dragging&&dragNode){dragNode.x=wx+dragOffX;dragNode.y=wy+dragOffY;redraw();return;}
+  if(panStart){ox=panOx+(e.clientX-panStart.x);oy=panOy+(e.clientY-panStart.y);redraw();return;}
+  const hN=hitNode(wx,wy);
+  const hL=hN?null:hitLink(wx,wy);
+  if(hN!==hovNode||hL!==hovLink){
+    hovNode=hN;hovLink=hL;
+    canvas.style.cursor=hN||hL?"pointer":(connectMode?"crosshair":"grab");
+    redraw();
   }
-  const wp=worldPt(e.clientX,e.clientY);
-  const hit=hitTest(wp.x,wp.y);
-  if(hit!==hoveredNode){ hoveredNode=hit; canvas.style.cursor=hit?"pointer":"grab"; scheduleRedraw(); }
+  if(hN){const n=nodes.find(x=>x.id===hN);showTooltip(e,n);}
+  else hideTooltip();
+  if(connectMode&&connectFirst)redraw();
 });
+
+canvas.addEventListener("mousedown",e=>{
+  if(e.button===2)return;
+  closeContextMenus();
+  const rect=canvas.getBoundingClientRect();
+  const wx=(e.clientX-rect.left-ox)/scale, wy=(e.clientY-rect.top-oy)/scale;
+  const hN=hitNode(wx,wy);
+  if(connectMode){
+    if(hN){
+      if(!connectFirst){
+        connectFirst=hN;
+        document.getElementById("modePillText").textContent="الآن اختر الجهاز الهدف ←";
+        redraw();
+      } else if(connectFirst!==hN){
+        openConnectModal(connectFirst,hN);
+      }
+    }
+    return;
+  }
+  if(hN){
+    dragging=true;
+    dragNode=nodes.find(n=>n.id===hN);
+    dragOffX=dragNode.x-wx;
+    dragOffY=dragNode.y-wy;
+    canvas.classList.add("grabbing");
+  } else {
+    panStart={x:e.clientX,y:e.clientY};
+    panOx=ox;panOy=oy;
+    canvas.classList.add("grabbing");
+  }
+});
+
 canvas.addEventListener("mouseup",e=>{
-  if(!dragging) return;
-  const dx=e.clientX-dragStart.x-offsetX, dy=e.clientY-dragStart.y-offsetY;
-  if(Math.abs(dx)<4&&Math.abs(dy)<4){
-    const wp=worldPt(e.clientX,e.clientY);
-    const hit=hitTest(wp.x,wp.y);
-    if(hit){ selectedNode=hit; showDetail(hit); }
-    else { selectedNode=null; closeDetail(); }
-    scheduleRedraw();
-  }
-  dragging=false; canvas.classList.remove("moving");
+  if(dragging&&dragNode)updatePos(dragNode);
+  dragging=false;dragNode=null;panStart=null;
+  canvas.classList.remove("grabbing");
 });
+
+canvas.addEventListener("contextmenu",e=>{
+  e.preventDefault();
+  closeContextMenus();
+  const rect=canvas.getBoundingClientRect();
+  const wx=(e.clientX-rect.left-ox)/scale, wy=(e.clientY-rect.top-oy)/scale;
+  const hN=hitNode(wx,wy);
+  const hL=hN?null:hitLink(wx,wy);
+  if(hN){
+    ctxNode=hN;
+    const n=nodes.find(x=>x.id===hN);
+    document.getElementById("ctxStatusText").textContent=n.status==="online"?"تعيين كـ غير متصل":"تعيين كـ متصل";
+    showCtxMenu("ctxNode",e.clientX,e.clientY);
+  } else if(hL){
+    ctxLink=hL;
+    showCtxMenu("ctxLink",e.clientX,e.clientY);
+  }
+});
+
+canvas.addEventListener("dblclick",e=>{
+  const rect=canvas.getBoundingClientRect();
+  const wx=(e.clientX-rect.left-ox)/scale, wy=(e.clientY-rect.top-oy)/scale;
+  const hN=hitNode(wx,wy);
+  if(hN){ctxNode=hN;ctxEdit();}
+  else if(!connectMode)openAddDevice();
+});
+
 canvas.addEventListener("wheel",e=>{
   e.preventDefault();
-  const factor=e.deltaY<0?1.1:0.9;
+  const f=e.deltaY<0?1.12:0.88;
   const rect=canvas.getBoundingClientRect();
   const mx=e.clientX-rect.left, my=e.clientY-rect.top;
-  offsetX=(offsetX-mx)*factor+mx; offsetY=(offsetY-my)*factor+my;
-  scale*=factor; scale=Math.min(Math.max(scale,0.2),4);
-  document.getElementById("zoomLevel").textContent=Math.round(scale*100)+"%";
-  scheduleRedraw();
+  ox=(ox-mx)*f+mx;
+  oy=(oy-my)*f+my;
+  scale*=f;
+  scale=Math.min(Math.max(scale,0.15),6);
+  document.getElementById("zoomLvl").textContent=Math.round(scale*100)+"%";
+  redraw();
 },{passive:false});
 
-// Touch support
-let lastTouchDist=0;
+let lastDist=0, touchPanStart=null, touchPanOx=0, touchPanOy=0;
 canvas.addEventListener("touchstart",e=>{
-  if(e.touches.length===1){dragging=true;dragStart={x:e.touches[0].clientX-offsetX,y:e.touches[0].clientY-offsetY};}
-  if(e.touches.length===2){const t=e.touches;lastTouchDist=Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);}
+  if(e.touches.length===1){
+    touchPanStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
+    touchPanOx=ox;touchPanOy=oy;
+    const rect=canvas.getBoundingClientRect();
+    const wx=(e.touches[0].clientX-rect.left-ox)/scale, wy=(e.touches[0].clientY-rect.top-oy)/scale;
+    const hN=hitNode(wx,wy);
+    if(hN){dragging=true;dragNode=nodes.find(n=>n.id===hN);dragOffX=dragNode.x-wx;dragOffY=dragNode.y-wy;}
+  }
+  if(e.touches.length===2){
+    const t=e.touches;
+    lastDist=Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+  }
 },{passive:true});
-canvas.addEventListener("touchmove",e=>{
-  if(e.touches.length===1&&dragging){offsetX=e.touches[0].clientX-dragStart.x;offsetY=e.touches[0].clientY-dragStart.y;scheduleRedraw();}
-  if(e.touches.length===2){const t=e.touches;const d=Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);scale*=d/lastTouchDist;scale=Math.min(Math.max(scale,0.2),4);lastTouchDist=d;scheduleRedraw();}
-},{passive:true});
-canvas.addEventListener("touchend",()=>{dragging=false;});
 
-function worldPt(cx,cy){
-  const rect=canvas.getBoundingClientRect();
-  return{x:(cx-rect.left-offsetX)/scale, y:(cy-rect.top-offsetY)/scale};
-}
-function hitTest(wx,wy){
-  for(const n of nodes){const dx=wx-n.x,dy=wy-n.y;if(Math.sqrt(dx*dx+dy*dy)<n.radius*1.5)return n.id;}
+canvas.addEventListener("touchmove",e=>{
+  if(e.touches.length===1){
+    if(dragging&&dragNode){
+      const rect=canvas.getBoundingClientRect();
+      dragNode.x=(e.touches[0].clientX-rect.left-ox)/scale+dragOffX;
+      dragNode.y=(e.touches[0].clientY-rect.top-oy)/scale+dragOffY;
+      redraw();
+    } else if(touchPanStart){
+      ox=touchPanOx+(e.touches[0].clientX-touchPanStart.x);
+      oy=touchPanOy+(e.touches[0].clientY-touchPanStart.y);
+      redraw();
+    }
+  }
+  if(e.touches.length===2){
+    const t=e.touches;
+    const d=Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+    scale*=d/lastDist;
+    scale=Math.min(Math.max(scale,0.15),6);
+    lastDist=d;
+    redraw();
+  }
+},{passive:true});
+
+canvas.addEventListener("touchend",()=>{
+  if(dragging&&dragNode)updatePos(dragNode);
+  dragging=false;dragNode=null;touchPanStart=null;
+});
+
+function hitNode(wx,wy){
+  for(const n of[...nodes].reverse()){
+    const r=nRadius(n.type)*1.4;
+    if(Math.hypot(wx-(n.x||0),wy-(n.y||0))<r)return n.id;
+  }
   return null;
 }
 
-// ── Detail Panel ───────────────────────────────────────
-function showDetail(id){
-  const n=nodes.find(x=>x.id===id); if(!n) return;
-  const col=nodeColor(n);
-  document.getElementById("dpIcon").textContent=nodeEmoji(n.type);
-  document.getElementById("dpTitle").textContent=n.name;
-  const children=nodes.filter(x=>x.parent===n.name);
-  const statusLabel={online:"متصل",offline:"غير متصل",warning:"تحذير"}[n.status]||n.status;
-  document.getElementById("dpBody").innerHTML=`
-    <div class="dp-row"><div class="dp-lbl">عنوان IP</div><div class="dp-val"><span class="ip-code">${n.ip||"—"}</span></div></div>
-    <div class="dp-row"><div class="dp-lbl">الشبكة الفرعية</div><div class="dp-val" style="font-size:13px">${n.subnet||"—"}</div></div>
-    <div class="dp-row"><div class="dp-lbl">الجهاز الرئيسي</div><div class="dp-val">${n.parent||"Core (بلا رئيسي)"}</div></div>
-    <div class="dp-row"><div class="dp-lbl">الحالة</div><div class="dp-val"><span class="status-badge ${n.status}"><span class="sdot2"></span>${statusLabel}</span></div></div>
-    <div class="dp-row"><div class="dp-lbl">الموديل</div><div class="dp-val" style="color:var(--text2)">${n.model||"—"}</div></div>
-    <div class="dp-row"><div class="dp-lbl">الموقع</div><div class="dp-val" style="color:var(--text2)">${n.location||"—"}</div></div>
-    <div class="dp-row"><div class="dp-lbl">التكلفة</div><div class="dp-val" style="color:var(--yellow);font-family:var(--mono)">${n.cost?"$"+parseFloat(n.cost).toLocaleString("en"):"—"}</div></div>
-    ${children.length?`<div class="dp-row"><div class="dp-lbl">الأجهزة التابعة (${children.length})</div><div class="dp-children">${children.map(c=>`<div class="dp-child"><div class="dp-child-dot" style="background:${nodeColor(c).main}"></div>${c.name} <span style="font-family:var(--mono);font-size:10px;color:var(--text2)">${c.ip}</span></div>`).join("")}</div></div>`:""}
-    <div style="margin-top:12px"><a href="devices.html" style="display:block;text-align:center;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--accent);border-radius:7px;padding:7px;font-size:12px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">✏️ تعديل الجهاز</a></div>
-  `;
-  document.getElementById("detailPanel").classList.add("open");
+function hitLink(wx,wy){
+  for(const l of links){
+    const f=nodes.find(n=>n.id===l.from), t=nodes.find(n=>n.id===l.to);
+    if(!f||!t)continue;
+    const dx=t.x-f.x, dy=t.y-f.y;
+    const len=Math.hypot(dx,dy)||1;
+    const tt=((wx-f.x)*dx+(wy-f.y)*dy)/(len*len);
+    if(tt<0||tt>1)continue;
+    const px=f.x+tt*dx, py=f.y+tt*dy;
+    if(Math.hypot(wx-px,wy-py)<9)return l.id;
+  }
+  return null;
 }
 
-window.closeDetail=()=>{
-  document.getElementById("detailPanel").classList.remove("open");
-  selectedNode=null; scheduleRedraw();
-};
-
-// ── Controls ───────────────────────────────────────────
-window.zoom=factor=>{
-  scale*=factor; scale=Math.min(Math.max(scale,0.2),4);
-  document.getElementById("zoomLevel").textContent=Math.round(scale*100)+"%";
-  scheduleRedraw();
-};
-window.resetView=()=>{ scale=1; offsetX=0; offsetY=0; document.getElementById("zoomLevel").textContent="100%"; scheduleRedraw(); };
-window.fitAll=()=>{
-  if(!nodes.length) return;
-  const xs=nodes.map(n=>n.x), ys=nodes.map(n=>n.y);
-  const minX=Math.min(...xs)-50, maxX=Math.max(...xs)+50;
-  const minY=Math.min(...ys)-50, maxY=Math.max(...ys)+50;
-  const W=canvas.width, H=canvas.height;
-  const scaleX=W/(maxX-minX), scaleY=H/(maxY-minY);
-  scale=Math.min(scaleX,scaleY,1.5);
-  offsetX=W/2-(minX+maxX)/2*scale;
-  offsetY=H/2-(minY+maxY)/2*scale;
-  document.getElementById("zoomLevel").textContent=Math.round(scale*100)+"%";
-  scheduleRedraw();
-};
-window.setLayout=l=>{
-  layout=l;
-  document.getElementById("btnHierarchy").className="tbtn"+(l==="hierarchy"?" active":"");
-  document.getElementById("btnTree").className="tbtn"+(l==="tree"?" active":"");
-  computeLayout(); fitAll(); scheduleRedraw();
-};
-
-function updateStatsBar(){
-  document.getElementById("sbTotal").textContent=devices.length;
-  document.getElementById("sbOnline").textContent=devices.filter(d=>d.status==="online").length;
-  document.getElementById("sbOffline").textContent=devices.filter(d=>d.status==="offline").length;
-  document.getElementById("sbWarn").textContent=devices.filter(d=>d.status==="warning").length;
+function showTooltip(e,n){
+  const tt=document.getElementById("tooltip");
+  document.getElementById("ttName").innerHTML=`${nEmoji(n.type)} ${esc(n.name)}`;
+  document.getElementById("ttType").textContent={router:"راوتر",modem:"موديم",switch:"سويتش",ap:"AP",client:"عميل",server:"خادم",other:"أخرى"}[n.type]||n.type;
+  document.getElementById("ttIp").textContent=n.ip||"—";
+  const statusEl=document.getElementById("ttStatus");
+  const statusMap={online:"✓ متصل",offline:"✕ غير متصل",planned:"📋 مخطط"};
+  statusEl.textContent=statusMap[n.status]||n.status;
+  statusEl.className=n.status==="online"?"text-success fw-700":n.status==="offline"?"text-danger fw-700":"text-warn fw-700";
+  document.getElementById("ttLinks").textContent=links.filter(l=>l.from===n.id||l.to===n.id).length;
+  tt.style.left=(e.clientX+16)+"px";
+  tt.style.top=(e.clientY-50)+"px";
+  tt.classList.add("show");
 }
+
+function hideTooltip(){document.getElementById("tooltip").classList.remove("show");}
+
+function showCtxMenu(id,x,y){
+  closeContextMenus();
+  const m=document.getElementById(id);
+  m.classList.add("show");
+  m.style.left=x+"px";
+  m.style.top=y+"px";
+}
+
+function closeContextMenus(){
+  document.querySelectorAll(".ctx-menu").forEach(m=>m.classList.remove("show"));
+}
+
+document.addEventListener("click",e=>{
+  if(!e.target.closest(".ctx-menu"))closeContextMenus();
+});
+
+window.ctxEdit=()=>{
+  if(!ctxNode)return;
+  const n=nodes.find(x=>x.id===ctxNode);if(!n)return;
+  editingId=ctxNode;
+  document.getElementById("addModalTitle").textContent="تعديل: "+n.name;
+  document.getElementById("addModalIcon").textContent=nEmoji(n.type);
+  document.getElementById("addSaveBtn").textContent="💾 حفظ التعديلات";
+  document.getElementById("f-name").value=n.name||"";
+  document.getElementById("f-type").value=n.type||"router";
+  document.getElementById("f-ip").value=n.ip||"";
+  document.getElementById("f-status").value=n.status||"online";
+  document.getElementById("f-location").value=n.location||"";
+  document.getElementById("connectToField").style.display="none";
+  document.getElementById("connTypeFields").style.display="none";
+  openModal("addModal");
+};
+
+window.ctxConnect=()=>{
+  if(!ctxNode)return;
+  connectFirst=ctxNode;
+  if(!connectMode)toggleConnectMode();
+};
+
+window.ctxToggle=async()=>{
+  if(!ctxNode)return;
+  const n=nodes.find(x=>x.id===ctxNode);if(!n)return;
+  await updateDoc(doc(db,"topoNodes",ctxNode),{status:n.status==="online"?"offline":"online"});
+};
+
+window.ctxDelete=async()=>{
+  if(!ctxNode)return;
+  const n=nodes.find(x=>x.id===ctxNode);
+  const ok=await confirmDialog(`حذف "${n?.name||""}" نهائياً؟ سيتم حذف كل روابطه أيضاً.`,true);
+  if(!ok)return;
+  const rl=links.filter(l=>l.from===ctxNode||l.to===ctxNode);
+  for(const l of rl)await deleteDoc(doc(db,"topoLinks",l.id));
+  await deleteDoc(doc(db,"topoNodes",ctxNode));
+  toast("تم حذف الجهاز ✓","success");
+};
+
+window.ctxEditLink=()=>{
+  if(!ctxLink)return;
+  const l=links.find(x=>x.id===ctxLink);if(!l)return;
+  const f=nodes.find(n=>n.id===l.from), t=nodes.find(n=>n.id===l.to);
+  document.getElementById("conn-from").value=f?.name||"";
+  document.getElementById("conn-to").value=t?.name||"";
+  document.getElementById("conn-type").value=l.connType||"wired";
+  document.getElementById("conn-dir").value=l.direction||"both";
+  document.getElementById("conn-note").value=l.note||"";
+  document.getElementById("connSuggest").innerHTML="✏️ <b>تعديل الرابط</b>";
+  document.getElementById("connModal").dataset.editId=ctxLink;
+  openModal("connModal");
+};
+
+window.ctxDeleteLink=async()=>{
+  if(!ctxLink)return;
+  const ok=await confirmDialog("حذف هذا الرابط؟",true);
+  if(!ok)return;
+  await deleteDoc(doc(db,"topoLinks",ctxLink));
+  toast("تم حذف الرابط ✓","success");
+};
+
+window.openAddDevice=()=>{
+  editingId=null;
+  document.getElementById("addModalTitle").textContent="إضافة جهاز جديد";
+  document.getElementById("addModalIcon").textContent="▤";
+  document.getElementById("addSaveBtn").textContent="💾 إضافة";
+  ["f-name","f-ip","f-location"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("f-type").value="router";
+  document.getElementById("f-status").value="online";
+  document.getElementById("f-parent").value="";
+  document.getElementById("connectToField").style.display="";
+  document.getElementById("connTypeFields").style.display="none";
+  populateParents();
+  openModal("addModal");
+  setTimeout(()=>document.getElementById("f-name").focus(),100);
+};
+
+window.updateTypeIcon=()=>{
+  document.getElementById("addModalIcon").textContent=nEmoji(document.getElementById("f-type").value);
+};
+
+document.getElementById("f-parent").addEventListener("change",e=>{
+  document.getElementById("connTypeFields").style.display=e.target.value?"":"none";
+});
+
+window.saveDevice=async()=>{
+  const name=document.getElementById("f-name").value.trim();
+  if(!name){toast("اسم الجهاز مطلوب","error");return;}
+  const payload={
+    name,
+    type:document.getElementById("f-type").value,
+    ip:document.getElementById("f-ip").value.trim(),
+    status:document.getElementById("f-status").value,
+    location:document.getElementById("f-location").value.trim(),
+  };
+  if(editingId){
+    await updateDoc(doc(db,"topoNodes",editingId),{...payload,updatedAt:serverTimestamp()});
+    toast("تم التحديث ✓","success");
+  } else {
+    const wd=W()/scale, ht=H()/scale;
+    payload.x=wd/2+(Math.random()-0.5)*200;
+    payload.y=ht/2+(Math.random()-0.5)*150;
+    payload.createdAt=serverTimestamp();
+    const newDoc=await addDoc(collection(db,"topoNodes"),payload);
+    const parentName=document.getElementById("f-parent").value;
+    if(parentName){
+      const parentNode=nodes.find(n=>n.name===parentName);
+      if(parentNode){
+        await addDoc(collection(db,"topoLinks"),{
+          from:parentNode.id,
+          to:newDoc.id,
+          connType:document.getElementById("f-conntype").value,
+          direction:document.getElementById("f-direction").value,
+          note:"",
+          createdAt:serverTimestamp()
+        });
+      }
+    }
+    toast("تمت الإضافة ✓","success");
+  }
+  closeModal("addModal");
+};
+
+function openConnectModal(fromId,toId){
+  const f=nodes.find(n=>n.id===fromId), t=nodes.find(n=>n.id===toId);
+  document.getElementById("conn-from").value=f?.name||"";
+  document.getElementById("conn-to").value=t?.name||"";
+  document.getElementById("conn-note").value="";
+  delete document.getElementById("connModal").dataset.editId;
+  document.getElementById("connModal").dataset.fromId=fromId;
+  document.getElementById("connModal").dataset.toId=toId;
+  let s="";
+  const ft=f?.type, tt2=t?.type;
+  if(ft==="router"&&tt2==="switch")s="💡 راوتر→سويتش: عادةً <b>سلكي ثنائي</b>";
+  else if(ft==="switch"&&tt2==="ap")s="💡 سويتش→AP: عادةً <b>سلكي ثنائي</b>";
+  else if((ft==="router"||ft==="ap")&&tt2==="client")s="💡 AP→عميل: عادةً <b>واي فاي ثنائي</b>";
+  else if(ft==="modem"&&tt2==="router")s="💡 موديم→راوتر: عادةً <b>سلكي، الموديم يبث</b>";
+  else if(ft===tt2)s=`⚠️ ربط <b>${ft}</b> بنفس النوع — ممكن في شبكات الميش`;
+  else s="🔗 حدد نوع الاتصال والاتجاه يدوياً";
+  document.getElementById("connSuggest").innerHTML=s;
+  document.getElementById("conn-type").value=(tt2==="client"||(ft==="ap"&&tt2==="client"))?"wifi":"wired";
+  openModal("connModal");
+}
+
+window.saveConnection=async()=>{
+  const modal=document.getElementById("connModal");
+  const editId=modal.dataset.editId;
+  const payload={
+    connType:document.getElementById("conn-type").value,
+    direction:document.getElementById("conn-dir").value,
+    note:document.getElementById("conn-note").value.trim(),
+  };
+  if(editId){
+    await updateDoc(doc(db,"topoLinks",editId),payload);
+    toast("تم تحديث الرابط ✓","success");
+  } else {
+    const fId=modal.dataset.fromId, tId=modal.dataset.toId;
+    const ex=links.find(l=>(l.from===fId&&l.to===tId)||(l.from===tId&&l.to===fId));
+    if(ex){
+      const ok=await confirmDialog("يوجد رابط مسبق بين هذين الجهازين. إضافة رابط آخر؟");
+      if(!ok){closeModal("connModal");return;}
+    }
+    await addDoc(collection(db,"topoLinks"),{
+      from:fId,
+      to:tId,
+      ...payload,
+      createdAt:serverTimestamp()
+    });
+    toast("تم الربط ✓","success");
+  }
+  connectFirst=null;
+  if(connectMode)toggleConnectMode();
+  closeModal("connModal");
+};
+
+window.toggleConnectMode=(force)=>{
+  connectMode=force===true?true:!connectMode;
+  connectFirst=null;
+  const btn=document.getElementById("connectModeBtn");
+  const pill=document.getElementById("modePill");
+  if(connectMode){
+    btn.classList.add("btn-primary");
+    pill.classList.add("show");
+    document.getElementById("modePillText").textContent="وضع الربط — اختر جهاز المصدر";
+    canvas.style.cursor="crosshair";
+  } else {
+    btn.classList.remove("btn-primary");
+    pill.classList.remove("show");
+    canvas.style.cursor="grab";
+  }
+  redraw();
+};
+
+window.toggleDevList=()=>{
+  document.getElementById("devListPanel").classList.toggle("open");
+  updateDevList();
+};
+
+function updateDevList(){
+  const body=document.getElementById("devListBody");
+  if(!nodes.length){
+    body.innerHTML=`<div style="text-align:center;color:var(--text-3);padding:24px;font-size:13px">لا توجد أجهزة</div>`;
+    return;
+  }
+  const byType={};
+  nodes.forEach(n=>{(byType[n.type]=byType[n.type]||[]).push(n);});
+  const tNames={router:"راوترات",modem:"موديمات",switch:"سويتشات",ap:"Access Points",client:"عملاء",server:"خوادم",other:"أخرى"};
+  body.innerHTML=Object.entries(byType).map(([type,ns])=>`
+    <div class="rp-section">
+      <div class="rp-section-title">${tNames[type]||type} (${ns.length})</div>
+      ${ns.map(n=>{
+        const sc={online:"#10b981",offline:"#ef4444",planned:"#f59e0b"}[n.status]||"#f59e0b";
+        const c=links.filter(l=>l.from===n.id||l.to===n.id).length;
+        return `<div class="rp-row" onclick="focusNode('${n.id}')">
+          <div class="rp-row-icon">${nEmoji(n.type)}</div>
+          <div class="rp-row-info">
+            <div class="rp-row-name">${esc(n.name)}</div>
+            <div class="rp-row-sub">${n.ip||"—"} · ${c} روابط</div>
+          </div>
+          <div class="sdot" style="background:${sc}"></div>
+        </div>`;
+      }).join("")}
+    </div>
+  `).join("");
+}
+
+window.focusNode=id=>{
+  const n=nodes.find(x=>x.id===id);
+  if(!n)return;
+  ox=W()/2-(n.x||0)*scale;
+  oy=H()/2-(n.y||0)*scale;
+  redraw();
+};
+
+function updateStats(){
+  document.getElementById("sbTotal").textContent=nodes.length;
+  document.getElementById("sbOn").textContent=nodes.filter(n=>n.status==="online").length;
+  document.getElementById("sbPlan").textContent=nodes.filter(n=>n.status==="planned").length;
+  document.getElementById("sbOff").textContent=nodes.filter(n=>n.status==="offline").length;
+  document.getElementById("sbLinks").textContent=links.length;
+}
+
+function populateParents(){
+  const s=document.getElementById("f-parent");
+  const c=s.value;
+  s.innerHTML='<option value="">— بدون ربط الآن، أربطه لاحقاً —</option>';
+  nodes.forEach(n=>{
+    const o=document.createElement("option");
+    o.value=n.name;
+    o.textContent=`${nEmoji(n.type)} ${n.name}${n.ip?" ("+n.ip+")":""}`;
+    s.appendChild(o);
+  });
+  s.value=c;
+}
+
+window.zoomIn=()=>{
+  scale=Math.min(scale*1.2,6);
+  document.getElementById("zoomLvl").textContent=Math.round(scale*100)+"%";
+  redraw();
+};
+window.zoomOut=()=>{
+  scale=Math.max(scale*0.8,0.15);
+  document.getElementById("zoomLvl").textContent=Math.round(scale*100)+"%";
+  redraw();
+};
+window.closeM=closeModal;
 </script>
 </body>
 </html>

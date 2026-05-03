@@ -3,181 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>المدى نت — المشتريات</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>المشتريات — المدى نت</title>
+<link rel="stylesheet" href="theme.css">
 <style>
-:root{--bg:#0a0e1a;--bg2:#0f1525;--bg3:#141c30;--surface:#1a2440;--surface2:#1e2b4a;--border:#243058;--border2:#2e3d6e;--accent:#00d4ff;--accent2:#0099cc;--green:#00e5a0;--yellow:#ffd166;--red:#ff4d6a;--purple:#a78bfa;--text:#e2e8f4;--text2:#8899b8;--mono:'JetBrains Mono',monospace;--sans:'IBM Plex Sans Arabic',sans-serif;}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
-.sidebar{position:fixed;right:0;top:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
-.sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.logo-text h1{font-size:14px;font-weight:700;line-height:1.2}
-.logo-text span{font-size:10px;color:var(--accent);font-family:var(--mono)}
-.sidebar-nav{padding:12px 10px;flex:1;overflow-y:auto}
-.nav-section-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;padding:8px 8px 4px;margin-top:6px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:all .2s;margin-bottom:2px;color:var(--text2);font-size:13px;text-decoration:none}
-.nav-item:hover{background:var(--surface);color:var(--text)}
-.nav-item.active{background:rgba(0,212,255,.12);color:var(--accent)}
-.nav-icon{font-size:15px;width:18px;text-align:center}
-.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
-.net-status{background:var(--surface);border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px}
-.sdot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pg 2s infinite}
-@keyframes pg{0%,100%{opacity:1}50%{opacity:.5}}
-.main{margin-right:240px;min-height:100vh;position:relative;z-index:1}
-.topbar{position:sticky;top:0;background:rgba(10,14,26,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:50}
-.topbar-title{font-size:17px;font-weight:600;flex:1}
-.topbar-title span{color:var(--accent)}
-.tbtn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 14px;font-family:var(--sans);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;text-decoration:none}
-.tbtn:hover{background:var(--surface2);border-color:var(--border2)}
-.tbtn.primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700}
-.tbtn.primary:hover{background:var(--accent2)}
-.content{padding:24px}
-@keyframes fiu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
-.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:16px;animation:fiu .4s ease both}
-.kpi:nth-child(1){animation-delay:.05s}.kpi:nth-child(2){animation-delay:.1s}.kpi:nth-child(3){animation-delay:.15s}.kpi:nth-child(4){animation-delay:.2s}
-.kpi-lbl{font-size:11px;color:var(--text2);margin-bottom:6px}
-.kpi-val{font-size:20px;font-weight:700;font-family:var(--mono)}
-.kpi.ck-blue .kpi-val{color:var(--accent)}.kpi.ck-yellow .kpi-val{color:var(--yellow)}.kpi.ck-green .kpi-val{color:var(--green)}.kpi.ck-purple .kpi-val{color:var(--purple)}
-.kpi-sub{font-size:11px;color:var(--text2);margin-top:3px}
-
-.panel{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;animation:fiu .4s ease .25s both}
-.ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.ph-title{font-size:14px;font-weight:600;flex:1}
-.filter-bar{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--bg3)}
-.chip{padding:4px 11px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:transparent;font-family:var(--sans);transition:all .2s}
-.chip:hover{border-color:var(--border2);color:var(--text)}
-.chip.active{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent)}
-.search-box{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;margin-right:auto}
-.search-box input{background:none;border:none;outline:none;color:var(--text);font-family:var(--sans);font-size:12px;width:160px}
-table{width:100%;border-collapse:collapse;min-width:700px}
-.tbl-wrap{overflow-x:auto}
-th{padding:8px 14px;text-align:right;font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.02)}
-.ip-code{font-family:var(--mono);font-size:11px;color:var(--yellow);background:rgba(255,209,102,.08);padding:2px 7px;border-radius:4px}
-.cat-badge{font-size:11px;padding:2px 9px;border-radius:4px;font-weight:600}
-.cat-device{background:rgba(0,212,255,.1);color:var(--accent)}
-.cat-maint{background:rgba(167,139,250,.1);color:var(--purple)}
-.cat-elec{background:rgba(255,209,102,.1);color:var(--yellow)}
-.cat-rent{background:rgba(255,154,60,.1);color:#ff9a3c}
-.cat-misc{background:rgba(136,153,184,.1);color:var(--text2)}
-.pay-badge{font-size:10px;padding:1px 7px;border-radius:4px;background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
-.pagination{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;justify-content:space-between}
-.page-info{font-size:12px;color:var(--text2)}
-.page-btns{display:flex;gap:4px}
-.pbn{background:none;border:1px solid var(--border);color:var(--text2);border-radius:5px;padding:3px 9px;font-size:12px;cursor:pointer;font-family:var(--sans);transition:all .2s}
-.pbn:hover{border-color:var(--accent);color:var(--accent)}
-.pbn.active{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent)}
-.pbn:disabled{opacity:.3;cursor:not-allowed}
-::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.cat-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600}
+.action-btn{background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.action-btn:hover{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">🌐</div>
-    <div class="logo-text"><h1>المدى نت</h1><span>ALMADA NET v1.0</span></div>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section-title">الرئيسية</div>
-    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> لوحة التحكم</a>
-    <a href="topology.html" class="nav-item"><span class="nav-icon">🗺️</span> توبولوجيا الشبكة</a>
-    <div class="nav-section-title">الأجهزة والشبكة</div>
-    <a href="devices.html" class="nav-item"><span class="nav-icon">🖥️</span> إدارة الأجهزة</a>
-    <a href="subnets.html" class="nav-item"><span class="nav-icon">🔌</span> الشبكات الفرعية</a>
-    <div class="nav-section-title">الإدارة المالية</div>
-    <a href="finances.html" class="nav-item"><span class="nav-icon">💰</span> الإدارة المالية</a>
-    <a href="purchases.html" class="nav-item active"><span class="nav-icon">🛒</span> المشتريات</a>
-    <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> التقارير المالية</a>
-    <div class="nav-section-title">الإعدادات</div>
-    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> الإعدادات</a>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="net-status"><div class="sdot"></div>
-      <div><div style="font-size:12px;font-weight:600">متصل بـ Firebase</div><div style="font-size:11px;color:var(--text2)">Firebase Firestore</div></div>
-    </div>
-  </div>
-</aside>
-
+<aside class="sidebar" id="sidebar"></aside>
 <main class="main">
   <header class="topbar">
-    <div class="topbar-title">المشتريات <span>/ سجل المصاريف</span></div>
-    <button class="tbtn" onclick="exportCSV()">📤 تصدير CSV</button>
-    <a href="finances.html" class="tbtn primary">＋ تسجيل مصروف جديد</a>
+    <h1 class="tb-title">المشتريات <span class="breadcrumb">/ سجل المصاريف</span></h1>
+    <input type="search" id="searchInput" class="search-input" placeholder="🔍 ابحث...">
+    <button class="btn btn-sm" id="exportBtn">📤 تصدير CSV</button>
+    <a href="finances.html" class="btn btn-primary btn-sm">＋ تسجيل مصروف</a>
   </header>
   <div class="content">
-
     <div class="kpi-grid">
-      <div class="kpi ck-blue"><div class="kpi-lbl">🛒 مشتريات أجهزة</div><div class="kpi-val" id="k-dev">—</div><div class="kpi-sub" id="k-dev-c">—</div></div>
-      <div class="kpi ck-purple"><div class="kpi-lbl">🔧 صيانة</div><div class="kpi-val" id="k-maint">—</div><div class="kpi-sub" id="k-maint-c">—</div></div>
-      <div class="kpi ck-yellow"><div class="kpi-lbl">⚡ كهرباء + إيجار</div><div class="kpi-val" id="k-util">—</div><div class="kpi-sub" id="k-util-c">—</div></div>
-      <div class="kpi ck-green"><div class="kpi-lbl">📦 متفرقات</div><div class="kpi-val" id="k-misc">—</div><div class="kpi-sub" id="k-misc-c">—</div></div>
+      <div class="kpi kpi-blue"><div class="kpi-label"><span class="kpi-icon">▤</span> أجهزة</div><div class="kpi-value" id="k-dev" style="font-size:20px">—</div><div class="kpi-sub" id="k-dev-c">—</div></div>
+      <div class="kpi kpi-purple"><div class="kpi-label"><span class="kpi-icon">🔧</span> صيانة</div><div class="kpi-value" id="k-maint" style="font-size:20px">—</div><div class="kpi-sub" id="k-maint-c">—</div></div>
+      <div class="kpi kpi-yellow"><div class="kpi-label"><span class="kpi-icon">⚡</span> فواتير</div><div class="kpi-value" id="k-util" style="font-size:20px">—</div><div class="kpi-sub" id="k-util-c">—</div></div>
+      <div class="kpi kpi-pink"><div class="kpi-label"><span class="kpi-icon">📦</span> أخرى</div><div class="kpi-value" id="k-misc" style="font-size:20px">—</div><div class="kpi-sub" id="k-misc-c">—</div></div>
     </div>
 
-    <div class="panel">
-      <div class="ph">
-        <span>🛒</span>
-        <div class="ph-title">جميع المصاريف</div>
-        <span id="countBadge" style="font-size:12px;color:var(--text2);background:var(--bg3);padding:3px 10px;border-radius:10px">0</span>
+    <div class="panel fade-up" style="animation-delay:.1s">
+      <div class="panel-header">
+        <span class="panel-icon">🛒</span>
+        <div class="panel-title">جميع المصاريف</div>
+        <span id="recordCount" class="badge badge-gray">0</span>
       </div>
       <div class="filter-bar">
         <button class="chip active" data-cat="all">الكل</button>
-        <button class="chip" data-cat="device">🖥️ أجهزة</button>
+        <button class="chip" data-cat="device">▤ أجهزة</button>
         <button class="chip" data-cat="maintenance">🔧 صيانة</button>
         <button class="chip" data-cat="electricity">⚡ كهرباء</button>
         <button class="chip" data-cat="rent">🏢 إيجار</button>
+        <button class="chip" data-cat="salary">👥 رواتب</button>
+        <button class="chip" data-cat="internet">📡 إنترنت</button>
         <button class="chip" data-cat="misc">📦 متفرقات</button>
-        <div class="search-box">
-          <span>🔍</span>
-          <input type="text" id="srch" placeholder="ابحث...">
-        </div>
       </div>
       <div class="tbl-wrap">
         <table>
           <thead><tr>
-            <th>الوصف</th><th>الفئة</th><th>المبلغ</th><th>التاريخ</th><th>الجهاز</th><th>الدفع</th>
+            <th>الوصف</th>
+            <th>الفئة</th>
+            <th>المبلغ</th>
+            <th>التاريخ</th>
+            <th>الجهاز</th>
+            <th>الدفع</th>
           </tr></thead>
-          <tbody id="pBody">
-            <tr><td colspan="6" style="text-align:center;padding:36px;color:var(--text2)">جاري التحميل...</td></tr>
+          <tbody id="tbBody">
+            <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-3)">جاري التحميل...</td></tr>
           </tbody>
         </table>
       </div>
       <div class="pagination">
-        <div class="page-info" id="pgInfo">0 مصروف</div>
-        <div class="page-btns" id="pgBtns"></div>
+        <div class="page-info" id="pageInfo">0</div>
+        <div class="page-btns" id="pageBtns"></div>
       </div>
     </div>
   </div>
 </main>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  db, collection, onSnapshot, query, orderBy,
+  watchSettings, fmt, getCurrencySymbol, convertFromBase,
+  esc, renderSidebar, toast
+} from "./app.js";
 
-const firebaseConfig={apiKey:"AIzaSyDdYIiZcithhvDRLwHwahV6-W_puXHN4rs",authDomain:"almadadashboard.firebaseapp.com",projectId:"almadadashboard",storageBucket:"almadadashboard.firebasestorage.app",messagingSenderId:"172655018085",appId:"1:172655018085:web:6b956408061985c3ccc68c"};
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
+document.getElementById("sidebar").innerHTML = renderSidebar("purchases");
+watchSettings(s=>{
+  const sn=document.getElementById("sbNetName");
+  if(sn)sn.textContent=s.netName;
+});
 
-const CUR="ر.ي";
 let allTx=[], filtered=[], curCat="all", srch="", curPage=1;
-const PAGE=15;
+const PAGE_SIZE=15;
 
-onSnapshot(query(collection(db,"transactions"),orderBy("date","desc")), snap=>{
-  // Only expenses
+onSnapshot(query(collection(db,"transactions"),orderBy("date","desc")),snap=>{
   allTx=snap.docs.map(d=>({id:d.id,...d.data()})).filter(t=>t.txType==="expense");
   updateKPIs(); applyFilters();
 });
 
-function fmt(n){return CUR+" "+n.toLocaleString("ar-YE",{minimumFractionDigits:0,maximumFractionDigits:0});}
-
 function updateKPIs(){
-  const cats={device:0,maintenance:0,electricity:0,rent:0,misc:0};
-  const counts={device:0,maintenance:0,electricity:0,rent:0,misc:0};
+  const cats={device:0,maintenance:0,electricity:0,rent:0,salary:0,internet:0,misc:0};
+  const counts={device:0,maintenance:0,electricity:0,rent:0,salary:0,internet:0,misc:0};
   allTx.forEach(t=>{
     const c=t.category||"misc";
     if(cats[c]!==undefined){cats[c]+=(parseFloat(t.amount)||0);counts[c]++;}
@@ -187,63 +100,92 @@ function updateKPIs(){
   document.getElementById("k-dev-c").textContent=counts.device+" مشتريات";
   document.getElementById("k-maint").textContent=fmt(cats.maintenance);
   document.getElementById("k-maint-c").textContent=counts.maintenance+" عملية";
-  document.getElementById("k-util").textContent=fmt(cats.electricity+cats.rent);
-  document.getElementById("k-util-c").textContent=(counts.electricity+counts.rent)+" فاتورة";
-  document.getElementById("k-misc").textContent=fmt(cats.misc);
-  document.getElementById("k-misc-c").textContent=counts.misc+" بند";
+  document.getElementById("k-util").textContent=fmt(cats.electricity+cats.rent+cats.internet);
+  document.getElementById("k-util-c").textContent=(counts.electricity+counts.rent+counts.internet)+" فاتورة";
+  document.getElementById("k-misc").textContent=fmt(cats.misc+cats.salary);
+  document.getElementById("k-misc-c").textContent=(counts.misc+counts.salary)+" بند";
 }
 
 function applyFilters(){
   let data=[...allTx];
-  if(curCat!=="all") data=data.filter(t=>t.category===curCat);
-  if(srch) data=data.filter(t=>(t.description||"").toLowerCase().includes(srch.toLowerCase())||(t.linkedDevice||"").toLowerCase().includes(srch.toLowerCase()));
+  if(curCat!=="all")data=data.filter(t=>t.category===curCat);
+  if(srch){
+    const q=srch.toLowerCase();
+    data=data.filter(t=>(t.description||"").toLowerCase().includes(q)||(t.linkedDevice||"").toLowerCase().includes(q));
+  }
   filtered=data; curPage=1; renderTable();
 }
 
 function renderTable(){
   const total=filtered.length;
-  const start=(curPage-1)*PAGE;
-  const slice=filtered.slice(start,start+PAGE);
-  document.getElementById("countBadge").textContent=total+" مصروف";
-  document.getElementById("pgInfo").textContent=`${start+1}–${Math.min(start+PAGE,total)} من ${total}`;
-  const catNames={device:"أجهزة",maintenance:"صيانة",electricity:"كهرباء",rent:"إيجار",misc:"متفرقات"};
-  const catCls={device:"cat-device",maintenance:"cat-maint",electricity:"cat-elec",rent:"cat-rent",misc:"cat-misc"};
+  const start=(curPage-1)*PAGE_SIZE;
+  const slice=filtered.slice(start,start+PAGE_SIZE);
+  document.getElementById("recordCount").textContent=total+" مصروف";
+  document.getElementById("pageInfo").textContent=total?`${start+1}–${Math.min(start+PAGE_SIZE,total)} من ${total}`:"0";
+  if(!total){
+    document.getElementById("tbBody").innerHTML=`<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-3)"><div style="font-size:36px;margin-bottom:10px;opacity:.4">🛒</div>لا توجد مصاريف — <a href="finances.html" style="color:var(--accent)">سجّل مصروف</a></td></tr>`;
+    document.getElementById("pageBtns").innerHTML="";
+    return;
+  }
+  const catColors={device:["#06b6d4","var(--accent-soft)"],maintenance:["#a855f7","rgba(168,85,247,.1)"],electricity:["#f59e0b","var(--warn-soft)"],rent:["#ec4899","rgba(236,72,153,.1)"],salary:["#a855f7","rgba(168,85,247,.1)"],internet:["#10b981","var(--success-soft)"],misc:["#64748b","rgba(100,116,139,.1)"]};
+  const catNames={device:"أجهزة",maintenance:"صيانة",electricity:"كهرباء",rent:"إيجار",salary:"رواتب",internet:"إنترنت",misc:"متفرقات"};
+  const catIcons={device:"▤",maintenance:"🔧",electricity:"⚡",rent:"🏢",salary:"👥",internet:"📡",misc:"📦"};
   const payNames={cash:"نقدي",transfer:"تحويل",card:"بطاقة",other:"أخرى"};
-  const tbody=document.getElementById("pBody");
-  if(!total){tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--text2)"><div style="font-size:28px;margin-bottom:8px">🛒</div>لا توجد مصاريف — <a href="finances.html" style="color:var(--accent)">أضف مصروفاً</a></td></tr>`;renderPager(0);return;}
-  tbody.innerHTML=slice.map(t=>`<tr>
-    <td><div style="font-weight:600">${esc(t.description||"—")}</div>${t.notes?`<div style="font-size:11px;color:var(--text2)">${esc(t.notes)}</div>`:""}</td>
-    <td><span class="cat-badge ${catCls[t.category||'misc']||'cat-misc'}">${catNames[t.category]||t.category||"—"}</span></td>
-    <td><span class="ip-code">-${fmt(parseFloat(t.amount||0))}</span></td>
-    <td style="font-size:12px;color:var(--text2)">${t.date||"—"}</td>
-    <td style="font-size:12px;color:var(--text2)">${esc(t.linkedDevice||"—")}</td>
-    <td><span class="pay-badge">${payNames[t.paymentMethod]||t.paymentMethod||"—"}</span></td>
-  </tr>`).join("");
-  renderPager(total);
+  document.getElementById("tbBody").innerHTML=slice.map(t=>{
+    const cc=catColors[t.category]||catColors.misc;
+    return `<tr>
+      <td><div class="fw-600">${esc(t.description||"—")}</div>${t.notes?`<div class="text-xs text-3">${esc(t.notes)}</div>`:""}</td>
+      <td><span class="cat-pill" style="color:${cc[0]};background:${cc[1]}">${catIcons[t.category]||"📋"} ${catNames[t.category]||t.category||"—"}</span></td>
+      <td><span class="text-mono fw-700 text-danger">−${fmt(t.amount)}</span></td>
+      <td class="text-3 text-mono text-sm">${t.date||"—"}</td>
+      <td class="text-2 text-sm">${esc(t.linkedDevice||"—")}</td>
+      <td class="text-2 text-sm">${payNames[t.paymentMethod]||"—"}</td>
+    </tr>`;
+  }).join("");
+  renderPagination(total);
 }
 
-function renderPager(total){
-  const pages=Math.ceil(total/PAGE),wrap=document.getElementById("pgBtns");
+function renderPagination(total){
+  const pages=Math.ceil(total/PAGE_SIZE);
+  const wrap=document.getElementById("pageBtns");
   if(pages<=1){wrap.innerHTML="";return;}
-  wrap.innerHTML=`<button class="pbn" onclick="goPage(${curPage-1})" ${curPage===1?"disabled":""}>→</button>`
-    +Array.from({length:pages},(_,i)=>`<button class="pbn ${i+1===curPage?'active':''}" onclick="goPage(${i+1})">${i+1}</button>`).join("")
-    +`<button class="pbn" onclick="goPage(${curPage+1})" ${curPage===pages?"disabled":""}>←</button>`;
+  let h=`<button class="page-btn" onclick="goPage(${curPage-1})" ${curPage===1?"disabled":""}>‹</button>`;
+  const start=Math.max(1,curPage-3);
+  const end=Math.min(pages,start+6);
+  for(let i=start;i<=end;i++){h+=`<button class="page-btn ${i===curPage?'active':''}" onclick="goPage(${i})">${i}</button>`;}
+  h+=`<button class="page-btn" onclick="goPage(${curPage+1})" ${curPage===pages?"disabled":""}>›</button>`;
+  wrap.innerHTML=h;
 }
 window.goPage=p=>{curPage=p;renderTable();};
 
 document.querySelectorAll(".chip[data-cat]").forEach(c=>c.addEventListener("click",()=>{
   document.querySelectorAll(".chip[data-cat]").forEach(x=>x.classList.remove("active"));
-  c.classList.add("active"); curCat=c.dataset.cat; applyFilters();
+  c.classList.add("active");
+  curCat=c.dataset.cat;
+  applyFilters();
 }));
-let st; document.getElementById("srch").addEventListener("input",e=>{clearTimeout(st);st=setTimeout(()=>{srch=e.target.value;applyFilters();},250);});
 
-window.exportCSV=()=>{
-  const csv="\uFEFF"+["الوصف,الفئة,المبلغ,التاريخ,الجهاز,الدفع",...filtered.map(t=>[t.description,t.category,t.amount,t.date,t.linkedDevice||"",t.paymentMethod||""].map(v=>`"${String(v||"").replace(/"/g,'""')}"`).join(","))].join("\n");
-  const a=document.createElement("a"); a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
-  a.download="مشتريات-المدى-نت-"+new Date().toISOString().split("T")[0]+".csv"; a.click();
+let st;
+document.getElementById("searchInput").addEventListener("input",e=>{
+  clearTimeout(st);
+  st=setTimeout(()=>{srch=e.target.value;applyFilters();},250);
+});
+
+document.getElementById("exportBtn").onclick=()=>{
+  const catNames={device:"أجهزة",maintenance:"صيانة",electricity:"كهرباء",rent:"إيجار",salary:"رواتب",internet:"إنترنت",misc:"متفرقات"};
+  const headers=["الوصف","الفئة","المبلغ","التاريخ","الجهاز","الدفع"];
+  const rows=filtered.map(t=>[
+    t.description, catNames[t.category]||t.category,
+    t.amount?convertFromBase(t.amount).toFixed(2):0, t.date,
+    t.linkedDevice||"", t.paymentMethod||""
+  ].map(v=>`"${String(v||"").replace(/"/g,'""')}"`).join(","));
+  const csv="\uFEFF"+headers.join(",")+"\n"+rows.join("\n");
+  const a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
+  a.download="مشتريات-"+new Date().toISOString().split("T")[0]+".csv";
+  a.click();
+  toast(`تم تصدير ${filtered.length} مصروف`,"info");
 };
-
-function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 </script>
 </body>
 </html>
