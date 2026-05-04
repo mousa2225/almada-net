@@ -4,48 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>التقارير المالية — المدى نت</title>
-<link rel="stylesheet" href="theme.css?v=5">
-<style>
-.profit-hero{border-radius:18px;padding:32px;margin-bottom:22px;border:2px solid;animation:fadeUp .5s ease both}
-.profit-hero.profit{background:linear-gradient(135deg,rgba(16,185,129,.1) 0%,rgba(6,182,212,.05) 100%);border-color:rgba(16,185,129,.3)}
-.profit-hero.loss{background:linear-gradient(135deg,rgba(239,68,68,.1) 0%,rgba(245,158,11,.05) 100%);border-color:rgba(239,68,68,.3)}
-.profit-hero.neutral{background:linear-gradient(135deg,rgba(245,158,11,.1) 0%,rgba(6,182,212,.05) 100%);border-color:rgba(245,158,11,.3)}
-.ph-row{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
-.ph-emoji{font-size:64px;line-height:1}
-.ph-text{flex:1;min-width:200px}
-.ph-label{font-size:14px;font-weight:600;margin-bottom:6px}
-.profit-hero.profit .ph-label{color:var(--success)}
-.profit-hero.loss .ph-label{color:var(--danger)}
-.profit-hero.neutral .ph-label{color:var(--warn)}
-.ph-amount{font-size:48px;font-weight:700;font-family:var(--mono);line-height:1.05;margin-bottom:8px}
-.profit-hero.profit .ph-amount{color:var(--success)}
-.profit-hero.loss .ph-amount{color:var(--danger)}
-.profit-hero.neutral .ph-amount{color:var(--warn)}
-.ph-sub{font-size:13px;color:var(--text-2)}
-.balance-sheet{padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:32px}
-@media(max-width:800px){.balance-sheet{grid-template-columns:1fr}}
-.bs-section h3{font-size:13px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.bs-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px}
-.bs-row.total{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-weight:700;font-size:14px}
-.bs-row .label{color:var(--text-2)}
-.bs-row .val{font-family:var(--mono);font-weight:600}
-
-.month-chart{padding:18px 22px;height:260px;display:flex;align-items:flex-end;gap:7px}
-.mc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
-.mc-bars{flex:1;display:flex;align-items:flex-end;gap:3px;width:100%;justify-content:center}
-.mc-bar{flex:1;border-radius:3px 3px 0 0;min-height:2px;transition:all 1s cubic-bezier(.4,0,.2,1)}
-.mc-bar.income{background:var(--success);opacity:.85}
-.mc-bar.expense{background:var(--danger);opacity:.85}
-.mc-label{font-size:10px;color:var(--text-3);font-family:var(--mono);font-weight:600}
-
-.cat-bars{padding:18px 22px;display:flex;flex-direction:column;gap:11px}
-.cat-row .cat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:12px}
-.cat-row .cat-bar{height:8px;background:var(--surface-2);border-radius:5px;overflow:hidden}
-.cat-row .cat-fill{height:100%;border-radius:5px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
-
-.year-select{background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:6px 12px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;cursor:pointer}
-.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px}
-</style>
+<link rel="stylesheet" href="theme.css?v=6">
 <script>
 (function(){
   function applyTheme(t){
@@ -78,6 +37,61 @@
   });
 })();
 </script>
+<style>
+.profit-hero{border-radius:18px;padding:32px;margin-bottom:22px;border:2px solid;animation:fadeUp .5s ease both}
+.profit-hero.profit{background:linear-gradient(135deg,rgba(16,185,129,.1) 0%,rgba(6,182,212,.05) 100%);border-color:rgba(16,185,129,.3)}
+.profit-hero.loss{background:linear-gradient(135deg,rgba(239,68,68,.1) 0%,rgba(245,158,11,.05) 100%);border-color:rgba(239,68,68,.3)}
+.profit-hero.neutral{background:linear-gradient(135deg,rgba(245,158,11,.1) 0%,rgba(6,182,212,.05) 100%);border-color:rgba(245,158,11,.3)}
+.ph-row{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.ph-emoji{font-size:64px;line-height:1}
+.ph-text{flex:1;min-width:200px}
+.ph-label{font-size:14px;font-weight:600;margin-bottom:6px}
+.profit-hero.profit .ph-label{color:var(--success)}
+.profit-hero.loss .ph-label{color:var(--danger)}
+.profit-hero.neutral .ph-label{color:var(--warn)}
+.ph-amount{font-size:48px;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1.05;margin-bottom:8px}
+.profit-hero.profit .ph-amount{color:var(--success)}
+.profit-hero.loss .ph-amount{color:var(--danger)}
+.profit-hero.neutral .ph-amount{color:var(--warn)}
+.ph-sub{font-size:13px;color:var(--text-2)}
+
+.balance-sheet{padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:32px}
+@media(max-width:800px){.balance-sheet{grid-template-columns:1fr}}
+.bs-section h3{font-size:13px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.bs-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px}
+.bs-row.total{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-weight:700;font-size:14px}
+.bs-row .label{color:var(--text-2)}
+.bs-row .val{font-family:'JetBrains Mono',monospace;font-weight:600}
+
+.month-chart{padding:18px 22px;height:280px;display:flex;align-items:flex-end;gap:7px;overflow-x:auto}
+.mc-col{flex:1;min-width:42px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.mc-bars{flex:1;display:flex;align-items:flex-end;gap:3px;width:100%;justify-content:center}
+.mc-bar{flex:1;border-radius:3px 3px 0 0;min-height:1px;transition:all 1s cubic-bezier(.4,0,.2,1)}
+.mc-bar.income{background:var(--success)}
+.mc-bar.expense{background:var(--danger)}
+.mc-col:hover .mc-bar{filter:brightness(1.15)}
+.mc-label{font-size:10px;color:var(--text-3);font-family:'JetBrains Mono',monospace;font-weight:600}
+.mc-col.has-data .mc-label{color:var(--text);font-weight:700}
+
+.cat-bars{padding:18px 22px;display:flex;flex-direction:column;gap:11px}
+.cat-row .cat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:12px}
+.cat-row .cat-bar{height:8px;background:var(--surface-2);border-radius:5px;overflow:hidden}
+.cat-row .cat-fill{height:100%;border-radius:5px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+
+.year-select,.period-select{background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:6px 12px;color:var(--text);font-family:inherit;font-size:12px;outline:none;cursor:pointer}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px}
+
+.filters-bar{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.filter-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px}
+.filter-group label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.filter-group input,.filter-group select{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:inherit;font-size:12px;outline:none;width:100%}
+.filter-group input:focus,.filter-group select:focus{border-color:var(--accent)}
+.preset-row{display:flex;gap:6px;flex-wrap:wrap;width:100%;margin-top:6px}
+.preset-chip{padding:5px 12px;border-radius:18px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);font-family:inherit;font-size:11px;cursor:pointer;transition:all .15s}
+.preset-chip:hover{border-color:var(--accent);color:var(--accent)}
+.preset-chip.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+.daily-row{padding:8px 16px;font-size:13px}
+</style>
 </head>
 <body>
 <aside class="sidebar" id="sidebar"></aside>
@@ -85,10 +99,51 @@
   <header class="topbar">
     <h1 class="tb-title">التقارير المالية <span class="breadcrumb">/ ربح وخسارة</span></h1>
     <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" title="تبديل السمة">☀️</button>
-    <select class="year-select" id="yearSel" onchange="changeYear(this.value)"></select>
     <button class="btn btn-sm" onclick="exportReport()">📤 تصدير</button>
   </header>
   <div class="content">
+
+    <!-- ═══ FILTERS BAR ═══ -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <label>الفترة</label>
+        <select id="periodMode" class="period-select">
+          <option value="year">سنة كاملة</option>
+          <option value="month">شهر محدد</option>
+          <option value="custom">نطاق تاريخ مخصص</option>
+        </select>
+      </div>
+      <div class="filter-group" id="yearGroup">
+        <label>السنة</label>
+        <select id="yearSel" class="year-select"></select>
+      </div>
+      <div class="filter-group" id="monthGroup" style="display:none">
+        <label>الشهر</label>
+        <select id="monthSel" class="period-select"></select>
+      </div>
+      <div class="filter-group" id="fromGroup" style="display:none">
+        <label>من تاريخ</label>
+        <input type="date" id="fromDate">
+      </div>
+      <div class="filter-group" id="toGroup" style="display:none">
+        <label>إلى تاريخ</label>
+        <input type="date" id="toDate">
+      </div>
+      <div class="filter-group" style="flex:0 0 auto">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary btn-sm" onclick="applyFilters()">🔍 تطبيق</button>
+      </div>
+      <div class="preset-row">
+        <button class="preset-chip" onclick="setPreset('today')">اليوم</button>
+        <button class="preset-chip" onclick="setPreset('yesterday')">أمس</button>
+        <button class="preset-chip" onclick="setPreset('week')">آخر 7 أيام</button>
+        <button class="preset-chip" onclick="setPreset('month')">هذا الشهر</button>
+        <button class="preset-chip" onclick="setPreset('lastmonth')">الشهر الماضي</button>
+        <button class="preset-chip" onclick="setPreset('quarter')">آخر 3 أشهر</button>
+        <button class="preset-chip active" onclick="setPreset('year')">هذه السنة</button>
+        <button class="preset-chip" onclick="setPreset('all')">كل الأوقات</button>
+      </div>
+    </div>
 
     <div class="profit-hero" id="profitHero">
       <div class="ph-row">
@@ -112,7 +167,7 @@
       <div class="panel-header">
         <span class="panel-icon">📑</span>
         <div class="panel-title">الميزانية العامة (Balance Sheet)</div>
-        <span class="text-3 text-xs">للسنة <span id="balYear"></span></span>
+        <span class="text-3 text-xs" id="balPeriod">—</span>
       </div>
       <div class="balance-sheet">
         <div class="bs-section">
@@ -134,10 +189,10 @@
       <div class="panel fade-up" style="animation-delay:.1s">
         <div class="panel-header">
           <span class="panel-icon">📊</span>
-          <div class="panel-title">إيرادات vs مصاريف شهرياً</div>
+          <div class="panel-title" id="chartTitle">إيرادات vs مصاريف شهرياً</div>
         </div>
         <div class="month-chart" id="monthChart">
-          <div style="width:100%;text-align:center;color:var(--text-3)">جاري التحميل...</div>
+          <div style="width:100%;text-align:center;color:var(--text-3);padding:60px 0">جاري التحميل...</div>
         </div>
         <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:18px;font-size:12px;color:var(--text-3)">
           <div class="flex items-center gap-2"><div style="width:12px;height:12px;background:var(--success);border-radius:3px"></div> إيرادات</div>
@@ -159,11 +214,12 @@
     <div class="panel fade-up" style="animation-delay:.2s">
       <div class="panel-header">
         <span class="panel-icon">📋</span>
-        <div class="panel-title">التفصيل الشهري</div>
+        <div class="panel-title" id="detailTitle">التفصيل الشهري</div>
+        <span id="detailCount" class="badge badge-gray">0</span>
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr>
+          <thead><tr id="detailHead">
             <th>الشهر</th>
             <th>الإيرادات</th>
             <th>المصاريف</th>
@@ -171,7 +227,7 @@
             <th>عدد المعاملات</th>
             <th>الحالة</th>
           </tr></thead>
-          <tbody id="monthTable">
+          <tbody id="detailTable">
             <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-3)">جاري التحميل...</td></tr>
           </tbody>
         </table>
@@ -187,7 +243,7 @@ import {
   watchSettings, fmt, getCurrencySymbol, convertFromBase,
   esc, renderSidebar, toast,
   isNetworkDevice, EXPENSE_CATEGORIES
-} from "./app.js?v=5";
+} from "./app.js?v=6";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("reports");
 watchSettings(s => {
@@ -195,18 +251,166 @@ watchSettings(s => {
   if (sn) sn.textContent = s.netName || "شبكة المدى نت";
 });
 
-let allTx = [], allDevices = [], selYear = new Date().getFullYear();
+let allTx = [], allDevices = [];
+let periodMode = "year";
+let selYear = new Date().getFullYear();
+let selMonth = new Date().getMonth() + 1;
+let fromDate = "", toDate = "";
 
+const months = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+
+// Build year selector
 const yearSel = document.getElementById("yearSel");
-for (let y = 2023; y <= 2027; y++) {
+const curYear = new Date().getFullYear();
+for (let y = curYear-3; y <= curYear+1; y++) {
   const o = document.createElement("option");
   o.value = y;
   o.textContent = y;
   if (y === selYear) o.selected = true;
   yearSel.appendChild(o);
 }
-window.changeYear = y => { selYear = parseInt(y); renderAll(); };
-document.getElementById("balYear").textContent = selYear;
+
+// Build month selector
+const monthSel = document.getElementById("monthSel");
+months.forEach((m, i) => {
+  const o = document.createElement("option");
+  o.value = i+1;
+  o.textContent = m;
+  if (i+1 === selMonth) o.selected = true;
+  monthSel.appendChild(o);
+});
+
+// Period mode change
+document.getElementById("periodMode").addEventListener("change", e => {
+  periodMode = e.target.value;
+  document.getElementById("yearGroup").style.display = (periodMode === "year" || periodMode === "month") ? "" : "none";
+  document.getElementById("monthGroup").style.display = (periodMode === "month") ? "" : "none";
+  document.getElementById("fromGroup").style.display = (periodMode === "custom") ? "" : "none";
+  document.getElementById("toGroup").style.display = (periodMode === "custom") ? "" : "none";
+});
+
+// Get the date string from a transaction (handles different formats)
+function getTxDate(t) {
+  if (!t.date) return null;
+  // Handle string ISO date like "2026-05-04"
+  if (typeof t.date === "string" && t.date.length >= 7) {
+    return t.date.slice(0, 10); // YYYY-MM-DD
+  }
+  // Handle Firestore Timestamp
+  if (t.date.seconds) {
+    const d = new Date(t.date.seconds * 1000);
+    return d.toISOString().slice(0, 10);
+  }
+  // Handle Date object
+  if (t.date instanceof Date) {
+    return t.date.toISOString().slice(0, 10);
+  }
+  return null;
+}
+
+// Get year from transaction
+function getTxYear(t) {
+  const d = getTxDate(t);
+  return d ? parseInt(d.slice(0, 4)) : null;
+}
+
+// Get month (1-12) from transaction
+function getTxMonth(t) {
+  const d = getTxDate(t);
+  return d ? parseInt(d.slice(5, 7)) : null;
+}
+
+// Filter transactions based on current period
+function filterTx() {
+  if (periodMode === "year") {
+    return allTx.filter(t => getTxYear(t) === selYear);
+  }
+  if (periodMode === "month") {
+    return allTx.filter(t => getTxYear(t) === selYear && getTxMonth(t) === selMonth);
+  }
+  if (periodMode === "custom") {
+    return allTx.filter(t => {
+      const d = getTxDate(t);
+      if (!d) return false;
+      if (fromDate && d < fromDate) return false;
+      if (toDate && d > toDate) return false;
+      return true;
+    });
+  }
+  return allTx;
+}
+
+window.applyFilters = () => {
+  selYear = parseInt(document.getElementById("yearSel").value);
+  selMonth = parseInt(document.getElementById("monthSel").value);
+  fromDate = document.getElementById("fromDate").value;
+  toDate = document.getElementById("toDate").value;
+  // Clear preset highlight if manually applied
+  document.querySelectorAll(".preset-chip").forEach(c => c.classList.remove("active"));
+  renderAll();
+};
+
+window.setPreset = (preset) => {
+  document.querySelectorAll(".preset-chip").forEach(c => c.classList.remove("active"));
+  event.target.classList.add("active");
+
+  const today = new Date();
+  const fmtDate = d => d.toISOString().slice(0,10);
+
+  switch(preset) {
+    case "today":
+      periodMode = "custom";
+      fromDate = toDate = fmtDate(today);
+      break;
+    case "yesterday":
+      periodMode = "custom";
+      const y = new Date(today); y.setDate(y.getDate()-1);
+      fromDate = toDate = fmtDate(y);
+      break;
+    case "week":
+      periodMode = "custom";
+      const w = new Date(today); w.setDate(w.getDate()-6);
+      fromDate = fmtDate(w); toDate = fmtDate(today);
+      break;
+    case "month":
+      periodMode = "month";
+      selYear = today.getFullYear();
+      selMonth = today.getMonth()+1;
+      break;
+    case "lastmonth":
+      periodMode = "month";
+      const lm = new Date(today.getFullYear(), today.getMonth()-1, 1);
+      selYear = lm.getFullYear();
+      selMonth = lm.getMonth()+1;
+      break;
+    case "quarter":
+      periodMode = "custom";
+      const q = new Date(today); q.setMonth(q.getMonth()-3);
+      fromDate = fmtDate(q); toDate = fmtDate(today);
+      break;
+    case "year":
+      periodMode = "year";
+      selYear = today.getFullYear();
+      break;
+    case "all":
+      periodMode = "custom";
+      fromDate = ""; toDate = "";
+      break;
+  }
+
+  // Sync UI
+  document.getElementById("periodMode").value = periodMode;
+  document.getElementById("yearSel").value = selYear;
+  document.getElementById("monthSel").value = selMonth;
+  document.getElementById("fromDate").value = fromDate;
+  document.getElementById("toDate").value = toDate;
+  document.getElementById("yearGroup").style.display = (periodMode === "year" || periodMode === "month") ? "" : "none";
+  document.getElementById("monthGroup").style.display = (periodMode === "month") ? "" : "none";
+  document.getElementById("fromGroup").style.display = (periodMode === "custom") ? "" : "none";
+  document.getElementById("toGroup").style.display = (periodMode === "custom") ? "" : "none";
+
+  renderAll();
+};
 
 onSnapshot(collection(db, "transactions"), snap => {
   allTx = snap.docs.map(d => ({id:d.id, ...d.data()}));
@@ -217,41 +421,50 @@ onSnapshot(collection(db, "devices"), snap => {
   renderAll();
 });
 
+function getPeriodLabel() {
+  if (periodMode === "year") return `سنة ${selYear}`;
+  if (periodMode === "month") return `${months[selMonth-1]} ${selYear}`;
+  if (periodMode === "custom") {
+    if (!fromDate && !toDate) return "كل الأوقات";
+    if (fromDate === toDate) return fromDate;
+    return `${fromDate || "البداية"} → ${toDate || "اليوم"}`;
+  }
+  return "—";
+}
+
 function renderAll() {
-  document.getElementById("balYear").textContent = selYear;
-  const yearTx = allTx.filter(t => (t.date||"").startsWith(selYear));
-  const inc = yearTx.filter(t => t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
-  const exp = yearTx.filter(t => t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
+  const filtered = filterTx();
+  const inc = filtered.filter(t => t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
+  const exp = filtered.filter(t => t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
   const netDevsCost = allDevices.filter(d => isNetworkDevice(d.type)).reduce((s,d)=>s+(parseFloat(d.cost)||0), 0);
   const assetDevsCost = allDevices.filter(d => !isNetworkDevice(d.type)).reduce((s,d)=>s+(parseFloat(d.cost)||0), 0);
   const totalAssets = netDevsCost + assetDevsCost;
-
-  // Operating profit (without devices, since they're assets)
   const net = inc - exp;
 
   // Hero
   const hero = document.getElementById("profitHero");
   let cls, emoji, label;
-  if (net > 0) { cls = "profit"; emoji = "📈"; label = "✓ أنت في ربح هذا العام"; }
-  else if (net < 0) { cls = "loss"; emoji = "📉"; label = "⚠ أنت في خسارة"; }
+  if (net > 0) { cls = "profit"; emoji = "📈"; label = "✓ في ربح خلال هذه الفترة"; }
+  else if (net < 0) { cls = "loss"; emoji = "📉"; label = "⚠ في خسارة خلال هذه الفترة"; }
   else { cls = "neutral"; emoji = "⚖️"; label = "نقطة التعادل"; }
   hero.className = "profit-hero " + cls;
   document.getElementById("phEmoji").textContent = emoji;
   document.getElementById("phLabel").textContent = label;
   document.getElementById("phAmount").textContent = (net>0?"+":net<0?"−":"") + fmt(Math.abs(net));
-  document.getElementById("phSub").textContent = `الإيرادات ${fmt(inc)} − المصاريف ${fmt(exp)} (الأصول لا تُحسب كمصروف)`;
+  document.getElementById("phSub").textContent = `${getPeriodLabel()} — إيرادات ${fmt(inc)} − مصاريف ${fmt(exp)}`;
 
   // KPIs
   document.getElementById("k-income").textContent = fmt(inc);
-  document.getElementById("k-income-sub").textContent = yearTx.filter(t=>t.txType==="income").length + " معاملة";
+  document.getElementById("k-income-sub").textContent = filtered.filter(t=>t.txType==="income").length + " معاملة";
   document.getElementById("k-expense").textContent = fmt(exp);
-  document.getElementById("k-expense-sub").textContent = yearTx.filter(t=>t.txType==="expense").length + " معاملة";
+  document.getElementById("k-expense-sub").textContent = filtered.filter(t=>t.txType==="expense").length + " معاملة";
   document.getElementById("k-assets").textContent = fmt(totalAssets);
   document.getElementById("k-net").textContent = (net>=0?"":"−") + fmt(Math.abs(net));
   document.getElementById("k-net-sub").textContent = net>=0 ? "✓ ربح" : "خسارة";
   document.getElementById("k-net-sub").className = "kpi-sub " + (net>=0 ? "text-success" : "text-danger");
 
   // Balance sheet
+  document.getElementById("balPeriod").textContent = getPeriodLabel();
   document.getElementById("bs-income").textContent = "+" + fmt(inc);
   document.getElementById("bs-expenses").textContent = "−" + fmt(exp);
   const netEl = document.getElementById("bs-net");
@@ -261,43 +474,251 @@ function renderAll() {
   document.getElementById("bs-asset-devs").textContent = fmt(assetDevsCost);
   document.getElementById("bs-total-assets").textContent = fmt(totalAssets);
 
-  // Monthly chart
-  const months = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  // Render chart based on period mode
+  if (periodMode === "month" || (periodMode === "custom" && isShortRange())) {
+    renderDailyChart(filtered);
+    renderDailyTable(filtered);
+  } else {
+    renderMonthlyChart(filtered);
+    renderMonthlyTable(filtered);
+  }
+
+  // Categories
+  renderCategories(filtered);
+}
+
+function isShortRange() {
+  if (!fromDate || !toDate) return false;
+  const days = (new Date(toDate) - new Date(fromDate)) / (1000*60*60*24);
+  return days <= 62; // Show daily view if range is <= 2 months
+}
+
+function renderMonthlyChart(filtered) {
+  document.getElementById("chartTitle").textContent = "إيرادات vs مصاريف شهرياً";
+  
   const mInc = {}, mExp = {};
-  months.forEach((_,i) => { const m = String(i+1).padStart(2,"0"); mInc[m] = 0; mExp[m] = 0; });
-  yearTx.forEach(t => {
-    const m = (t.date||"").slice(5,7);
-    if (mInc[m] !== undefined) {
-      if (t.txType === "income") mInc[m] += (parseFloat(t.amount)||0);
-      else mExp[m] += (parseFloat(t.amount)||0);
+  for (let i = 1; i <= 12; i++) {
+    mInc[i] = 0;
+    mExp[i] = 0;
+  }
+  
+  filtered.forEach(t => {
+    const m = getTxMonth(t);
+    if (m && mInc[m] !== undefined) {
+      const amt = parseFloat(t.amount) || 0;
+      if (t.txType === "income") mInc[m] += amt;
+      else mExp[m] += amt;
     }
   });
-  const maxVal = Math.max(...Object.values(mInc), ...Object.values(mExp), 1);
-  // Only show months up to current month (for current year) or full year (for past years)
-  const now = new Date();
-  const currentMonth = selYear === now.getFullYear() ? now.getMonth() : 11;
-  const visibleMonths = Object.keys(mInc).slice(0, currentMonth + 1);
-  document.getElementById("monthChart").innerHTML = visibleMonths.map((m,i) => {
-    const iH = Math.round((mInc[m]/maxVal)*200);
-    const eH = Math.round((mExp[m]/maxVal)*200);
-    return `<div class="mc-col" title="${months[i]}: إيراد ${fmt(mInc[m])} / مصروف ${fmt(mExp[m])}">
+
+  // Determine which months to show
+  let showMonths;
+  if (periodMode === "year") {
+    // For current year, show only up to current month; for past years show all 12
+    if (selYear === new Date().getFullYear()) {
+      showMonths = Array.from({length: new Date().getMonth() + 1}, (_, i) => i+1);
+    } else {
+      showMonths = Array.from({length: 12}, (_, i) => i+1);
+    }
+  } else {
+    // Custom range — show only months in the range
+    const startM = fromDate ? parseInt(fromDate.slice(5,7)) : 1;
+    const endM = toDate ? parseInt(toDate.slice(5,7)) : 12;
+    showMonths = [];
+    for (let m = startM; m <= endM; m++) showMonths.push(m);
+  }
+
+  const maxVal = Math.max(...showMonths.map(m => Math.max(mInc[m], mExp[m])), 1);
+
+  document.getElementById("monthChart").innerHTML = showMonths.map(m => {
+    const iH = Math.round((mInc[m]/maxVal)*210);
+    const eH = Math.round((mExp[m]/maxVal)*210);
+    const hasData = mInc[m]>0 || mExp[m]>0;
+    return `<div class="mc-col ${hasData?'has-data':''}" title="${months[m-1]}: إيراد ${fmt(mInc[m])} / مصروف ${fmt(mExp[m])}">
       <div class="mc-bars">
         <div class="mc-bar income" style="height:${iH}px"></div>
         <div class="mc-bar expense" style="height:${eH}px"></div>
       </div>
-      <div class="mc-label">${months[i].slice(0,3)}</div>
+      <div class="mc-label">${months[m-1].slice(0,3)}</div>
     </div>`;
   }).join("");
+}
 
-  // Categories
+function renderDailyChart(filtered) {
+  document.getElementById("chartTitle").textContent = "إيرادات vs مصاريف يومياً";
+  
+  // Determine date range
+  let startStr, endStr;
+  if (periodMode === "month") {
+    startStr = `${selYear}-${String(selMonth).padStart(2,"0")}-01`;
+    const lastDay = new Date(selYear, selMonth, 0).getDate();
+    endStr = `${selYear}-${String(selMonth).padStart(2,"0")}-${String(lastDay).padStart(2,"0")}`;
+  } else {
+    startStr = fromDate;
+    endStr = toDate;
+  }
+  
+  if (!startStr || !endStr) {
+    document.getElementById("monthChart").innerHTML = `<div style="width:100%;text-align:center;color:var(--text-3);padding:60px 0">حدد نطاق التاريخ</div>`;
+    return;
+  }
+  
+  const startD = new Date(startStr);
+  const endD = new Date(endStr);
+  const dInc = {}, dExp = {};
+  const days = [];
+  
+  for (let d = new Date(startD); d <= endD; d.setDate(d.getDate()+1)) {
+    const ds = d.toISOString().slice(0,10);
+    days.push(ds);
+    dInc[ds] = 0;
+    dExp[ds] = 0;
+  }
+  
+  filtered.forEach(t => {
+    const d = getTxDate(t);
+    if (d && dInc[d] !== undefined) {
+      const amt = parseFloat(t.amount) || 0;
+      if (t.txType === "income") dInc[d] += amt;
+      else dExp[d] += amt;
+    }
+  });
+  
+  const maxVal = Math.max(...days.map(d => Math.max(dInc[d], dExp[d])), 1);
+  
+  document.getElementById("monthChart").innerHTML = days.map(ds => {
+    const iH = Math.round((dInc[ds]/maxVal)*210);
+    const eH = Math.round((dExp[ds]/maxVal)*210);
+    const hasData = dInc[ds]>0 || dExp[ds]>0;
+    const dayLabel = ds.slice(8, 10); // DD
+    return `<div class="mc-col ${hasData?'has-data':''}" title="${ds}: إيراد ${fmt(dInc[ds])} / مصروف ${fmt(dExp[ds])}">
+      <div class="mc-bars">
+        <div class="mc-bar income" style="height:${iH}px"></div>
+        <div class="mc-bar expense" style="height:${eH}px"></div>
+      </div>
+      <div class="mc-label">${dayLabel}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderMonthlyTable(filtered) {
+  document.getElementById("detailTitle").textContent = "التفصيل الشهري";
+  document.getElementById("detailHead").innerHTML = `
+    <th>الشهر</th>
+    <th>الإيرادات</th>
+    <th>المصاريف</th>
+    <th>صافي الربح/الخسارة</th>
+    <th>عدد المعاملات</th>
+    <th>الحالة</th>
+  `;
+
+  // Group by year-month  
+  const byMonth = {};
+  filtered.forEach(t => {
+    const d = getTxDate(t);
+    if (!d) return;
+    const key = d.slice(0, 7); // YYYY-MM
+    if (!byMonth[key]) byMonth[key] = { inc: 0, exp: 0, count: 0 };
+    const amt = parseFloat(t.amount) || 0;
+    if (t.txType === "income") byMonth[key].inc += amt;
+    else byMonth[key].exp += amt;
+    byMonth[key].count++;
+  });
+
+  // Determine which months to show
+  let monthKeys;
+  if (periodMode === "year") {
+    const max = selYear === new Date().getFullYear() ? new Date().getMonth() + 1 : 12;
+    monthKeys = [];
+    for (let m = 1; m <= max; m++) {
+      monthKeys.push(`${selYear}-${String(m).padStart(2,"0")}`);
+    }
+  } else {
+    monthKeys = Object.keys(byMonth).sort();
+  }
+
+  document.getElementById("detailCount").textContent = monthKeys.length + " شهر";
+
+  const tbody = document.getElementById("detailTable");
+  if (!monthKeys.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-3)">لا توجد بيانات في هذه الفترة</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = monthKeys.map(key => {
+    const data = byMonth[key] || { inc: 0, exp: 0, count: 0 };
+    const n = data.inc - data.exp;
+    const hasData = data.inc>0 || data.exp>0;
+    const [yr, mn] = key.split("-");
+    const monthName = months[parseInt(mn)-1];
+    const yearLabel = parseInt(yr) !== selYear ? ` ${yr}` : "";
+    return `<tr>
+      <td class="fw-600">${monthName}${yearLabel}</td>
+      <td class="text-mono ${data.inc>0?'text-success':''} fw-700">${data.inc>0?fmt(data.inc):"—"}</td>
+      <td class="text-mono ${data.exp>0?'text-danger':''} fw-700">${data.exp>0?fmt(data.exp):"—"}</td>
+      <td class="text-mono fw-700 ${n>0?'text-success':n<0?'text-danger':'text-warn'}">${hasData?(n>0?"+":n<0?"−":"")+fmt(Math.abs(n)):"—"}</td>
+      <td class="text-2 text-sm">${data.count}</td>
+      <td>${!hasData?"—":n>0?'<span class="status-badge" style="background:var(--success-soft);color:var(--success)">✓ ربح</span>':n<0?'<span class="status-badge" style="background:var(--danger-soft);color:var(--danger)">⚠ خسارة</span>':'<span class="status-badge" style="background:var(--warn-soft);color:var(--warn)">→ تعادل</span>'}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderDailyTable(filtered) {
+  document.getElementById("detailTitle").textContent = "التفصيل اليومي";
+  document.getElementById("detailHead").innerHTML = `
+    <th>التاريخ</th>
+    <th>اليوم</th>
+    <th>الإيرادات</th>
+    <th>المصاريف</th>
+    <th>الصافي</th>
+    <th>المعاملات</th>
+  `;
+
+  const byDay = {};
+  filtered.forEach(t => {
+    const d = getTxDate(t);
+    if (!d) return;
+    if (!byDay[d]) byDay[d] = { inc: 0, exp: 0, count: 0 };
+    const amt = parseFloat(t.amount) || 0;
+    if (t.txType === "income") byDay[d].inc += amt;
+    else byDay[d].exp += amt;
+    byDay[d].count++;
+  });
+
+  const dayKeys = Object.keys(byDay).sort().reverse();
+  document.getElementById("detailCount").textContent = dayKeys.length + " يوم";
+
+  const tbody = document.getElementById("detailTable");
+  if (!dayKeys.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-3)">لا توجد معاملات في هذه الفترة</td></tr>`;
+    return;
+  }
+
+  const dayNames = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+  tbody.innerHTML = dayKeys.map(d => {
+    const data = byDay[d];
+    const n = data.inc - data.exp;
+    const dt = new Date(d);
+    return `<tr>
+      <td class="text-mono fw-600">${d}</td>
+      <td class="text-2 text-sm">${dayNames[dt.getDay()]}</td>
+      <td class="text-mono ${data.inc>0?'text-success':''} fw-700">${data.inc>0?fmt(data.inc):"—"}</td>
+      <td class="text-mono ${data.exp>0?'text-danger':''} fw-700">${data.exp>0?fmt(data.exp):"—"}</td>
+      <td class="text-mono fw-700 ${n>0?'text-success':n<0?'text-danger':'text-warn'}">${(n>0?"+":n<0?"−":"")+fmt(Math.abs(n))}</td>
+      <td class="text-2 text-sm">${data.count}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderCategories(filtered) {
   const cats = {};
-  yearTx.filter(t => t.txType === "expense").forEach(t => {
+  filtered.filter(t => t.txType === "expense").forEach(t => {
     cats[t.category||"misc"] = (cats[t.category||"misc"]||0) + (parseFloat(t.amount)||0);
   });
   const catTotal = Object.values(cats).reduce((s,v) => s+v, 0);
   const catWrap = document.getElementById("catBars");
   if (!catTotal) {
-    catWrap.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:30px">لا توجد مصاريف هذا العام</div>`;
+    catWrap.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:30px">لا توجد مصاريف في هذه الفترة</div>`;
   } else {
     catWrap.innerHTML = Object.entries(cats).sort((a,b) => b[1]-a[1]).map(([cat, amt]) => {
       const pct = Math.round(amt/catTotal*100);
@@ -311,51 +732,31 @@ function renderAll() {
       </div>`;
     }).join("");
   }
-
-  // Monthly table — only show past + current months
-  const tbody = document.getElementById("monthTable");
-  const nowDate = new Date();
-  const lastMonthIdx = selYear === nowDate.getFullYear() ? nowDate.getMonth() : 11;
-  const rowsHtml = Object.keys(mInc).map((m,i) => {
-    const incM = mInc[m], expM = mExp[m], n = incM - expM;
-    const txCount = yearTx.filter(t => (t.date||"").slice(5,7) === m).length;
-    const hasData = incM>0 || expM>0;
-    // Skip future months entirely
-    if (i > lastMonthIdx) return "";
-    return `<tr>
-      <td class="fw-600">${months[i]}</td>
-      <td class="text-mono ${incM>0?'text-success':''} fw-700">${incM>0?fmt(incM):"—"}</td>
-      <td class="text-mono ${expM>0?'text-danger':''} fw-700">${expM>0?fmt(expM):"—"}</td>
-      <td class="text-mono fw-700 ${n>0?'text-success':n<0?'text-danger':'text-warn'}">${hasData?(n>0?"+":"")+fmt(Math.abs(n)):"—"}</td>
-      <td class="text-2 text-sm">${txCount}</td>
-      <td>${!hasData?"—":n>0?'<span class="status-badge" style="background:var(--success-soft);color:var(--success)">✓ ربح</span>':n<0?'<span class="status-badge" style="background:var(--danger-soft);color:var(--danger)">⚠ خسارة</span>':'<span class="status-badge" style="background:var(--warn-soft);color:var(--warn)">→ تعادل</span>'}</td>
-    </tr>`;
-  }).filter(Boolean).join("");
-  tbody.innerHTML = rowsHtml || `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-3)">لا توجد بيانات لهذا العام — <a href="finances.html" style="color:var(--accent)">سجّل معاملاتك</a></td></tr>`;
 }
 
 window.exportReport = () => {
-  const yearTx = allTx.filter(t => (t.date||"").startsWith(selYear));
-  const inc = yearTx.filter(t => t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
-  const exp = yearTx.filter(t => t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
+  const filtered = filterTx();
+  const inc = filtered.filter(t => t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
+  const exp = filtered.filter(t => t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
   const rows = [
     ["الوصف","النوع","الفئة","المبلغ","التاريخ"],
-    ...yearTx.map(t => [
+    ...filtered.map(t => [
       t.description,
       t.txType==="income"?"إيراد":"مصروف",
       EXPENSE_CATEGORIES[t.category]?.label || t.category,
       t.amount?convertFromBase(t.amount).toFixed(2):0,
-      t.date
+      getTxDate(t)
     ])
   ];
   rows.push([]);
+  rows.push(["الفترة", getPeriodLabel(), "","",""]);
   rows.push(["إجمالي الإيرادات","","",convertFromBase(inc).toFixed(2),""]);
   rows.push(["إجمالي المصاريف","","",convertFromBase(exp).toFixed(2),""]);
   rows.push(["صافي الربح/الخسارة","","",convertFromBase(inc-exp).toFixed(2),inc-exp>0?"ربح":"خسارة"]);
   const csv = "\uFEFF" + rows.map(r => r.map(v => `"${String(v||"").replace(/"/g,'""')}"`).join(",")).join("\n");
   const a = document.createElement("a");
   a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
-  a.download = `تقرير-${selYear}.csv`;
+  a.download = `تقرير-${getPeriodLabel().replace(/\s/g,"_")}.csv`;
   a.click();
   toast("تم تصدير التقرير ✓", "success");
 };
