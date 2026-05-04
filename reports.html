@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>التقارير المالية — المدى نت</title>
-<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="theme.css?v=3">
 <style>
 .profit-hero{border-radius:18px;padding:32px;margin-bottom:22px;border:2px solid;animation:fadeUp .5s ease both}
 .profit-hero.profit{background:linear-gradient(135deg,rgba(16,185,129,.1) 0%,rgba(6,182,212,.05) 100%);border-color:rgba(16,185,129,.3)}
@@ -179,7 +179,7 @@ import {
   watchSettings, fmt, getCurrencySymbol, convertFromBase,
   esc, renderSidebar, toast,
   isNetworkDevice, EXPENSE_CATEGORIES
-} from "./app.js";
+} from "./app.js?v=3";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("reports");
 watchSettings(s => {

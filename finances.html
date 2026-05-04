@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>الإدارة المالية — المدى نت</title>
-<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="theme.css?v=3">
 <style>
 .tx-amount-cell{font-family:var(--mono);font-weight:700;font-size:13px;white-space:nowrap}
 .tx-amount-cell.income{color:var(--success)}
@@ -172,7 +172,7 @@ import {
   watchSettings, fmt, getCurrencySymbol, convertToBase, convertFromBase,
   esc, renderSidebar, toast, openModal, closeModal, confirmDialog,
   EXPENSE_CATEGORIES, INCOME_CATEGORIES
-} from "./app.js";
+} from "./app.js?v=3";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("finances");
 

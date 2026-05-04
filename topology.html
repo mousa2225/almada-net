@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>توبولوجيا الشبكة — المدى نت</title>
-<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="theme.css?v=3">
 <style>
 body{height:100vh;overflow:hidden;display:flex}
 .sidebar{position:relative;flex-shrink:0}
@@ -237,7 +237,7 @@ import {
   onSnapshot, serverTimestamp, query, where, getDocs,
   watchSettings, esc, renderSidebar, toast, openModal, closeModal, confirmDialog,
   ALL_DEVICE_TYPES, isNetworkDevice
-} from "./app.js";
+} from "./app.js?v=3";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("topology");
 watchSettings(s => {

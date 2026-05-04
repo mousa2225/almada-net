@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>الإعدادات — المدى نت</title>
-<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="theme.css?v=3">
 <style>
 .section-card{background:linear-gradient(180deg,var(--surface) 0%,rgba(13,20,36,.5) 100%);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:18px;animation:fadeUp .4s ease both}
 .sc-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
@@ -218,7 +218,7 @@ import {
   db, doc, setDoc, getDoc, serverTimestamp,
   watchSettings, getSettings, getAllCurrencies, getCurrencyInfo,
   esc, renderSidebar, toast, openModal, closeModal
-} from "./app.js";
+} from "./app.js?v=3";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("settings");
 
