@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>التقارير المالية — المدى نت</title>
-<link rel="stylesheet" href="theme.css?v=4">
+<link rel="stylesheet" href="theme.css?v=5">
 <style>
 .profit-hero{border-radius:18px;padding:32px;margin-bottom:22px;border:2px solid;animation:fadeUp .5s ease both}
 .profit-hero.profit{background:linear-gradient(135deg,rgba(16,185,129,.1) 0%,rgba(6,182,212,.05) 100%);border-color:rgba(16,185,129,.3)}
@@ -187,7 +187,7 @@ import {
   watchSettings, fmt, getCurrencySymbol, convertFromBase,
   esc, renderSidebar, toast,
   isNetworkDevice, EXPENSE_CATEGORIES
-} from "./app.js?v=4";
+} from "./app.js?v=5";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("reports");
 watchSettings(s => {
@@ -273,7 +273,11 @@ function renderAll() {
     }
   });
   const maxVal = Math.max(...Object.values(mInc), ...Object.values(mExp), 1);
-  document.getElementById("monthChart").innerHTML = Object.keys(mInc).map((m,i) => {
+  // Only show months up to current month (for current year) or full year (for past years)
+  const now = new Date();
+  const currentMonth = selYear === now.getFullYear() ? now.getMonth() : 11;
+  const visibleMonths = Object.keys(mInc).slice(0, currentMonth + 1);
+  document.getElementById("monthChart").innerHTML = visibleMonths.map((m,i) => {
     const iH = Math.round((mInc[m]/maxVal)*200);
     const eH = Math.round((mExp[m]/maxVal)*200);
     return `<div class="mc-col" title="${months[i]}: إيراد ${fmt(mInc[m])} / مصروف ${fmt(mExp[m])}">
@@ -308,13 +312,16 @@ function renderAll() {
     }).join("");
   }
 
-  // Monthly table
+  // Monthly table — only show past + current months
   const tbody = document.getElementById("monthTable");
+  const nowDate = new Date();
+  const lastMonthIdx = selYear === nowDate.getFullYear() ? nowDate.getMonth() : 11;
   const rowsHtml = Object.keys(mInc).map((m,i) => {
     const incM = mInc[m], expM = mExp[m], n = incM - expM;
     const txCount = yearTx.filter(t => (t.date||"").slice(5,7) === m).length;
     const hasData = incM>0 || expM>0;
-    if (!hasData && i >= new Date().getMonth()+1 && selYear === new Date().getFullYear()) return "";
+    // Skip future months entirely
+    if (i > lastMonthIdx) return "";
     return `<tr>
       <td class="fw-600">${months[i]}</td>
       <td class="text-mono ${incM>0?'text-success':''} fw-700">${incM>0?fmt(incM):"—"}</td>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>توبولوجيا الشبكة — المدى نت</title>
-<link rel="stylesheet" href="theme.css?v=4">
+<link rel="stylesheet" href="theme.css?v=5">
 <style>
 body{height:100vh;overflow:hidden;display:flex}
 .sidebar{position:relative;flex-shrink:0}
@@ -245,7 +245,7 @@ import {
   onSnapshot, serverTimestamp, query, where, getDocs,
   watchSettings, esc, renderSidebar, toast, openModal, closeModal, confirmDialog,
   ALL_DEVICE_TYPES, isNetworkDevice
-} from "./app.js?v=4";
+} from "./app.js?v=5";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("topology");
 watchSettings(s => {
@@ -266,18 +266,26 @@ let mousePos = null, animFrame = null, initialized = false;
 const canvas = document.getElementById("topoCanvas");
 const ctx = canvas.getContext("2d");
 
-// Listen to devices (only network ones) and sync to topology
-onSnapshot(collection(db, "devices"), async snap => {
+let devicesLoaded = false, nodesLoaded = false;
+
+function bothLoaded() {
+  if (devicesLoaded && nodesLoaded) {
+    cleanupAndSync();
+    document.getElementById("topoLoading").style.display = "none";
+  }
+}
+
+// Listen to devices (only network ones)
+onSnapshot(collection(db, "devices"), snap => {
   devices = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  // Auto-sync: ensure every network device has a topo node
-  await ensureTopoNodes();
-  document.getElementById("topoLoading").style.display = "none";
+  devicesLoaded = true;
+  bothLoaded();
 });
 
 onSnapshot(collection(db, "topoNodes"), snap => {
   nodes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  // Filter out orphan nodes (deviceId not in devices anymore)
-  // The visible nodes are those whose deviceId is a network device
+  nodesLoaded = true;
+  bothLoaded();
   initLayout();
   updateStats();
   updateDevList();
@@ -292,6 +300,71 @@ onSnapshot(collection(db, "topoLinks"), snap => {
   redraw();
 });
 
+let syncing = false;
+async function cleanupAndSync() {
+  if (syncing) return;
+  syncing = true;
+  try {
+    // 1. Remove DUPLICATE nodes for the same device (keep the oldest)
+    const byDevice = {};
+    for (const n of nodes) {
+      if (!n.deviceId) continue;
+      if (!byDevice[n.deviceId]) byDevice[n.deviceId] = [];
+      byDevice[n.deviceId].push(n);
+    }
+    for (const [devId, list] of Object.entries(byDevice)) {
+      if (list.length > 1) {
+        // Sort by createdAt, keep the first one
+        list.sort((a,b) => (a.createdAt?.seconds||0) - (b.createdAt?.seconds||0));
+        for (let i = 1; i < list.length; i++) {
+          // Move any links pointing to duplicates → point to the kept one
+          const keepId = list[0].id;
+          const dupId = list[i].id;
+          const dupLinks = links.filter(l => l.from === dupId || l.to === dupId);
+          for (const l of dupLinks) {
+            await deleteDoc(doc(db, "topoLinks", l.id));
+          }
+          await deleteDoc(doc(db, "topoNodes", dupId));
+        }
+      }
+    }
+
+    // 2. Remove ORPHAN nodes (deviceId no longer exists, or device is no longer network)
+    for (const n of nodes) {
+      if (!n.deviceId) continue;
+      const dev = devices.find(d => d.id === n.deviceId);
+      if (!dev || !isNetworkDevice(dev.type)) {
+        // Delete its links first
+        const orphanLinks = links.filter(l => l.from === n.id || l.to === n.id);
+        for (const l of orphanLinks) {
+          await deleteDoc(doc(db, "topoLinks", l.id));
+        }
+        await deleteDoc(doc(db, "topoNodes", n.id));
+      }
+    }
+
+    // 3. Create topoNode for network devices that don't have one
+    for (const dev of devices) {
+      if (!isNetworkDevice(dev.type)) continue;
+      const existing = nodes.find(n => n.deviceId === dev.id);
+      if (!existing) {
+        const W = canvas.offsetWidth || 800;
+        const H = canvas.offsetHeight || 600;
+        await addDoc(collection(db, "topoNodes"), {
+          deviceId: dev.id,
+          x: W/2 + (Math.random()-0.5)*300,
+          y: H/2 + (Math.random()-0.5)*200,
+          createdAt: serverTimestamp()
+        });
+      }
+    }
+  } catch (e) {
+    console.error("Sync error:", e);
+  } finally {
+    syncing = false;
+  }
+}
+
 // Get visible nodes — only those for network devices
 function visibleNodes() {
   return nodes.filter(n => {
@@ -305,24 +378,6 @@ function visibleNodes() {
   });
 }
 
-// Auto-create topoNode for any network device that doesn't have one
-async function ensureTopoNodes() {
-  for (const dev of devices) {
-    if (!isNetworkDevice(dev.type)) continue;
-    const existing = nodes.find(n => n.deviceId === dev.id);
-    if (!existing) {
-      // Create topo node
-      const W = canvas.offsetWidth || 800;
-      const H = canvas.offsetHeight || 600;
-      await addDoc(collection(db, "topoNodes"), {
-        deviceId: dev.id,
-        x: W/2 + (Math.random()-0.5)*300,
-        y: H/2 + (Math.random()-0.5)*200,
-        createdAt: serverTimestamp()
-      });
-    }
-  }
-}
 
 function resize() {
   const dpr = window.devicePixelRatio || 1;
@@ -387,118 +442,385 @@ function drawGrid() {
   for(let y=sy;y<(H()-oy)/scale+gs;y+=gs){ctx.beginPath();ctx.moveTo(sx-gs,y);ctx.lineTo((W()-ox)/scale+gs,y);ctx.stroke();}
 }
 
-const TYPE_COLORS = {router:"#06b6d4",modem:"#ec4899",switch:"#8b5cf6",ap:"#10b981",client:"#f59e0b",server:"#f59e0b"};
+const TYPE_COLORS = {router:"#06b6d4",modem:"#ec4899",switch:"#8b5cf6",ap:"#10b981",client:"#f59e0b",server:"#a855f7"};
 function nColor(n) {
-  if (n.status==="offline") return {main:"#ef4444",border:"#ef4444",text:"#ef4444"};
-  if (n.status==="planned") return {main:"#f59e0b",border:"#f59e0b",text:"#f59e0b"};
-  const c = TYPE_COLORS[n.type] || "#64748b";
-  return {main:c, border:c, text:c};
+  const baseCol = TYPE_COLORS[n.type] || "#64748b";
+  if (n.status==="offline") return {main:baseCol, border:"#ef4444", text:"#ef4444", glow:"#ef4444"};
+  if (n.status==="planned") return {main:baseCol, border:"#f59e0b", text:"#f59e0b", glow:"#f59e0b"};
+  return {main:baseCol, border:baseCol, text:baseCol, glow:baseCol};
 }
-function nEmoji(t) { return ALL_DEVICE_TYPES[t]?.icon || "⚙️"; }
-function nRadius(t) { return {router:28,modem:24,switch:22,ap:19,client:16,server:22}[t] || 17; }
+function nRadius(t) { return {router:30,modem:26,switch:26,ap:24,client:20,server:26}[t] || 22; }
+
+// Draw EVE-NG style device icon inside the node
+function drawDeviceIcon(type, cx, cy, size, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 1.8;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  
+  const s = size * 0.55; // icon size factor
+  
+  if (type === "router") {
+    // Router: cylinder with arrows
+    ctx.beginPath();
+    ctx.ellipse(cx, cy-s*0.15, s*0.85, s*0.3, 0, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx-s*0.85, cy-s*0.15);
+    ctx.lineTo(cx-s*0.85, cy+s*0.15);
+    ctx.moveTo(cx+s*0.85, cy-s*0.15);
+    ctx.lineTo(cx+s*0.85, cy+s*0.15);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(cx, cy+s*0.15, s*0.85, s*0.3, 0, 0, Math.PI);
+    ctx.stroke();
+    // 4 arrows in 4 directions
+    const a = s*0.5;
+    const drawArr = (x1,y1,x2,y2) => {
+      ctx.beginPath();
+      ctx.moveTo(x1,y1);
+      ctx.lineTo(x2,y2);
+      ctx.stroke();
+      const ang = Math.atan2(y2-y1, x2-x1);
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - 4*Math.cos(ang-0.4), y2 - 4*Math.sin(ang-0.4));
+      ctx.lineTo(x2 - 4*Math.cos(ang+0.4), y2 - 4*Math.sin(ang+0.4));
+      ctx.closePath();
+      ctx.fill();
+    };
+    drawArr(cx, cy-s*0.5, cx-a*0.7, cy-s*1);
+    drawArr(cx, cy-s*0.5, cx+a*0.7, cy-s*1);
+  }
+  else if (type === "switch") {
+    // Switch: rectangle with multiple ports
+    ctx.beginPath();
+    ctx.roundRect(cx-s*0.95, cy-s*0.45, s*1.9, s*0.9, 4);
+    ctx.stroke();
+    // 4 port dots
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.arc(cx-s*0.65 + i*s*0.45, cy, 2.5, 0, Math.PI*2);
+      ctx.fill();
+    }
+    // Bidirectional arrows on top
+    const ay = cy - s*0.85;
+    ctx.beginPath();
+    ctx.moveTo(cx-s*0.4, ay);
+    ctx.lineTo(cx+s*0.4, ay);
+    ctx.stroke();
+    // Arrow heads
+    ctx.beginPath();
+    ctx.moveTo(cx-s*0.4, ay);
+    ctx.lineTo(cx-s*0.25, ay-3);
+    ctx.lineTo(cx-s*0.25, ay+3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(cx+s*0.4, ay);
+    ctx.lineTo(cx+s*0.25, ay-3);
+    ctx.lineTo(cx+s*0.25, ay+3);
+    ctx.closePath();
+    ctx.fill();
+  }
+  else if (type === "modem") {
+    // Modem: rectangle with antenna + signal waves
+    ctx.beginPath();
+    ctx.roundRect(cx-s*0.85, cy-s*0.2, s*1.7, s*0.7, 3);
+    ctx.stroke();
+    // LED dots
+    ctx.beginPath();
+    ctx.arc(cx-s*0.5, cy+s*0.1, 2, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx-s*0.2, cy+s*0.1, 2, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx+s*0.1, cy+s*0.1, 2, 0, Math.PI*2);
+    ctx.fill();
+    // Signal waves on top
+    for (let i = 1; i <= 3; i++) {
+      ctx.beginPath();
+      ctx.arc(cx, cy-s*0.3, i*s*0.25, -Math.PI*0.75, -Math.PI*0.25);
+      ctx.stroke();
+    }
+  }
+  else if (type === "ap") {
+    // Access Point: dome with wifi waves
+    ctx.beginPath();
+    ctx.arc(cx, cy+s*0.3, s*0.7, Math.PI, Math.PI*2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx-s*0.7, cy+s*0.3);
+    ctx.lineTo(cx+s*0.7, cy+s*0.3);
+    ctx.stroke();
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(cx, cy+s*0.1, 2.5, 0, Math.PI*2);
+    ctx.fill();
+    // WiFi waves arcs above
+    for (let i = 1; i <= 3; i++) {
+      ctx.beginPath();
+      ctx.arc(cx, cy+s*0.1, i*s*0.32, -Math.PI*0.85, -Math.PI*0.15);
+      ctx.stroke();
+    }
+  }
+  else if (type === "client") {
+    // Client: laptop/monitor
+    ctx.beginPath();
+    ctx.roundRect(cx-s*0.7, cy-s*0.55, s*1.4, s*0.85, 3);
+    ctx.stroke();
+    // Screen content
+    ctx.fillRect(cx-s*0.55, cy-s*0.4, s*1.1, s*0.55);
+    // Base/keyboard
+    ctx.beginPath();
+    ctx.moveTo(cx-s*0.85, cy+s*0.4);
+    ctx.lineTo(cx+s*0.85, cy+s*0.4);
+    ctx.lineTo(cx+s*0.7, cy+s*0.55);
+    ctx.lineTo(cx-s*0.7, cy+s*0.55);
+    ctx.closePath();
+    ctx.stroke();
+  }
+  else if (type === "server") {
+    // Server: tower with disks
+    ctx.beginPath();
+    ctx.roundRect(cx-s*0.5, cy-s*0.7, s*1, s*1.4, 3);
+    ctx.stroke();
+    // 3 horizontal lines (disks)
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.moveTo(cx-s*0.35, cy-s*0.4 + i*s*0.35);
+      ctx.lineTo(cx+s*0.35, cy-s*0.4 + i*s*0.35);
+      ctx.stroke();
+      // Status dot
+      ctx.beginPath();
+      ctx.arc(cx+s*0.25, cy-s*0.4 + i*s*0.35, 1.5, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+  else {
+    // Generic device icon (gear)
+    ctx.beginPath();
+    ctx.arc(cx, cy, s*0.5, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, s*0.2, 0, Math.PI*2);
+    ctx.fill();
+  }
+  
+  ctx.restore();
+}
 
 function drawNode(n) {
   const col = nColor(n);
   const r = nRadius(n.type);
   const isHov = hovNode === n.id;
   const isSel = connectFirst === n.id;
-  const rr = r * (isHov||isSel ? 1.18 : 1);
-  if (isHov||isSel||n.type==="router"||n.type==="modem") {
-    const g = ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,rr*3.2);
-    g.addColorStop(0, col.main + (isSel?"66":isHov?"44":"30"));
+  const rr = r * (isHov||isSel ? 1.12 : 1);
+  
+  // Glow effect
+  if (isHov || isSel || n.type==="router" || n.type==="modem") {
+    const g = ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,rr*2.8);
+    g.addColorStop(0, col.glow + (isSel?"66":isHov?"44":"22"));
     g.addColorStop(1, "transparent");
     ctx.beginPath();
-    ctx.arc(n.x,n.y,rr*3.2,0,Math.PI*2);
+    ctx.arc(n.x,n.y,rr*2.8,0,Math.PI*2);
     ctx.fillStyle = g;
     ctx.fill();
   }
+  
+  // Outer ring (rounded square like EVE-NG)
+  const cornerR = rr * 0.25;
   ctx.beginPath();
-  ctx.arc(n.x,n.y,rr,0,Math.PI*2);
-  const bgGrad = ctx.createRadialGradient(n.x-rr*.3, n.y-rr*.3, 0, n.x, n.y, rr);
-  bgGrad.addColorStop(0, col.main+"30");
-  bgGrad.addColorStop(1, col.main+"12");
+  ctx.roundRect(n.x-rr, n.y-rr, rr*2, rr*2, cornerR);
+  
+  // Background gradient
+  const bgGrad = ctx.createLinearGradient(n.x-rr, n.y-rr, n.x+rr, n.y+rr);
+  if (n.status === "offline") {
+    bgGrad.addColorStop(0, "rgba(239,68,68,.08)");
+    bgGrad.addColorStop(1, "rgba(239,68,68,.16)");
+  } else if (n.status === "planned") {
+    bgGrad.addColorStop(0, "rgba(245,158,11,.08)");
+    bgGrad.addColorStop(1, "rgba(245,158,11,.16)");
+  } else {
+    bgGrad.addColorStop(0, col.main + "20");
+    bgGrad.addColorStop(1, col.main + "10");
+  }
   ctx.fillStyle = bgGrad;
   ctx.fill();
-  ctx.strokeStyle = isSel ? "#fff" : col.border;
-  ctx.lineWidth = isSel ? 2.5 : (n.status==="planned" ? 1.5 : 2);
+  
+  // Border
+  ctx.strokeStyle = isSel ? "#ffffff" : col.border;
+  ctx.lineWidth = isSel ? 3 : (n.status==="planned" ? 2 : 2.2);
   if (n.status==="planned") ctx.setLineDash([5,3]);
   ctx.stroke();
   ctx.setLineDash([]);
-  ctx.font = `${rr*0.85}px serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.globalAlpha = n.status==="offline" ? 0.4 : 1;
-  ctx.fillText(nEmoji(n.type), n.x, n.y);
+  
+  // Draw EVE-NG-style icon
+  ctx.globalAlpha = n.status === "offline" ? 0.5 : 1;
+  drawDeviceIcon(n.type, n.x, n.y, rr, col.main);
   ctx.globalAlpha = 1;
-  if (scale > 0.45) {
+  
+  // Status dot (top right corner)
+  const sdx = n.x + rr - 2;
+  const sdy = n.y - rr + 2;
+  const sc = {online:"#10b981",offline:"#ef4444",planned:"#f59e0b"}[n.status] || "#f59e0b";
+  ctx.beginPath();
+  ctx.arc(sdx, sdy, 5, 0, Math.PI*2);
+  ctx.fillStyle = sc;
+  ctx.fill();
+  ctx.strokeStyle = "var(--surface)";
+  // Get computed surface color
+  const surfColor = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || "#0d1424";
+  ctx.strokeStyle = surfColor;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  // Pulse for online
+  if (n.status === "online") {
+    ctx.beginPath();
+    ctx.arc(sdx, sdy, 5, 0, Math.PI*2);
+    ctx.strokeStyle = sc + "66";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+  
+  // Name label below
+  if (scale > 0.4) {
     const fs = Math.min(13, 12/scale*0.9);
     ctx.font = `600 ${fs}px IBM Plex Sans Arabic, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
-    ctx.fillStyle = col.text;
-    ctx.globalAlpha = n.status==="offline" ? 0.5 : 1;
-    ctx.fillText(n.name||"", n.x, n.y+rr+6);
-    ctx.globalAlpha = 1;
+    
+    // Background for label
+    const label = n.name || "";
+    if (label) {
+      const tw = ctx.measureText(label).width;
+      ctx.fillStyle = surfColor + "ee";
+      ctx.beginPath();
+      ctx.roundRect(n.x-tw/2-6, n.y+rr+5, tw+12, fs+6, 4);
+      ctx.fill();
+      ctx.strokeStyle = col.border + "44";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      
+      ctx.fillStyle = col.text;
+      ctx.globalAlpha = n.status==="offline" ? 0.6 : 1;
+      ctx.fillText(label, n.x, n.y+rr+8);
+      ctx.globalAlpha = 1;
+    }
   }
-  if (scale > 0.7 && n.ip) {
+  
+  // IP label
+  if (scale > 0.65 && n.ip) {
     const fs = Math.min(10, 9/scale*0.85);
     ctx.font = `${fs}px JetBrains Mono, monospace`;
-    ctx.fillStyle = "rgba(148,163,184,.85)";
-    ctx.fillText(n.ip, n.x, n.y+rr+6+13);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-3').trim() || "#94a3b8";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText(n.ip, n.x, n.y + rr + 5 + 13 + 8);
   }
-  const sdx = n.x+rr*0.72, sdy = n.y-rr*0.72;
-  const sc = {online:"#10b981",offline:"#ef4444",planned:"#f59e0b"}[n.status] || "#f59e0b";
-  ctx.beginPath();
-  ctx.arc(sdx,sdy,4,0,Math.PI*2);
-  ctx.fillStyle = sc;
-  ctx.fill();
-  ctx.strokeStyle = "#0d1424";
-  ctx.lineWidth = 2;
-  ctx.stroke();
 }
 
 function drawLink(from, to, l) {
   const isHov = hovLink === l.id;
   const isWifi = l.connType === "wifi";
   const bothOn = from.status==="online" && to.status==="online";
+  
   ctx.save();
-  ctx.strokeStyle = bothOn ? (isWifi?"rgba(168,85,247,.7)":"rgba(6,182,212,.6)") : "rgba(58,77,119,.5)";
-  ctx.lineWidth = isHov ? 3 : 1.8;
-  if (isWifi) ctx.setLineDash([7,4]); else ctx.setLineDash([]);
+  
+  // Color based on status
+  let strokeColor;
+  if (!bothOn) {
+    strokeColor = "rgba(120,130,160,.4)";  // Muted gray
+  } else if (isWifi) {
+    strokeColor = "#a855f7";  // Purple for wifi
+  } else {
+    strokeColor = "#22d3ee";  // Cyan for wired (brighter EVE-NG style)
+  }
+  
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = isHov ? 3.5 : 2.2;
+  ctx.lineCap = "round";
+  
   const dx = to.x-from.x, dy = to.y-from.y;
   const dist = Math.hypot(dx,dy) || 1;
   const ux = dx/dist, uy = dy/dist;
   const fr = nRadius(from.type), tr = nRadius(to.type);
   const sx = from.x+ux*fr, sy = from.y+uy*fr;
   const ex = to.x-ux*tr, ey = to.y-uy*tr;
+  
+  // Wifi: dashed line with glow
+  if (isWifi) {
+    ctx.setLineDash([8,5]);
+    // Subtle glow
+    ctx.shadowColor = strokeColor;
+    ctx.shadowBlur = 6;
+  } else {
+    ctx.setLineDash([]);
+    if (bothOn) {
+      ctx.shadowColor = strokeColor;
+      ctx.shadowBlur = 4;
+    }
+  }
+  
   ctx.beginPath();
   ctx.moveTo(sx,sy);
   ctx.lineTo(ex,ey);
   ctx.stroke();
+  
   ctx.setLineDash([]);
+  ctx.shadowBlur = 0;
+  
   const angle = Math.atan2(ey-sy, ex-sx);
   const mx = (sx+ex)/2, my = (sy+ey)/2;
+  
+  // EVE-NG style: green dots at the endpoints (port indicators)
+  if (bothOn) {
+    ctx.fillStyle = "#10b981";
+    ctx.beginPath();
+    ctx.arc(sx, sy, 3, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(ex, ey, 3, 0, Math.PI*2);
+    ctx.fill();
+  }
+  
+  // Direction arrows (smaller, cleaner)
   const arrow = (ax,ay,a) => {
-    ctx.fillStyle = ctx.strokeStyle;
+    ctx.fillStyle = strokeColor;
     ctx.beginPath();
     ctx.moveTo(ax,ay);
-    ctx.lineTo(ax-9*Math.cos(a-0.4), ay-9*Math.sin(a-0.4));
-    ctx.lineTo(ax-9*Math.cos(a+0.4), ay-9*Math.sin(a+0.4));
+    ctx.lineTo(ax-8*Math.cos(a-0.35), ay-8*Math.sin(a-0.35));
+    ctx.lineTo(ax-6*Math.cos(a), ay-6*Math.sin(a));
+    ctx.lineTo(ax-8*Math.cos(a+0.35), ay-8*Math.sin(a+0.35));
     ctx.closePath();
     ctx.fill();
   };
-  if (l.direction==="from"||l.direction==="both") arrow(mx+dx*0.08, my+dy*0.08, angle);
-  if (l.direction==="to"||l.direction==="both")   arrow(mx-dx*0.08, my-dy*0.08, angle+Math.PI);
-  if (scale>0.7 && l.note) {
-    ctx.font = "10px IBM Plex Sans Arabic, sans-serif";
+  if (l.direction==="from"||l.direction==="both") arrow(mx+dx*0.06, my+dy*0.06, angle);
+  if (l.direction==="to"||l.direction==="both")   arrow(mx-dx*0.06, my-dy*0.06, angle+Math.PI);
+  
+  // Note label
+  if (scale>0.65 && l.note) {
+    ctx.font = "600 10px IBM Plex Sans Arabic, sans-serif";
     const tw = ctx.measureText(l.note).width;
-    ctx.fillStyle = "rgba(13,20,36,.9)";
-    ctx.fillRect(mx-tw/2-4, my-8, tw+8, 14);
-    ctx.fillStyle = "rgba(148,163,184,.95)";
+    const surfColor = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || "#0d1424";
+    
+    ctx.fillStyle = surfColor + "ee";
+    ctx.beginPath();
+    ctx.roundRect(mx-tw/2-5, my-8, tw+10, 16, 4);
+    ctx.fill();
+    ctx.strokeStyle = strokeColor + "55";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    ctx.fillStyle = strokeColor;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(l.note, mx, my-1);
+    ctx.fillText(l.note, mx, my);
   }
+  
   ctx.restore();
 }
 
