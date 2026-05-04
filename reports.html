@@ -6,13 +6,13 @@
 <title>التقارير المالية — المدى نت</title>
 <link rel="stylesheet" href="theme.css">
 <style>
-.profit-hero{border-radius:18px;padding:32px;margin-bottom:22px;position:relative;overflow:hidden;border:2px solid;animation:fadeUp .5s ease both}
+.profit-hero{border-radius:18px;padding:32px;margin-bottom:22px;border:2px solid;animation:fadeUp .5s ease both}
 .profit-hero.profit{background:linear-gradient(135deg,rgba(16,185,129,.1) 0%,rgba(6,182,212,.05) 100%);border-color:rgba(16,185,129,.3)}
 .profit-hero.loss{background:linear-gradient(135deg,rgba(239,68,68,.1) 0%,rgba(245,158,11,.05) 100%);border-color:rgba(239,68,68,.3)}
 .profit-hero.neutral{background:linear-gradient(135deg,rgba(245,158,11,.1) 0%,rgba(6,182,212,.05) 100%);border-color:rgba(245,158,11,.3)}
-.ph-row{display:flex;align-items:center;gap:24px}
-.ph-emoji{font-size:64px;flex-shrink:0;line-height:1}
-.ph-text{flex:1}
+.ph-row{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.ph-emoji{font-size:64px;line-height:1}
+.ph-text{flex:1;min-width:200px}
 .ph-label{font-size:14px;font-weight:600;margin-bottom:6px}
 .profit-hero.profit .ph-label{color:var(--success)}
 .profit-hero.loss .ph-label{color:var(--danger)}
@@ -22,14 +22,20 @@
 .profit-hero.loss .ph-amount{color:var(--danger)}
 .profit-hero.neutral .ph-amount{color:var(--warn)}
 .ph-sub{font-size:13px;color:var(--text-2)}
+.balance-sheet{padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:32px}
+@media(max-width:800px){.balance-sheet{grid-template-columns:1fr}}
+.bs-section h3{font-size:13px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.bs-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px}
+.bs-row.total{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-weight:700;font-size:14px}
+.bs-row .label{color:var(--text-2)}
+.bs-row .val{font-family:var(--mono);font-weight:600}
 
 .month-chart{padding:18px 22px;height:260px;display:flex;align-items:flex-end;gap:7px}
-.mc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.mc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
 .mc-bars{flex:1;display:flex;align-items:flex-end;gap:3px;width:100%;justify-content:center}
 .mc-bar{flex:1;border-radius:3px 3px 0 0;min-height:2px;transition:all 1s cubic-bezier(.4,0,.2,1)}
 .mc-bar.income{background:var(--success);opacity:.85}
 .mc-bar.expense{background:var(--danger);opacity:.85}
-.mc-col:hover .mc-bar{opacity:1;transform:scaleY(1.02)}
 .mc-label{font-size:10px;color:var(--text-3);font-family:var(--mono);font-weight:600}
 
 .cat-bars{padding:18px 22px;display:flex;flex-direction:column;gap:11px}
@@ -38,8 +44,6 @@
 .cat-row .cat-fill{height:100%;border-radius:5px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
 
 .year-select{background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:6px 12px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;cursor:pointer}
-.year-select:focus{border-color:var(--accent)}
-
 .status-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px}
 </style>
 </head>
@@ -67,8 +71,30 @@
     <div class="kpi-grid">
       <div class="kpi kpi-green"><div class="kpi-label"><span class="kpi-icon">↓</span> الإيرادات</div><div class="kpi-value" id="k-income" style="font-size:22px">—</div><div class="kpi-sub" id="k-income-sub">—</div></div>
       <div class="kpi kpi-red"><div class="kpi-label"><span class="kpi-icon">↑</span> المصاريف</div><div class="kpi-value" id="k-expense" style="font-size:22px">—</div><div class="kpi-sub" id="k-expense-sub">—</div></div>
-      <div class="kpi kpi-yellow"><div class="kpi-label"><span class="kpi-icon">▤</span> تكلفة الأجهزة</div><div class="kpi-value" id="k-devices" style="font-size:22px">—</div><div class="kpi-sub">من سجل الأجهزة</div></div>
-      <div class="kpi kpi-purple"><div class="kpi-label"><span class="kpi-icon">◆</span> الصافي</div><div class="kpi-value" id="k-net" style="font-size:22px">—</div><div class="kpi-sub" id="k-net-sub">—</div></div>
+      <div class="kpi kpi-yellow"><div class="kpi-label"><span class="kpi-icon">▤</span> قيمة الأصول</div><div class="kpi-value" id="k-assets" style="font-size:22px">—</div><div class="kpi-sub">رأس مال</div></div>
+      <div class="kpi kpi-purple"><div class="kpi-label"><span class="kpi-icon">◆</span> صافي التشغيل</div><div class="kpi-value" id="k-net" style="font-size:22px">—</div><div class="kpi-sub" id="k-net-sub">—</div></div>
+    </div>
+
+    <div class="panel mb-5 fade-up" style="animation-delay:.05s">
+      <div class="panel-header">
+        <span class="panel-icon">📑</span>
+        <div class="panel-title">الميزانية العامة (Balance Sheet)</div>
+        <span class="text-3 text-xs">للسنة <span id="balYear"></span></span>
+      </div>
+      <div class="balance-sheet">
+        <div class="bs-section">
+          <h3>📊 قائمة الدخل (Income Statement)</h3>
+          <div class="bs-row"><span class="label">الإيرادات</span><span class="val text-success" id="bs-income">—</span></div>
+          <div class="bs-row"><span class="label">(−) المصاريف التشغيلية</span><span class="val text-danger" id="bs-expenses">—</span></div>
+          <div class="bs-row total"><span class="label">صافي الربح/الخسارة</span><span class="val" id="bs-net">—</span></div>
+        </div>
+        <div class="bs-section">
+          <h3>💼 الأصول الثابتة (Fixed Assets)</h3>
+          <div class="bs-row"><span class="label">أجهزة الشبكة</span><span class="val" style="color:var(--accent)" id="bs-net-devs">—</span></div>
+          <div class="bs-row"><span class="label">الأصول الطرفية</span><span class="val" style="color:#a855f7" id="bs-asset-devs">—</span></div>
+          <div class="bs-row total"><span class="label">إجمالي الأصول</span><span class="val text-warn" id="bs-total-assets">—</span></div>
+        </div>
+      </div>
     </div>
 
     <div class="grid-2 mb-5">
@@ -126,80 +152,97 @@
 import {
   db, collection, onSnapshot,
   watchSettings, fmt, getCurrencySymbol, convertFromBase,
-  esc, renderSidebar, toast
+  esc, renderSidebar, toast,
+  isNetworkDevice, EXPENSE_CATEGORIES
 } from "./app.js";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("reports");
-watchSettings(s=>{
-  const sn=document.getElementById("sbNetName");
-  if(sn)sn.textContent=s.netName;
+watchSettings(s => {
+  const sn = document.getElementById("sbNetName");
+  if (sn) sn.textContent = s.netName || "شبكة المدى نت";
 });
 
-let allTx=[], allDevices=[], selYear=new Date().getFullYear();
+let allTx = [], allDevices = [], selYear = new Date().getFullYear();
 
-const yearSel=document.getElementById("yearSel");
-for(let y=2023;y<=2027;y++){
-  const o=document.createElement("option");
-  o.value=y;
-  o.textContent=y;
-  if(y===selYear)o.selected=true;
+const yearSel = document.getElementById("yearSel");
+for (let y = 2023; y <= 2027; y++) {
+  const o = document.createElement("option");
+  o.value = y;
+  o.textContent = y;
+  if (y === selYear) o.selected = true;
   yearSel.appendChild(o);
 }
-window.changeYear=y=>{selYear=parseInt(y);renderAll();};
+window.changeYear = y => { selYear = parseInt(y); renderAll(); };
+document.getElementById("balYear").textContent = selYear;
 
-onSnapshot(collection(db,"transactions"),snap=>{
-  allTx=snap.docs.map(d=>({id:d.id,...d.data()}));
+onSnapshot(collection(db, "transactions"), snap => {
+  allTx = snap.docs.map(d => ({id:d.id, ...d.data()}));
   renderAll();
 });
-onSnapshot(collection(db,"devices"),snap=>{
-  allDevices=snap.docs.map(d=>({id:d.id,...d.data()}));
+onSnapshot(collection(db, "devices"), snap => {
+  allDevices = snap.docs.map(d => ({id:d.id, ...d.data()}));
   renderAll();
 });
 
-function renderAll(){
-  const yearTx=allTx.filter(t=>(t.date||"").startsWith(selYear));
-  const inc=yearTx.filter(t=>t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
-  const exp=yearTx.filter(t=>t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
-  const devCost=allDevices.reduce((s,d)=>s+(parseFloat(d.cost)||0),0);
-  const net=inc-exp-devCost;
+function renderAll() {
+  document.getElementById("balYear").textContent = selYear;
+  const yearTx = allTx.filter(t => (t.date||"").startsWith(selYear));
+  const inc = yearTx.filter(t => t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
+  const exp = yearTx.filter(t => t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
+  const netDevsCost = allDevices.filter(d => isNetworkDevice(d.type)).reduce((s,d)=>s+(parseFloat(d.cost)||0), 0);
+  const assetDevsCost = allDevices.filter(d => !isNetworkDevice(d.type)).reduce((s,d)=>s+(parseFloat(d.cost)||0), 0);
+  const totalAssets = netDevsCost + assetDevsCost;
+
+  // Operating profit (without devices, since they're assets)
+  const net = inc - exp;
 
   // Hero
-  const hero=document.getElementById("profitHero");
-  let cls,emoji,label;
-  if(net>0){cls="profit";emoji="📈";label="✓ أنت في ربح هذا العام";}
-  else if(net<0){cls="loss";emoji="📉";label="⚠ أنت في خسارة";}
-  else{cls="neutral";emoji="⚖️";label="نقطة التعادل";}
-  hero.className="profit-hero "+cls;
-  document.getElementById("phEmoji").textContent=emoji;
-  document.getElementById("phLabel").textContent=label;
-  document.getElementById("phAmount").textContent=(net>0?"+":net<0?"−":"")+fmt(Math.abs(net));
-  document.getElementById("phSub").textContent=`الإيرادات ${fmt(inc)} − المصاريف ${fmt(exp+devCost)}`;
+  const hero = document.getElementById("profitHero");
+  let cls, emoji, label;
+  if (net > 0) { cls = "profit"; emoji = "📈"; label = "✓ أنت في ربح هذا العام"; }
+  else if (net < 0) { cls = "loss"; emoji = "📉"; label = "⚠ أنت في خسارة"; }
+  else { cls = "neutral"; emoji = "⚖️"; label = "نقطة التعادل"; }
+  hero.className = "profit-hero " + cls;
+  document.getElementById("phEmoji").textContent = emoji;
+  document.getElementById("phLabel").textContent = label;
+  document.getElementById("phAmount").textContent = (net>0?"+":net<0?"−":"") + fmt(Math.abs(net));
+  document.getElementById("phSub").textContent = `الإيرادات ${fmt(inc)} − المصاريف ${fmt(exp)} (الأصول لا تُحسب كمصروف)`;
 
   // KPIs
-  document.getElementById("k-income").textContent=fmt(inc);
-  document.getElementById("k-income-sub").textContent=yearTx.filter(t=>t.txType==="income").length+" معاملة";
-  document.getElementById("k-expense").textContent=fmt(exp);
-  document.getElementById("k-expense-sub").textContent=yearTx.filter(t=>t.txType==="expense").length+" معاملة";
-  document.getElementById("k-devices").textContent=fmt(devCost);
-  document.getElementById("k-net").textContent=(net>=0?"":"−")+fmt(Math.abs(net));
-  document.getElementById("k-net-sub").textContent=net>=0?"✓ ربح":"خسارة";
-  document.getElementById("k-net-sub").className="kpi-sub "+(net>=0?"text-success":"text-danger");
+  document.getElementById("k-income").textContent = fmt(inc);
+  document.getElementById("k-income-sub").textContent = yearTx.filter(t=>t.txType==="income").length + " معاملة";
+  document.getElementById("k-expense").textContent = fmt(exp);
+  document.getElementById("k-expense-sub").textContent = yearTx.filter(t=>t.txType==="expense").length + " معاملة";
+  document.getElementById("k-assets").textContent = fmt(totalAssets);
+  document.getElementById("k-net").textContent = (net>=0?"":"−") + fmt(Math.abs(net));
+  document.getElementById("k-net-sub").textContent = net>=0 ? "✓ ربح" : "خسارة";
+  document.getElementById("k-net-sub").className = "kpi-sub " + (net>=0 ? "text-success" : "text-danger");
+
+  // Balance sheet
+  document.getElementById("bs-income").textContent = "+" + fmt(inc);
+  document.getElementById("bs-expenses").textContent = "−" + fmt(exp);
+  const netEl = document.getElementById("bs-net");
+  netEl.textContent = (net>=0?"+":"−") + fmt(Math.abs(net));
+  netEl.className = "val " + (net>=0?"text-success":"text-danger");
+  document.getElementById("bs-net-devs").textContent = fmt(netDevsCost);
+  document.getElementById("bs-asset-devs").textContent = fmt(assetDevsCost);
+  document.getElementById("bs-total-assets").textContent = fmt(totalAssets);
 
   // Monthly chart
-  const months=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
-  const mInc={},mExp={};
-  months.forEach((_,i)=>{const m=String(i+1).padStart(2,"0");mInc[m]=0;mExp[m]=0;});
-  yearTx.forEach(t=>{
-    const m=(t.date||"").slice(5,7);
-    if(mInc[m]!==undefined){
-      if(t.txType==="income")mInc[m]+=(parseFloat(t.amount)||0);
-      else mExp[m]+=(parseFloat(t.amount)||0);
+  const months = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  const mInc = {}, mExp = {};
+  months.forEach((_,i) => { const m = String(i+1).padStart(2,"0"); mInc[m] = 0; mExp[m] = 0; });
+  yearTx.forEach(t => {
+    const m = (t.date||"").slice(5,7);
+    if (mInc[m] !== undefined) {
+      if (t.txType === "income") mInc[m] += (parseFloat(t.amount)||0);
+      else mExp[m] += (parseFloat(t.amount)||0);
     }
   });
-  const maxVal=Math.max(...Object.values(mInc),...Object.values(mExp),1);
-  document.getElementById("monthChart").innerHTML=Object.keys(mInc).map((m,i)=>{
-    const iH=Math.round((mInc[m]/maxVal)*200);
-    const eH=Math.round((mExp[m]/maxVal)*200);
+  const maxVal = Math.max(...Object.values(mInc), ...Object.values(mExp), 1);
+  document.getElementById("monthChart").innerHTML = Object.keys(mInc).map((m,i) => {
+    const iH = Math.round((mInc[m]/maxVal)*200);
+    const eH = Math.round((mExp[m]/maxVal)*200);
     return `<div class="mc-col" title="${months[i]}: إيراد ${fmt(mInc[m])} / مصروف ${fmt(mExp[m])}">
       <div class="mc-bars">
         <div class="mc-bar income" style="height:${iH}px"></div>
@@ -210,37 +253,35 @@ function renderAll(){
   }).join("");
 
   // Categories
-  const cats={};
-  yearTx.filter(t=>t.txType==="expense").forEach(t=>{
-    cats[t.category||"misc"]=(cats[t.category||"misc"]||0)+(parseFloat(t.amount)||0);
+  const cats = {};
+  yearTx.filter(t => t.txType === "expense").forEach(t => {
+    cats[t.category||"misc"] = (cats[t.category||"misc"]||0) + (parseFloat(t.amount)||0);
   });
-  const catTotal=Object.values(cats).reduce((s,v)=>s+v,0);
-  const catColors={device:"#06b6d4",maintenance:"#a855f7",electricity:"#f59e0b",rent:"#ec4899",salary:"#a855f7",internet:"#10b981",misc:"#64748b"};
-  const catNames={device:"أجهزة",maintenance:"صيانة",electricity:"كهرباء",rent:"إيجار",salary:"رواتب",internet:"إنترنت",misc:"متفرقات"};
-  const catWrap=document.getElementById("catBars");
-  if(!catTotal){
-    catWrap.innerHTML=`<div style="text-align:center;color:var(--text-3);padding:30px">لا توجد مصاريف هذا العام</div>`;
+  const catTotal = Object.values(cats).reduce((s,v) => s+v, 0);
+  const catWrap = document.getElementById("catBars");
+  if (!catTotal) {
+    catWrap.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:30px">لا توجد مصاريف هذا العام</div>`;
   } else {
-    catWrap.innerHTML=Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>{
-      const pct=Math.round(amt/catTotal*100);
-      const col=catColors[cat]||"#64748b";
+    catWrap.innerHTML = Object.entries(cats).sort((a,b) => b[1]-a[1]).map(([cat, amt]) => {
+      const pct = Math.round(amt/catTotal*100);
+      const info = EXPENSE_CATEGORIES[cat] || { label: cat, icon: "📦", color: "#64748b" };
       return `<div class="cat-row">
         <div class="cat-top">
-          <span class="fw-600">${catNames[cat]||cat}</span>
-          <span class="text-mono fw-700" style="color:${col}">${fmt(amt)} <span class="text-3 text-xs">(${pct}%)</span></span>
+          <span class="fw-600">${info.icon} ${info.label}</span>
+          <span class="text-mono fw-700" style="color:${info.color}">${fmt(amt)} <span class="text-3 text-xs">(${pct}%)</span></span>
         </div>
-        <div class="cat-bar"><div class="cat-fill" style="width:${pct}%;background:${col}"></div></div>
+        <div class="cat-bar"><div class="cat-fill" style="width:${pct}%;background:${info.color}"></div></div>
       </div>`;
     }).join("");
   }
 
   // Monthly table
-  const tbody=document.getElementById("monthTable");
-  const rowsHtml=Object.keys(mInc).map((m,i)=>{
-    const incM=mInc[m], expM=mExp[m], n=incM-expM;
-    const txCount=yearTx.filter(t=>(t.date||"").slice(5,7)===m).length;
-    const hasData=incM>0||expM>0;
-    if(!hasData&&i>=new Date().getMonth()+1&&selYear===new Date().getFullYear())return "";
+  const tbody = document.getElementById("monthTable");
+  const rowsHtml = Object.keys(mInc).map((m,i) => {
+    const incM = mInc[m], expM = mExp[m], n = incM - expM;
+    const txCount = yearTx.filter(t => (t.date||"").slice(5,7) === m).length;
+    const hasData = incM>0 || expM>0;
+    if (!hasData && i >= new Date().getMonth()+1 && selYear === new Date().getFullYear()) return "";
     return `<tr>
       <td class="fw-600">${months[i]}</td>
       <td class="text-mono ${incM>0?'text-success':''} fw-700">${incM>0?fmt(incM):"—"}</td>
@@ -250,26 +291,33 @@ function renderAll(){
       <td>${!hasData?"—":n>0?'<span class="status-badge" style="background:var(--success-soft);color:var(--success)">✓ ربح</span>':n<0?'<span class="status-badge" style="background:var(--danger-soft);color:var(--danger)">⚠ خسارة</span>':'<span class="status-badge" style="background:var(--warn-soft);color:var(--warn)">→ تعادل</span>'}</td>
     </tr>`;
   }).filter(Boolean).join("");
-  tbody.innerHTML=rowsHtml||`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-3)">لا توجد بيانات لهذا العام — <a href="finances.html" style="color:var(--accent)">سجّل معاملاتك</a></td></tr>`;
+  tbody.innerHTML = rowsHtml || `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-3)">لا توجد بيانات لهذا العام — <a href="finances.html" style="color:var(--accent)">سجّل معاملاتك</a></td></tr>`;
 }
 
-window.exportReport=()=>{
-  const yearTx=allTx.filter(t=>(t.date||"").startsWith(selYear));
-  const inc=yearTx.filter(t=>t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
-  const exp=yearTx.filter(t=>t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
-  const catNames={device:"أجهزة",maintenance:"صيانة",electricity:"كهرباء",rent:"إيجار",salary:"رواتب",internet:"إنترنت",misc:"متفرقات"};
-  const rows=[["الوصف","النوع","الفئة","المبلغ","التاريخ"],
-    ...yearTx.map(t=>[t.description,t.txType==="income"?"إيراد":"مصروف",catNames[t.category]||t.category,t.amount?convertFromBase(t.amount).toFixed(2):0,t.date])];
+window.exportReport = () => {
+  const yearTx = allTx.filter(t => (t.date||"").startsWith(selYear));
+  const inc = yearTx.filter(t => t.txType==="income").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
+  const exp = yearTx.filter(t => t.txType==="expense").reduce((s,t)=>s+(parseFloat(t.amount)||0), 0);
+  const rows = [
+    ["الوصف","النوع","الفئة","المبلغ","التاريخ"],
+    ...yearTx.map(t => [
+      t.description,
+      t.txType==="income"?"إيراد":"مصروف",
+      EXPENSE_CATEGORIES[t.category]?.label || t.category,
+      t.amount?convertFromBase(t.amount).toFixed(2):0,
+      t.date
+    ])
+  ];
   rows.push([]);
   rows.push(["إجمالي الإيرادات","","",convertFromBase(inc).toFixed(2),""]);
   rows.push(["إجمالي المصاريف","","",convertFromBase(exp).toFixed(2),""]);
   rows.push(["صافي الربح/الخسارة","","",convertFromBase(inc-exp).toFixed(2),inc-exp>0?"ربح":"خسارة"]);
-  const csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v||"").replace(/"/g,'""')}"`).join(",")).join("\n");
-  const a=document.createElement("a");
-  a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
-  a.download=`تقرير-${selYear}.csv`;
+  const csv = "\uFEFF" + rows.map(r => r.map(v => `"${String(v||"").replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  a.download = `تقرير-${selYear}.csv`;
   a.click();
-  toast("تم تصدير التقرير ✓","success");
+  toast("تم تصدير التقرير ✓", "success");
 };
 </script>
 </body>

@@ -3,65 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>المشتريات — المدى نت</title>
+<title>المشتريات والأصول — المدى نت</title>
 <link rel="stylesheet" href="theme.css">
 <style>
 .cat-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600}
 .action-btn{background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
 .action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);padding:0 18px}
+.tab-btn{background:none;border:none;padding:13px 18px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:7px}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:hover{color:var(--text)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.note-banner{background:linear-gradient(135deg,rgba(6,182,212,.07),rgba(139,92,246,.04));border:1px solid var(--accent-soft);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--text-2);line-height:1.6;margin-bottom:14px}
+.note-banner b{color:var(--accent)}
 </style>
 </head>
 <body>
 <aside class="sidebar" id="sidebar"></aside>
 <main class="main">
   <header class="topbar">
-    <h1 class="tb-title">المشتريات <span class="breadcrumb">/ سجل المصاريف</span></h1>
+    <h1 class="tb-title">المشتريات والأصول <span class="breadcrumb">/ السجل</span></h1>
     <input type="search" id="searchInput" class="search-input" placeholder="🔍 ابحث...">
     <button class="btn btn-sm" id="exportBtn">📤 تصدير CSV</button>
-    <a href="finances.html" class="btn btn-primary btn-sm">＋ تسجيل مصروف</a>
   </header>
   <div class="content">
+
     <div class="kpi-grid">
-      <div class="kpi kpi-blue"><div class="kpi-label"><span class="kpi-icon">▤</span> أجهزة</div><div class="kpi-value" id="k-dev" style="font-size:20px">—</div><div class="kpi-sub" id="k-dev-c">—</div></div>
-      <div class="kpi kpi-purple"><div class="kpi-label"><span class="kpi-icon">🔧</span> صيانة</div><div class="kpi-value" id="k-maint" style="font-size:20px">—</div><div class="kpi-sub" id="k-maint-c">—</div></div>
-      <div class="kpi kpi-yellow"><div class="kpi-label"><span class="kpi-icon">⚡</span> فواتير</div><div class="kpi-value" id="k-util" style="font-size:20px">—</div><div class="kpi-sub" id="k-util-c">—</div></div>
-      <div class="kpi kpi-pink"><div class="kpi-label"><span class="kpi-icon">📦</span> أخرى</div><div class="kpi-value" id="k-misc" style="font-size:20px">—</div><div class="kpi-sub" id="k-misc-c">—</div></div>
+      <div class="kpi kpi-blue"><div class="kpi-label"><span class="kpi-icon">▤</span> أجهزة الشبكة</div><div class="kpi-value" id="k-net" style="font-size:20px">—</div><div class="kpi-sub" id="k-net-c">—</div></div>
+      <div class="kpi kpi-purple"><div class="kpi-label"><span class="kpi-icon">🔋</span> أصول طرفية</div><div class="kpi-value" id="k-asset" style="font-size:20px">—</div><div class="kpi-sub" id="k-asset-c">—</div></div>
+      <div class="kpi kpi-yellow"><div class="kpi-label"><span class="kpi-icon">📊</span> مصاريف تشغيلية</div><div class="kpi-value" id="k-exp" style="font-size:20px">—</div><div class="kpi-sub" id="k-exp-c">—</div></div>
+      <div class="kpi kpi-pink"><div class="kpi-label"><span class="kpi-icon">💰</span> الإجمالي</div><div class="kpi-value" id="k-total" style="font-size:20px">—</div><div class="kpi-sub">صرفت كلياً</div></div>
     </div>
 
     <div class="panel fade-up" style="animation-delay:.1s">
-      <div class="panel-header">
-        <span class="panel-icon">🛒</span>
-        <div class="panel-title">جميع المصاريف</div>
-        <span id="recordCount" class="badge badge-gray">0</span>
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="assets">▤ الأصول (أجهزة)</button>
+        <button class="tab-btn" data-tab="expenses">📊 المصاريف التشغيلية</button>
       </div>
-      <div class="filter-bar">
-        <button class="chip active" data-cat="all">الكل</button>
-        <button class="chip" data-cat="device">▤ أجهزة</button>
-        <button class="chip" data-cat="maintenance">🔧 صيانة</button>
-        <button class="chip" data-cat="electricity">⚡ كهرباء</button>
-        <button class="chip" data-cat="rent">🏢 إيجار</button>
-        <button class="chip" data-cat="salary">👥 رواتب</button>
-        <button class="chip" data-cat="internet">📡 إنترنت</button>
-        <button class="chip" data-cat="misc">📦 متفرقات</button>
+
+      <!-- ASSETS TAB -->
+      <div class="tab-content active" id="tab-assets">
+        <div class="note-banner">
+          💡 <b>الأصول الثابتة:</b> هذه الأجهزة (راوترات، بطاريات، ألواح شمسية، UPS...) تُحسب رأس مال — <b>لا تُخصم من الأرباح</b>. لإضافة جهاز جديد، اذهب إلى <a href="devices.html" style="color:var(--accent)">شاشة الأجهزة</a>.
+        </div>
+        <div class="filter-bar">
+          <button class="chip active" data-asset="all">الكل</button>
+          <button class="chip" data-asset="network">🌐 شبكية</button>
+          <button class="chip" data-asset="terminal">🔋 طرفية</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>الجهاز</th>
+              <th>النوع</th>
+              <th>التصنيف</th>
+              <th>القيمة</th>
+              <th>تاريخ الشراء</th>
+              <th>الموقع</th>
+            </tr></thead>
+            <tbody id="assetsBody">
+              <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-3)">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr>
-            <th>الوصف</th>
-            <th>الفئة</th>
-            <th>المبلغ</th>
-            <th>التاريخ</th>
-            <th>الجهاز</th>
-            <th>الدفع</th>
-          </tr></thead>
-          <tbody id="tbBody">
-            <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-3)">جاري التحميل...</td></tr>
-          </tbody>
-        </table>
+
+      <!-- EXPENSES TAB -->
+      <div class="tab-content" id="tab-expenses">
+        <div class="note-banner">
+          📊 <b>المصاريف التشغيلية:</b> هذه مصاريف يومية/شهرية تُخصم من الأرباح (صيانة، كهرباء، إيجار، اشتراك إنترنت، رواتب...). لإضافة مصروف، اذهب إلى <a href="finances.html" style="color:var(--accent)">المعاملات المالية</a>.
+        </div>
+        <div class="filter-bar" id="expCatBar">
+          <button class="chip active" data-cat="all">الكل</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>الوصف</th>
+              <th>الفئة</th>
+              <th>المبلغ</th>
+              <th>التاريخ</th>
+              <th>الجهاز</th>
+              <th>الدفع</th>
+            </tr></thead>
+            <tbody id="expensesBody">
+              <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-3)">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
       <div class="pagination">
         <div class="page-info" id="pageInfo">0</div>
-        <div class="page-btns" id="pageBtns"></div>
       </div>
     </div>
   </div>
@@ -71,120 +105,181 @@
 import {
   db, collection, onSnapshot, query, orderBy,
   watchSettings, fmt, getCurrencySymbol, convertFromBase,
-  esc, renderSidebar, toast
+  esc, renderSidebar, toast,
+  isNetworkDevice, ALL_DEVICE_TYPES, EXPENSE_CATEGORIES
 } from "./app.js";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("purchases");
-watchSettings(s=>{
-  const sn=document.getElementById("sbNetName");
-  if(sn)sn.textContent=s.netName;
+watchSettings(s => {
+  const sn = document.getElementById("sbNetName");
+  if (sn) sn.textContent = s.netName || "شبكة المدى نت";
 });
 
-let allTx=[], filtered=[], curCat="all", srch="", curPage=1;
-const PAGE_SIZE=15;
+let allTx = [], allDevices = [];
+let currentTab = "assets", assetFilter = "all", expFilter = "all", srch = "";
 
-onSnapshot(query(collection(db,"transactions"),orderBy("date","desc")),snap=>{
-  allTx=snap.docs.map(d=>({id:d.id,...d.data()})).filter(t=>t.txType==="expense");
-  updateKPIs(); applyFilters();
+// Build expense categories chips
+const expBar = document.getElementById("expCatBar");
+Object.entries(EXPENSE_CATEGORIES).forEach(([k,v]) => {
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.dataset.cat = k;
+  b.innerHTML = `${v.icon} ${v.label}`;
+  expBar.appendChild(b);
 });
 
-function updateKPIs(){
-  const cats={device:0,maintenance:0,electricity:0,rent:0,salary:0,internet:0,misc:0};
-  const counts={device:0,maintenance:0,electricity:0,rent:0,salary:0,internet:0,misc:0};
-  allTx.forEach(t=>{
-    const c=t.category||"misc";
-    if(cats[c]!==undefined){cats[c]+=(parseFloat(t.amount)||0);counts[c]++;}
-    else{cats.misc+=(parseFloat(t.amount)||0);counts.misc++;}
+// Tab switching
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    currentTab = btn.dataset.tab;
+    render();
   });
-  document.getElementById("k-dev").textContent=fmt(cats.device);
-  document.getElementById("k-dev-c").textContent=counts.device+" مشتريات";
-  document.getElementById("k-maint").textContent=fmt(cats.maintenance);
-  document.getElementById("k-maint-c").textContent=counts.maintenance+" عملية";
-  document.getElementById("k-util").textContent=fmt(cats.electricity+cats.rent+cats.internet);
-  document.getElementById("k-util-c").textContent=(counts.electricity+counts.rent+counts.internet)+" فاتورة";
-  document.getElementById("k-misc").textContent=fmt(cats.misc+cats.salary);
-  document.getElementById("k-misc-c").textContent=(counts.misc+counts.salary)+" بند";
+});
+
+document.querySelectorAll(".chip[data-asset]").forEach(c => c.addEventListener("click", () => {
+  document.querySelectorAll(".chip[data-asset]").forEach(x => x.classList.remove("active"));
+  c.classList.add("active");
+  assetFilter = c.dataset.asset;
+  render();
+}));
+
+document.getElementById("expCatBar").addEventListener("click", e => {
+  if (!e.target.dataset.cat) return;
+  document.querySelectorAll("#expCatBar .chip").forEach(x => x.classList.remove("active"));
+  e.target.classList.add("active");
+  expFilter = e.target.dataset.cat;
+  render();
+});
+
+let st;
+document.getElementById("searchInput").addEventListener("input", e => {
+  clearTimeout(st);
+  st = setTimeout(() => { srch = e.target.value; render(); }, 250);
+});
+
+onSnapshot(query(collection(db,"transactions"), orderBy("date","desc")), snap => {
+  allTx = snap.docs.map(d => ({id:d.id, ...d.data()})).filter(t => t.txType === "expense");
+  updateKPIs();
+  render();
+});
+
+onSnapshot(query(collection(db,"devices"), orderBy("createdAt","desc")), snap => {
+  allDevices = snap.docs.map(d => ({id:d.id, ...d.data()}));
+  updateKPIs();
+  render();
+});
+
+function updateKPIs() {
+  const netDevs = allDevices.filter(d => isNetworkDevice(d.type));
+  const assetDevs = allDevices.filter(d => !isNetworkDevice(d.type));
+  const netCost = netDevs.reduce((s,d) => s+(parseFloat(d.cost)||0), 0);
+  const assetCost = assetDevs.reduce((s,d) => s+(parseFloat(d.cost)||0), 0);
+  const expTotal = allTx.reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
+  document.getElementById("k-net").textContent = fmt(netCost);
+  document.getElementById("k-net-c").textContent = `${netDevs.length} جهاز`;
+  document.getElementById("k-asset").textContent = fmt(assetCost);
+  document.getElementById("k-asset-c").textContent = `${assetDevs.length} أصل`;
+  document.getElementById("k-exp").textContent = fmt(expTotal);
+  document.getElementById("k-exp-c").textContent = `${allTx.length} عملية`;
+  document.getElementById("k-total").textContent = fmt(netCost + assetCost + expTotal);
 }
 
-function applyFilters(){
-  let data=[...allTx];
-  if(curCat!=="all")data=data.filter(t=>t.category===curCat);
-  if(srch){
-    const q=srch.toLowerCase();
-    data=data.filter(t=>(t.description||"").toLowerCase().includes(q)||(t.linkedDevice||"").toLowerCase().includes(q));
+function render() {
+  if (currentTab === "assets") renderAssets();
+  else renderExpenses();
+}
+
+function renderAssets() {
+  let data = [...allDevices];
+  if (assetFilter === "network") data = data.filter(d => isNetworkDevice(d.type));
+  else if (assetFilter === "terminal") data = data.filter(d => !isNetworkDevice(d.type));
+  if (srch) {
+    const q = srch.toLowerCase();
+    data = data.filter(d => (d.name||"").toLowerCase().includes(q) || (d.model||"").toLowerCase().includes(q) || (d.location||"").toLowerCase().includes(q));
   }
-  filtered=data; curPage=1; renderTable();
-}
-
-function renderTable(){
-  const total=filtered.length;
-  const start=(curPage-1)*PAGE_SIZE;
-  const slice=filtered.slice(start,start+PAGE_SIZE);
-  document.getElementById("recordCount").textContent=total+" مصروف";
-  document.getElementById("pageInfo").textContent=total?`${start+1}–${Math.min(start+PAGE_SIZE,total)} من ${total}`:"0";
-  if(!total){
-    document.getElementById("tbBody").innerHTML=`<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-3)"><div style="font-size:36px;margin-bottom:10px;opacity:.4">🛒</div>لا توجد مصاريف — <a href="finances.html" style="color:var(--accent)">سجّل مصروف</a></td></tr>`;
-    document.getElementById("pageBtns").innerHTML="";
+  const tbody = document.getElementById("assetsBody");
+  document.getElementById("pageInfo").textContent = data.length + " أصل";
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-3)"><div style="font-size:36px;margin-bottom:10px;opacity:.4">▤</div>لا توجد أصول — <a href="devices.html" style="color:var(--accent)">أضف من شاشة الأجهزة</a></td></tr>`;
     return;
   }
-  const catColors={device:["#06b6d4","var(--accent-soft)"],maintenance:["#a855f7","rgba(168,85,247,.1)"],electricity:["#f59e0b","var(--warn-soft)"],rent:["#ec4899","rgba(236,72,153,.1)"],salary:["#a855f7","rgba(168,85,247,.1)"],internet:["#10b981","var(--success-soft)"],misc:["#64748b","rgba(100,116,139,.1)"]};
-  const catNames={device:"أجهزة",maintenance:"صيانة",electricity:"كهرباء",rent:"إيجار",salary:"رواتب",internet:"إنترنت",misc:"متفرقات"};
-  const catIcons={device:"▤",maintenance:"🔧",electricity:"⚡",rent:"🏢",salary:"👥",internet:"📡",misc:"📦"};
-  const payNames={cash:"نقدي",transfer:"تحويل",card:"بطاقة",other:"أخرى"};
-  document.getElementById("tbBody").innerHTML=slice.map(t=>{
-    const cc=catColors[t.category]||catColors.misc;
+  tbody.innerHTML = data.map(d => {
+    const t = ALL_DEVICE_TYPES[d.type] || ALL_DEVICE_TYPES.other;
+    const isNet = isNetworkDevice(d.type);
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:9px">
+        <span style="font-size:16px">${t.icon}</span>
+        <div>
+          <div class="fw-600">${esc(d.name)}</div>
+          <div class="text-xs text-3">${esc(d.model||"—")}</div>
+        </div>
+      </div></td>
+      <td><span class="badge ${isNet?'badge-blue':'badge-purple'}">${t.label}</span></td>
+      <td><span class="badge ${isNet?'badge-blue':'badge-yellow'}">${isNet?'🌐 شبكي':'🔋 طرفي'}</span></td>
+      <td><span class="text-mono fw-700 text-warn">${d.cost?fmt(d.cost):"—"}</span></td>
+      <td class="text-3 text-mono text-sm">${d.buyDate||"—"}</td>
+      <td class="text-2 text-sm">${esc(d.location||"—")}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderExpenses() {
+  let data = [...allTx];
+  if (expFilter !== "all") data = data.filter(t => t.category === expFilter);
+  if (srch) {
+    const q = srch.toLowerCase();
+    data = data.filter(t => (t.description||"").toLowerCase().includes(q) || (t.linkedDevice||"").toLowerCase().includes(q));
+  }
+  const tbody = document.getElementById("expensesBody");
+  document.getElementById("pageInfo").textContent = data.length + " مصروف";
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-3)"><div style="font-size:36px;margin-bottom:10px;opacity:.4">📊</div>لا توجد مصاريف — <a href="finances.html" style="color:var(--accent)">سجّل مصروف</a></td></tr>`;
+    return;
+  }
+  const payNames = { cash:"نقدي", transfer:"تحويل", card:"بطاقة", other:"أخرى" };
+  tbody.innerHTML = data.map(t => {
+    const info = EXPENSE_CATEGORIES[t.category] || { label: t.category||"—", icon: "📦", color: "#64748b" };
     return `<tr>
       <td><div class="fw-600">${esc(t.description||"—")}</div>${t.notes?`<div class="text-xs text-3">${esc(t.notes)}</div>`:""}</td>
-      <td><span class="cat-pill" style="color:${cc[0]};background:${cc[1]}">${catIcons[t.category]||"📋"} ${catNames[t.category]||t.category||"—"}</span></td>
+      <td><span class="cat-pill" style="color:${info.color};background:${info.color}1a">${info.icon} ${info.label}</span></td>
       <td><span class="text-mono fw-700 text-danger">−${fmt(t.amount)}</span></td>
       <td class="text-3 text-mono text-sm">${t.date||"—"}</td>
       <td class="text-2 text-sm">${esc(t.linkedDevice||"—")}</td>
       <td class="text-2 text-sm">${payNames[t.paymentMethod]||"—"}</td>
     </tr>`;
   }).join("");
-  renderPagination(total);
 }
 
-function renderPagination(total){
-  const pages=Math.ceil(total/PAGE_SIZE);
-  const wrap=document.getElementById("pageBtns");
-  if(pages<=1){wrap.innerHTML="";return;}
-  let h=`<button class="page-btn" onclick="goPage(${curPage-1})" ${curPage===1?"disabled":""}>‹</button>`;
-  const start=Math.max(1,curPage-3);
-  const end=Math.min(pages,start+6);
-  for(let i=start;i<=end;i++){h+=`<button class="page-btn ${i===curPage?'active':''}" onclick="goPage(${i})">${i}</button>`;}
-  h+=`<button class="page-btn" onclick="goPage(${curPage+1})" ${curPage===pages?"disabled":""}>›</button>`;
-  wrap.innerHTML=h;
-}
-window.goPage=p=>{curPage=p;renderTable();};
-
-document.querySelectorAll(".chip[data-cat]").forEach(c=>c.addEventListener("click",()=>{
-  document.querySelectorAll(".chip[data-cat]").forEach(x=>x.classList.remove("active"));
-  c.classList.add("active");
-  curCat=c.dataset.cat;
-  applyFilters();
-}));
-
-let st;
-document.getElementById("searchInput").addEventListener("input",e=>{
-  clearTimeout(st);
-  st=setTimeout(()=>{srch=e.target.value;applyFilters();},250);
-});
-
-document.getElementById("exportBtn").onclick=()=>{
-  const catNames={device:"أجهزة",maintenance:"صيانة",electricity:"كهرباء",rent:"إيجار",salary:"رواتب",internet:"إنترنت",misc:"متفرقات"};
-  const headers=["الوصف","الفئة","المبلغ","التاريخ","الجهاز","الدفع"];
-  const rows=filtered.map(t=>[
-    t.description, catNames[t.category]||t.category,
-    t.amount?convertFromBase(t.amount).toFixed(2):0, t.date,
-    t.linkedDevice||"", t.paymentMethod||""
-  ].map(v=>`"${String(v||"").replace(/"/g,'""')}"`).join(","));
-  const csv="\uFEFF"+headers.join(",")+"\n"+rows.join("\n");
-  const a=document.createElement("a");
-  a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
-  a.download="مشتريات-"+new Date().toISOString().split("T")[0]+".csv";
+document.getElementById("exportBtn").onclick = () => {
+  let csv;
+  if (currentTab === "assets") {
+    const headers = ["الاسم","النوع","التصنيف","القيمة","تاريخ الشراء","الموقع","الموديل","ملاحظات"];
+    const rows = allDevices.map(d => {
+      const t = ALL_DEVICE_TYPES[d.type] || ALL_DEVICE_TYPES.other;
+      return [d.name, t.label, isNetworkDevice(d.type)?"شبكي":"طرفي",
+        d.cost?convertFromBase(d.cost).toFixed(2):0,
+        d.buyDate||"", d.location||"", d.model||"", d.notes||""
+      ].map(v => `"${String(v||"").replace(/"/g,'""')}"`).join(",");
+    });
+    csv = "\uFEFF" + headers.join(",") + "\n" + rows.join("\n");
+  } else {
+    const headers = ["الوصف","الفئة","المبلغ","التاريخ","الجهاز","الدفع"];
+    const rows = allTx.map(t => [
+      t.description, EXPENSE_CATEGORIES[t.category]?.label || t.category,
+      t.amount?convertFromBase(t.amount).toFixed(2):0, t.date,
+      t.linkedDevice||"", t.paymentMethod||""
+    ].map(v => `"${String(v||"").replace(/"/g,'""')}"`).join(","));
+    csv = "\uFEFF" + headers.join(",") + "\n" + rows.join("\n");
+  }
+  const a = document.createElement("a");
+  a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  a.download = (currentTab==="assets"?"أصول":"مصاريف") + "-" + new Date().toISOString().split("T")[0] + ".csv";
   a.click();
-  toast(`تم تصدير ${filtered.length} مصروف`,"info");
+  toast("تم التصدير ✓", "info");
 };
 </script>
 </body>

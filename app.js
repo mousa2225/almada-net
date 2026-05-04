@@ -4,7 +4,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import {
   getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
-  onSnapshot, serverTimestamp, query, orderBy, getDoc, setDoc, getDocs
+  onSnapshot, serverTimestamp, query, orderBy, limit, getDoc, setDoc, getDocs, where
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -21,14 +21,13 @@ export const db = getFirestore(app);
 
 export {
   collection, addDoc, doc, updateDoc, deleteDoc,
-  onSnapshot, serverTimestamp, query, orderBy, getDoc, setDoc, getDocs
+  onSnapshot, serverTimestamp, query, orderBy, limit, getDoc, setDoc, getDocs, where
 };
 
 // ══════════════════════════════════════════════════════════════
 // Settings & Currency Management
 // ══════════════════════════════════════════════════════════════
 
-// Default settings
 const DEFAULT_SETTINGS = {
   netName: "شبكة المدى نت",
   ownerName: "",
@@ -38,15 +37,23 @@ const DEFAULT_SETTINGS = {
 };
 
 let _settings = { ...DEFAULT_SETTINGS };
-let _settingsListeners = [];
+let _settingsLoaded = false;
 
-// Load settings from Firestore (real-time)
 export function watchSettings(callback) {
+  // Fire callback immediately with defaults so UI doesn't freeze
+  if (!_settingsLoaded) {
+    if (callback) callback(_settings);
+  }
   const unsub = onSnapshot(doc(db, "settings", "main"), (snap) => {
     if (snap.exists()) {
       _settings = { ..._settings, ...snap.data() };
     }
-    _settingsListeners.forEach(cb => cb(_settings));
+    _settingsLoaded = true;
+    if (callback) callback(_settings);
+  }, (err) => {
+    // On error, still call with defaults
+    console.warn("Settings load error:", err);
+    _settingsLoaded = true;
     if (callback) callback(_settings);
   });
   return unsub;
@@ -72,19 +79,16 @@ const CURRENCY_INFO = {
 export function getCurrencyInfo(code) { return CURRENCY_INFO[code] || CURRENCY_INFO.SAR; }
 export function getAllCurrencies() { return CURRENCY_INFO; }
 
-// Convert amount from base currency (stored in DB) to display currency
 export function convertFromBase(amountInBase) {
   const rate = _settings.exchangeRates?.[_settings.displayCurrency] || 1;
-  return amountInBase * rate;
+  return (amountInBase || 0) * rate;
 }
 
-// Convert amount from display currency to base currency (for storage)
 export function convertToBase(amountInDisplay) {
   const rate = _settings.exchangeRates?.[_settings.displayCurrency] || 1;
-  return amountInDisplay / rate;
+  return (amountInDisplay || 0) / rate;
 }
 
-// Format with display currency symbol
 export function fmt(amountInBase, opts = {}) {
   const display = convertFromBase(amountInBase || 0);
   const info = getCurrencyInfo(_settings.displayCurrency);
@@ -106,6 +110,62 @@ export function fmtNoSymbol(amountInBase, opts = {}) {
 export function getCurrencySymbol() {
   return getCurrencyInfo(_settings.displayCurrency).symbol;
 }
+
+// ══════════════════════════════════════════════════════════════
+// Device categories — Network vs Asset
+// ══════════════════════════════════════════════════════════════
+
+// Network devices appear in topology
+export const NETWORK_TYPES = ["router","modem","switch","ap","client","server"];
+
+// Asset devices DON'T appear in topology — they're capital assets
+export const ASSET_TYPES = ["battery","solar","ups","generator","cooling","other"];
+
+export const ALL_DEVICE_TYPES = {
+  router:    { label: "راوتر",       icon: "🌐", isNetwork: true,  isAsset: true  },
+  modem:     { label: "موديم",       icon: "📡", isNetwork: true,  isAsset: true  },
+  switch:    { label: "سويتش",       icon: "🔀", isNetwork: true,  isAsset: true  },
+  ap:        { label: "Access Point", icon: "📶", isNetwork: true,  isAsset: true  },
+  client:    { label: "عميل",        icon: "💻", isNetwork: true,  isAsset: false },
+  server:    { label: "خادم",        icon: "🖧", isNetwork: true,  isAsset: true  },
+  battery:   { label: "بطارية",      icon: "🔋", isNetwork: false, isAsset: true  },
+  solar:     { label: "ألواح شمسية",  icon: "☀️", isNetwork: false, isAsset: true  },
+  ups:       { label: "UPS",         icon: "⚡", isNetwork: false, isAsset: true  },
+  generator: { label: "مولّد",       icon: "⚙️", isNetwork: false, isAsset: true  },
+  cooling:   { label: "تبريد",       icon: "❄️", isNetwork: false, isAsset: true  },
+  other:     { label: "أخرى",        icon: "📦", isNetwork: false, isAsset: true  }
+};
+
+export function isNetworkDevice(type) {
+  return ALL_DEVICE_TYPES[type]?.isNetwork || false;
+}
+
+export function isAssetDevice(type) {
+  return ALL_DEVICE_TYPES[type]?.isAsset !== false;
+}
+
+// ══════════════════════════════════════════════════════════════
+// Transaction categories
+// ══════════════════════════════════════════════════════════════
+
+export const EXPENSE_CATEGORIES = {
+  maintenance:  { label: "صيانة",      icon: "🔧", color: "#a855f7" },
+  electricity:  { label: "كهرباء",     icon: "⚡", color: "#f59e0b" },
+  rent:         { label: "إيجار",      icon: "🏢", color: "#ec4899" },
+  internet:     { label: "اشتراك إنترنت", icon: "📡", color: "#10b981" },
+  salary:       { label: "رواتب",      icon: "👥", color: "#8b5cf6" },
+  fuel:         { label: "وقود",       icon: "⛽", color: "#f97316" },
+  transport:    { label: "نقل",        icon: "🚚", color: "#06b6d4" },
+  marketing:    { label: "تسويق",      icon: "📢", color: "#ec4899" },
+  misc:         { label: "متفرقات",    icon: "📦", color: "#64748b" }
+};
+
+export const INCOME_CATEGORIES = {
+  subscription: { label: "اشتراكات",   icon: "💳", color: "#10b981" },
+  installation: { label: "تركيب",      icon: "🔌", color: "#06b6d4" },
+  service:      { label: "خدمات",      icon: "🛠️", color: "#a855f7" },
+  other_income: { label: "أخرى",       icon: "💰", color: "#64748b" }
+};
 
 // ══════════════════════════════════════════════════════════════
 // UI Helpers
@@ -143,7 +203,6 @@ export function toast(msg, type = "info") {
   }, 3000);
 }
 
-// Inject toast keyframes once
 if (!document.getElementById("__toastStyles")) {
   const s = document.createElement("style");
   s.id = "__toastStyles";
@@ -160,10 +219,10 @@ export function confirmDialog(message, danger = false) {
     modal.innerHTML = `
       <div style="font-size:42px;margin-bottom:12px">${danger ? '⚠️' : '❓'}</div>
       <div style="font-size:15px;font-weight:600;margin-bottom:6px;color:var(--text)">${danger ? 'تأكيد الحذف' : 'تأكيد'}</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px">${esc(message)}</div>
+      <div style="font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:20px">${esc(message)}</div>
       <div style="display:flex;gap:10px;justify-content:center">
-        <button class="cancel-btn" style="background:none;border:1px solid var(--border);color:var(--text2);border-radius:9px;padding:9px 22px;font-family:inherit;font-size:13px;cursor:pointer;transition:all .2s">إلغاء</button>
-        <button class="ok-btn" style="background:${danger?'#ef4444':'var(--accent)'};border:none;color:#fff;border-radius:9px;padding:9px 22px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s">${danger?'حذف':'موافق'}</button>
+        <button class="cancel-btn" style="background:none;border:1px solid var(--border);color:var(--text-2);border-radius:9px;padding:9px 22px;font-family:inherit;font-size:13px;cursor:pointer">إلغاء</button>
+        <button class="ok-btn" style="background:${danger?'#ef4444':'var(--accent)'};border:none;color:#fff;border-radius:9px;padding:9px 22px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">${danger?'حذف':'موافق'}</button>
       </div>
     `;
     overlay.appendChild(modal);
@@ -185,7 +244,7 @@ export function confirmDialog(message, danger = false) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// Sidebar component (injected by each page)
+// Sidebar
 // ══════════════════════════════════════════════════════════════
 
 export function renderSidebar(activePage) {
@@ -254,7 +313,6 @@ export function closeModal(id) {
   }
 }
 
-// Close on overlay click
 document.addEventListener("click", e => {
   if (e.target.classList && e.target.classList.contains("modal-overlay")) {
     e.target.classList.remove("open");
@@ -262,7 +320,6 @@ document.addEventListener("click", e => {
   }
 });
 
-// ESC key closes modals
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") {
     document.querySelectorAll(".modal-overlay.open").forEach(m => {
