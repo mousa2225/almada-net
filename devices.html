@@ -44,6 +44,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 <main class="main">
   <header class="topbar">
     <h1 class="tb-title">إدارة الأجهزة <span class="breadcrumb">/ الكل</span></h1>
+    <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" title="تبديل السمة">☀️</button>
     <input type="search" id="searchInput" class="search-input" placeholder="🔍 ابحث...">
     <button class="btn btn-sm" id="exportBtn">📤 تصدير CSV</button>
     <button class="btn btn-danger btn-sm" id="bulkDelBtn" style="display:none" onclick="bulkDelete()">🗑️ حذف <span id="selCount">0</span></button>

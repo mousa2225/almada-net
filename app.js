@@ -328,3 +328,34 @@ document.addEventListener("keydown", e => {
     });
   }
 });
+
+// ══════════════════════════════════════════════════════════════
+// Theme Switcher (Light / Dark)
+// ══════════════════════════════════════════════════════════════
+
+function getStoredTheme() {
+  try {
+    return localStorage.getItem("almada-theme") || "dark";
+  } catch (e) {
+    return "dark";
+  }
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  try { localStorage.setItem("almada-theme", theme); } catch (e) {}
+  // Update toggle icon
+  const btn = document.getElementById("themeToggle");
+  if (btn) btn.innerHTML = theme === "dark" ? "☀️" : "🌙";
+}
+
+export function toggleTheme() {
+  const cur = getStoredTheme();
+  applyTheme(cur === "dark" ? "light" : "dark");
+}
+
+// Apply theme immediately on load (before page renders)
+applyTheme(getStoredTheme());
+
+// Make toggleTheme available globally
+window.toggleTheme = toggleTheme;
