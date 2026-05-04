@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>إدارة الأجهزة — المدى نت</title>
-<link rel="stylesheet" href="theme.css?v=3">
+<link rel="stylesheet" href="theme.css?v=4">
 <style>
 .dev-cell{display:flex;align-items:center;gap:10px}
 .dev-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
@@ -49,16 +49,24 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
   function getStored(){
     try{return localStorage.getItem("almada-theme") || "dark";}catch(e){return "dark";}
   }
-  // Apply immediately
+  function loadCustomColors(){
+    try{
+      var custom = JSON.parse(localStorage.getItem("almada-custom-colors") || "{}");
+      Object.entries(custom).forEach(function(entry){
+        document.documentElement.style.setProperty(entry[0], entry[1]);
+      });
+    }catch(e){}
+  }
   applyTheme(getStored());
-  // Make global function
+  loadCustomColors();
   window.toggleTheme = function(){
     var cur = getStored();
     applyTheme(cur === "dark" ? "light" : "dark");
+    setTimeout(loadCustomColors, 50);
   };
-  // Sync icon on DOM ready
   document.addEventListener("DOMContentLoaded", function(){
     applyTheme(getStored());
+    loadCustomColors();
   });
 })();
 </script>
@@ -266,7 +274,7 @@ import {
   watchSettings, getSettings, fmt, getCurrencySymbol, convertToBase, convertFromBase,
   esc, renderSidebar, toast, openModal, closeModal, confirmDialog,
   ALL_DEVICE_TYPES, isNetworkDevice, isAssetDevice
-} from "./app.js?v=3";
+} from "./app.js?v=4";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("devices");
 

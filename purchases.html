@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>المشتريات والأصول — المدى نت</title>
-<link rel="stylesheet" href="theme.css?v=3">
+<link rel="stylesheet" href="theme.css?v=4">
 <style>
 .cat-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600}
 .action-btn{background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
@@ -29,16 +29,24 @@
   function getStored(){
     try{return localStorage.getItem("almada-theme") || "dark";}catch(e){return "dark";}
   }
-  // Apply immediately
+  function loadCustomColors(){
+    try{
+      var custom = JSON.parse(localStorage.getItem("almada-custom-colors") || "{}");
+      Object.entries(custom).forEach(function(entry){
+        document.documentElement.style.setProperty(entry[0], entry[1]);
+      });
+    }catch(e){}
+  }
   applyTheme(getStored());
-  // Make global function
+  loadCustomColors();
   window.toggleTheme = function(){
     var cur = getStored();
     applyTheme(cur === "dark" ? "light" : "dark");
+    setTimeout(loadCustomColors, 50);
   };
-  // Sync icon on DOM ready
   document.addEventListener("DOMContentLoaded", function(){
     applyTheme(getStored());
+    loadCustomColors();
   });
 })();
 </script>
@@ -132,7 +140,7 @@ import {
   watchSettings, fmt, getCurrencySymbol, convertFromBase,
   esc, renderSidebar, toast,
   isNetworkDevice, ALL_DEVICE_TYPES, EXPENSE_CATEGORIES
-} from "./app.js?v=3";
+} from "./app.js?v=4";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("purchases");
 watchSettings(s => {

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>التقارير المالية — المدى نت</title>
-<link rel="stylesheet" href="theme.css?v=3">
+<link rel="stylesheet" href="theme.css?v=4">
 <style>
 .profit-hero{border-radius:18px;padding:32px;margin-bottom:22px;border:2px solid;animation:fadeUp .5s ease both}
 .profit-hero.profit{background:linear-gradient(135deg,rgba(16,185,129,.1) 0%,rgba(6,182,212,.05) 100%);border-color:rgba(16,185,129,.3)}
@@ -57,16 +57,24 @@
   function getStored(){
     try{return localStorage.getItem("almada-theme") || "dark";}catch(e){return "dark";}
   }
-  // Apply immediately
+  function loadCustomColors(){
+    try{
+      var custom = JSON.parse(localStorage.getItem("almada-custom-colors") || "{}");
+      Object.entries(custom).forEach(function(entry){
+        document.documentElement.style.setProperty(entry[0], entry[1]);
+      });
+    }catch(e){}
+  }
   applyTheme(getStored());
-  // Make global function
+  loadCustomColors();
   window.toggleTheme = function(){
     var cur = getStored();
     applyTheme(cur === "dark" ? "light" : "dark");
+    setTimeout(loadCustomColors, 50);
   };
-  // Sync icon on DOM ready
   document.addEventListener("DOMContentLoaded", function(){
     applyTheme(getStored());
+    loadCustomColors();
   });
 })();
 </script>
@@ -179,7 +187,7 @@ import {
   watchSettings, fmt, getCurrencySymbol, convertFromBase,
   esc, renderSidebar, toast,
   isNetworkDevice, EXPENSE_CATEGORIES
-} from "./app.js?v=3";
+} from "./app.js?v=4";
 
 document.getElementById("sidebar").innerHTML = renderSidebar("reports");
 watchSettings(s => {
