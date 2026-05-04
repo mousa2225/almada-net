@@ -45,6 +45,30 @@
 .curr-old-new{display:flex;align-items:center;gap:12px;justify-content:center;background:var(--surface-2);border-radius:10px;padding:14px;margin-bottom:14px}
 .curr-pill{padding:8px 14px;background:var(--surface);border-radius:8px;font-weight:700;display:flex;align-items:center;gap:6px}
 </style>
+<script>
+(function(){
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t);
+    try{localStorage.setItem("almada-theme", t);}catch(e){}
+    var btn = document.getElementById("themeToggle");
+    if(btn) btn.innerHTML = t === "dark" ? "☀️" : "🌙";
+  }
+  function getStored(){
+    try{return localStorage.getItem("almada-theme") || "dark";}catch(e){return "dark";}
+  }
+  // Apply immediately
+  applyTheme(getStored());
+  // Make global function
+  window.toggleTheme = function(){
+    var cur = getStored();
+    applyTheme(cur === "dark" ? "light" : "dark");
+  };
+  // Sync icon on DOM ready
+  document.addEventListener("DOMContentLoaded", function(){
+    applyTheme(getStored());
+  });
+})();
+</script>
 </head>
 <body>
 <aside class="sidebar" id="sidebar"></aside>

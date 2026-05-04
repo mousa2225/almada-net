@@ -32,6 +32,30 @@
 .empty-state{text-align:center;padding:60px 20px;color:var(--text-3)}
 .empty-state .icon{font-size:48px;opacity:.3;margin-bottom:14px}
 </style>
+<script>
+(function(){
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t);
+    try{localStorage.setItem("almada-theme", t);}catch(e){}
+    var btn = document.getElementById("themeToggle");
+    if(btn) btn.innerHTML = t === "dark" ? "☀️" : "🌙";
+  }
+  function getStored(){
+    try{return localStorage.getItem("almada-theme") || "dark";}catch(e){return "dark";}
+  }
+  // Apply immediately
+  applyTheme(getStored());
+  // Make global function
+  window.toggleTheme = function(){
+    var cur = getStored();
+    applyTheme(cur === "dark" ? "light" : "dark");
+  };
+  // Sync icon on DOM ready
+  document.addEventListener("DOMContentLoaded", function(){
+    applyTheme(getStored());
+  });
+})();
+</script>
 </head>
 <body>
 <aside class="sidebar" id="sidebar"></aside>

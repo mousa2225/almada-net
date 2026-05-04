@@ -38,6 +38,30 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .topo-bridge .icon{color:var(--accent);font-size:14px;flex-shrink:0;margin-top:1px}
 .topo-bridge b{color:var(--accent)}
 </style>
+<script>
+(function(){
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t);
+    try{localStorage.setItem("almada-theme", t);}catch(e){}
+    var btn = document.getElementById("themeToggle");
+    if(btn) btn.innerHTML = t === "dark" ? "☀️" : "🌙";
+  }
+  function getStored(){
+    try{return localStorage.getItem("almada-theme") || "dark";}catch(e){return "dark";}
+  }
+  // Apply immediately
+  applyTheme(getStored());
+  // Make global function
+  window.toggleTheme = function(){
+    var cur = getStored();
+    applyTheme(cur === "dark" ? "light" : "dark");
+  };
+  // Sync icon on DOM ready
+  document.addEventListener("DOMContentLoaded", function(){
+    applyTheme(getStored());
+  });
+})();
+</script>
 </head>
 <body>
 <aside class="sidebar" id="sidebar"></aside>

@@ -55,6 +55,30 @@
 .qa-btn:hover{border-color:var(--accent);background:var(--accent-soft);transform:translateY(-2px)}
 .qa-icon{width:28px;height:28px;background:var(--accent-soft);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:13px}
 </style>
+<script>
+(function(){
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t);
+    try{localStorage.setItem("almada-theme", t);}catch(e){}
+    var btn = document.getElementById("themeToggle");
+    if(btn) btn.innerHTML = t === "dark" ? "☀️" : "🌙";
+  }
+  function getStored(){
+    try{return localStorage.getItem("almada-theme") || "dark";}catch(e){return "dark";}
+  }
+  // Apply immediately
+  applyTheme(getStored());
+  // Make global function
+  window.toggleTheme = function(){
+    var cur = getStored();
+    applyTheme(cur === "dark" ? "light" : "dark");
+  };
+  // Sync icon on DOM ready
+  document.addEventListener("DOMContentLoaded", function(){
+    applyTheme(getStored());
+  });
+})();
+</script>
 </head>
 <body>
 
